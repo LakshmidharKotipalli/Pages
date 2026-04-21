@@ -155,7 +155,6 @@ footer{position:relative;z-index:1;text-align:center;padding:1.8rem;
     <button id="clr" aria-label="Clear search">&times;</button>
   </div>
   <nav class="tb-links">
-    <a href="topics/summary.html">Interview Summary</a>
     <a href="llm-benchmark-guide.html">Benchmark Guide</a>
   </nav>
 </header>
@@ -165,7 +164,7 @@ footer{position:relative;z-index:1;text-align:center;padding:1.8rem;
   <h1>Everything you need to<br><em>build with AI</em></h1>
   <p class="hero-sub">Guides, deep dives, and references &#8212; from first principles to production systems.</p>
   <div class="stats">
-    <div class="stat"><div class="stat-v" id="vis-cnt">22</div><div class="stat-l">Resources</div></div>
+    <div class="stat"><div class="stat-v" id="vis-cnt">11</div><div class="stat-l">Resources</div></div>
     <div class="stat"><div class="stat-v">6</div><div class="stat-l">Categories</div></div>
     <div class="stat"><div class="stat-v">160+</div><div class="stat-l">Sections</div></div>
   </div>
@@ -182,7 +181,7 @@ footer{position:relative;z-index:1;text-align:center;padding:1.8rem;
 </div>
 
 <div class="rline" id="rline">
-  <span class="rline-count" id="rline-n">22</span>
+  <span class="rline-count" id="rline-n">11</span>
   <span id="rline-base"> resources</span>
   <span class="rline-query" id="rline-q"></span>
 </div>
@@ -207,33 +206,22 @@ var CAT = {
 
 var PAGES = [
   // Reference
-  {title:"LLM Benchmark Guide",          href:"llm-benchmark-guide.html",                icon:"⚡", type:"ref",   cat:"ref",         desc:"Which benchmarks matter and why — a practitioner’s guide to evaluating frontier models",      ac:"#F59E0B"},
-  {title:"Interview Prep Summary",        href:"topics/summary.html",                     icon:"📋",type:"ref",  cat:"ref",         desc:"Quick-reference summary across all 9 AI engineering topics for technical interviews",         ac:"#F59E0B"},
+  {title:"LLM Benchmark Guide",          href:"llm-benchmark-guide.html",             icon:"⚡", type:"ref",  cat:"ref",         desc:"Which benchmarks matter and why — a practitioner’s guide to evaluating frontier models",      ac:"#F59E0B"},
   // AI Foundations
-  {title:"LLM Fundamentals",              href:"required/llm-fundamentals.html",          icon:"🧬",type:"guide",cat:"foundations", desc:"Inside the mind of an AI — tokenisation, embeddings, attention, and inference explained",      ac:"#8B5CF6"},
-  {title:"Large Language Models",         href:"large-language-models.html",              icon:"🧠",type:"dive", cat:"foundations", desc:"How LLMs work — transformer architecture, training, scaling laws, and production deployment",  ac:"#F59E0B"},
-  {title:"AI Vision, Language & OCR",     href:"required/ai-complete-guide.html",         icon:"👁️",type:"guide",cat:"foundations", desc:"Complete guide to AI vision, language models, and optical character recognition systems",     ac:"#3B82F6"},
-  {title:"Prompt Engineering",            href:"required/prompt-engineering.html",        icon:"✍️",type:"guide",cat:"foundations", desc:"The art and science of writing effective prompts — techniques, patterns, and best practices",  ac:"#A855F7"},
+  {title:"Large Language Models",        href:"large-language-models.html",           icon:"🧠",type:"dive", cat:"foundations", desc:"How LLMs work — transformer architecture, training, scaling laws, and production deployment",  ac:"#F59E0B"},
   // Frameworks
-  {title:"LangChain + LangGraph Mastery", href:"required/langchain-langgraph-mastery.html",icon:"⛓️",type:"guide",cat:"frameworks",  desc:"Complete mastery guide — chains, memory, tools, agents, and stateful graph workflows",       ac:"#6366F1"},
-  {title:"LangChain",                     href:"langchain.html",                          icon:"🔗",type:"dive", cat:"frameworks",  desc:"Orchestration layer for building production LLM applications — chains, memory, retrievers",   ac:"#3B82F6"},
-  {title:"LangGraph",                     href:"langgraph.html",                          icon:"🔀",type:"dive", cat:"frameworks",  desc:"Stateful graph-based AI agent orchestration with memory, loops, and human-in-the-loop",       ac:"#8B5CF6"},
-  {title:"RAG Decoded",                   href:"required/rag-decoded.html",               icon:"🔍",type:"guide",cat:"frameworks",  desc:"Visual deep-dive into retrieval-augmented generation systems, pipelines, and architecture",   ac:"#10B981"},
-  {title:"Retrieval-Augmented Generation",href:"retrieval-augmented-generation.html",     icon:"📚",type:"dive", cat:"frameworks",  desc:"Combining LLMs with external knowledge retrieval for factually grounded, up-to-date responses",ac:"#10B981"},
+  {title:"LangChain",                    href:"langchain.html",                       icon:"🔗",type:"dive", cat:"frameworks",  desc:"Orchestration layer for building production LLM applications — chains, memory, retrievers",   ac:"#3B82F6"},
+  {title:"LangGraph",                    href:"langgraph.html",                       icon:"🔀",type:"dive", cat:"frameworks",  desc:"Stateful graph-based AI agent orchestration with memory, loops, and human-in-the-loop",       ac:"#8B5CF6"},
+  {title:"Retrieval-Augmented Generation",href:"retrieval-augmented-generation.html", icon:"📚",type:"dive", cat:"frameworks",  desc:"Combining LLMs with external knowledge retrieval for factually grounded, up-to-date responses",ac:"#10B981"},
   // Agents & Vision
-  {title:"AI Agents & MCP",               href:"ai-agents-mcp-ecosystem.html",            icon:"🤖",type:"dive", cat:"agents",      desc:"Autonomous agents with tools, skills, and the Model Context Protocol ecosystem",              ac:"#6366F1"},
-  {title:"Vision-Language Models",        href:"vision-language-models.html",             icon:"🌐",type:"dive", cat:"agents",      desc:"Multimodal AI that fuses vision and language — ViT, CLIP, projection layers, cross-attention", ac:"#EC4899"},
-  {title:"LLM Productionization",         href:"required/productionization.html",         icon:"🚀",type:"guide",cat:"agents",      desc:"Ship reliable AI systems — observability, evaluation, cost control, guardrails, and monitoring",ac:"#F59E0B"},
+  {title:"AI Agents & MCP",              href:"ai-agents-mcp-ecosystem.html",         icon:"🤖",type:"dive", cat:"agents",      desc:"Autonomous agents with tools, skills, and the Model Context Protocol ecosystem",              ac:"#6366F1"},
+  {title:"Vision-Language Models",       href:"vision-language-models.html",          icon:"🌐",type:"dive", cat:"agents",      desc:"Multimodal AI that fuses vision and language — ViT, CLIP, projection layers, cross-attention", ac:"#EC4899"},
   // Claude Code
-  {title:"Claude Code Mastery",           href:"required/claude-code-mastery.html",       icon:"⚡",type:"guide",cat:"claude",      desc:"The complete guide to Claude Code CLI — workflows, CLAUDE.md, hooks, MCP, and automation",    ac:"#EC4899"},
-  {title:"Claude Code Deep Dive",         href:"claude-code-mastery.html",                icon:"💡",type:"dive", cat:"claude",      desc:"Best practices and advanced patterns for AI-assisted software engineering at scale",           ac:"#A855F7"},
-  {title:"Claude Code Ecosystem",         href:"claude-code-ecosystem.html",              icon:"🛠️",type:"dive", cat:"claude",      desc:"Agentic terminal AI orchestrating sub-agents, memory, skills, plugins, and tools",             ac:"#8B5CF6"},
+  {title:"Claude Code Deep Dive",        href:"claude-code-mastery.html",             icon:"💡",type:"dive", cat:"claude",      desc:"Best practices and advanced patterns for AI-assisted software engineering at scale",           ac:"#A855F7"},
+  {title:"Claude Code Ecosystem",        href:"claude-code-ecosystem.html",           icon:"🛠️",type:"dive", cat:"claude",      desc:"Agentic terminal AI orchestrating sub-agents, memory, skills, plugins, and tools",             ac:"#8B5CF6"},
   // Infrastructure
-  {title:"Docker Ecosystem",              href:"docker-ecosystem.html",                   icon:"🐳",type:"dive", cat:"infra",       desc:"Containerisation, images, Compose, multi-stage builds, registries, and the full Docker stack", ac:"#2563EB"},
-  {title:"Kubernetes",                    href:"kubernetes.html",                         icon:"☸️",type:"dive", cat:"infra",       desc:"Container orchestration at scale — clusters, pods, services, Helm, GitOps, and observability",  ac:"#3B82F6"},
-  {title:"Modern Backend Stack",          href:"required/modern-backend-stack.html",      icon:"🏗️",type:"guide",cat:"infra",       desc:"APIs, FastAPI, Docker, Kubernetes — the complete modern backend engineer’s reference",         ac:"#2563EB"},
-  {title:"GCP Explorer",                  href:"required/gcp-explorer.html",              icon:"☁️",type:"guide",cat:"infra",       desc:"Google Cloud Platform services decoded — compute, storage, AI/ML, databases, and networking",   ac:"#EA4335"},
-  {title:"System Design",                 href:"required/system%20design.html",           icon:"📐",type:"guide",cat:"infra",       desc:"AI engineer’s system design mastery — scalability, reliability, trade-offs, and architecture",  ac:"#14B8A6"}
+  {title:"Docker Ecosystem",             href:"docker-ecosystem.html",                icon:"🐳",type:"dive", cat:"infra",       desc:"Containerisation, images, Compose, multi-stage builds, registries, and the full Docker stack", ac:"#2563EB"},
+  {title:"Kubernetes",                   href:"kubernetes.html",                      icon:"☸️",type:"dive", cat:"infra",       desc:"Container orchestration at scale — clusters, pods, services, Helm, GitOps, and observability",  ac:"#3B82F6"}
 ];
 
 // ── Chip counts ───────────────────────────────────

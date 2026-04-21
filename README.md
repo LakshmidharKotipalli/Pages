@@ -1,6 +1,6 @@
 # AI Engineering Hub
 
-A personal reference site for AI engineers — comprehensive guides, deep dives, and quick references on LLMs, agents, frameworks, and infrastructure.
+A personal reference site for AI engineers — comprehensive deep dives and quick references on LLMs, agents, frameworks, and infrastructure.
 
 **Live:** [LakshmidharKotipalli.github.io/Pages](https://LakshmidharKotipalli.github.io/Pages/)
 
@@ -8,16 +8,16 @@ A personal reference site for AI engineers — comprehensive guides, deep dives,
 
 ## What's inside
 
-22 resources across 6 categories, all accessible from the hub page with live search and category filtering.
+11 resources across 6 categories, all accessible from the hub page with live search and category filtering.
 
 | Category | Resources |
 |----------|-----------|
-| **AI Foundations** | LLM Fundamentals, Large Language Models, AI Vision & OCR, Prompt Engineering |
-| **Frameworks** | LangChain + LangGraph, LangChain, LangGraph, RAG Decoded, RAG Deep Dive |
-| **Agents & Vision** | AI Agents & MCP, Vision-Language Models, LLM Productionization |
-| **Claude Code** | Claude Code Mastery (guide + deep dive), Claude Code Ecosystem |
-| **Infrastructure** | Docker, Kubernetes, Modern Backend Stack, GCP Explorer, System Design |
-| **Reference** | LLM Benchmark Guide, Interview Prep Summary |
+| **Reference** | LLM Benchmark Guide |
+| **AI Foundations** | Large Language Models |
+| **Frameworks** | LangChain, LangGraph, Retrieval-Augmented Generation |
+| **Agents & Vision** | AI Agents & MCP, Vision-Language Models |
+| **Claude Code** | Claude Code Deep Dive, Claude Code Ecosystem |
+| **Infrastructure** | Docker Ecosystem, Kubernetes |
 
 Each **Deep Dive** combines 12–18 structured sections into a single scrollable page with:
 - Fixed sidebar navigation with scroll-spy
@@ -32,15 +32,10 @@ Each **Deep Dive** combines 12–18 structured sections into a single scrollable
 
 ```
 Pages/
-├── index.html                    # Hub — search, filter chips, all 22 cards
+├── index.html                    # Hub — search, filter chips, all 11 cards
 ├── llm-benchmark-guide.html      # Standalone benchmark reference
 │
 ├── <topic>.html                  # 10 combined deep-dive pages
-│
-├── required/                     # 10 standalone guide pages
-│
-├── topics/                       # Source sections for deep-dive pages
-│   └── <topic>/                  # 16–18 HTML section files per topic
 │
 ├── combine_topics.py             # Combines section files → single pages
 └── patch_combined.py             # Adds interactive JS to combined pages
@@ -50,13 +45,13 @@ Pages/
 
 ## Extending the site
 
-### Add a standalone guide
+### Add a standalone reference page
 
-1. Drop a self-contained HTML file in `required/`.
+1. Create a self-contained HTML file at the repo root.
 2. Add it to the `PAGES` array in `index.html`:
    ```js
-   { title:"Title", href:"required/slug.html", icon:"📘",
-     type:"guide", cat:"foundations", desc:"Description", ac:"#8B5CF6" }
+   { title:"Title", href:"slug.html", icon:"📘",
+     type:"ref", cat:"foundations", desc:"Description", ac:"#8B5CF6" }
    ```
 
 ### Add a topic deep-dive
