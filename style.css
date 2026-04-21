@@ -1,0 +1,52 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: sans-serif;
+  color: #222;
+  background: #fff;
+}
+
+nav {
+  background: #1a1a2e;
+  padding: 0 2rem;
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+nav a {
+  color: #eee;
+  text-decoration: none;
+  padding: 1rem 0;
+  display: inline-block;
+  font-size: 0.95rem;
+  letter-spacing: 0.03em;
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.2s;
+}
+
+nav a:hover,
+nav a.active {
+  border-bottom-color: #e94560;
+  color: #fff;
+}
+
+main {
+  max-width: 800px;
+  margin: 3rem auto;
+  padding: 0 1.5rem;
+}
+
+h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+p {
+  line-height: 1.7;
+  color: #444;
+}
