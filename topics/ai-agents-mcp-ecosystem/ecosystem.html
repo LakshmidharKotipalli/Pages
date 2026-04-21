@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Ecosystem - Learn AI Agents, Skills, Tools & MCP</title>
+    <link rel="stylesheet" href="../../css/styles.css">
+    <link rel="stylesheet" href="theme.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <a href="index.html" class="nav-back">Back to Overview</a>
+        <span class="current-section">The Ecosystem</span>
+        <div class="nav-links">
+            <a href="reference.html">Previous</a>
+            <a href="next.html">Next</a>
+        </div>
+    </nav>
+
+    <main>
+        <h1>The MCP Ecosystem</h1>
+
+        <div class="hero">
+            <p class="powerful-sentence">The MCP ecosystem is not a product — it is an emerging infrastructure layer, the same way TCP/IP is not a product but the foundation everything else is built on.</p>
+            <p class="explanation">In the hospital analogy: MCP is the medical records standard that lets a specialist in any department instantly access a patient's full history, labs, and imaging — regardless of which hospital system originally created each record. The ecosystem is every hospital, clinic, and specialist network that adopts the standard and gains the ability to interoperate.</p>
+        </div>
+
+        <!-- Ecosystem Mindmap SVG -->
+        <div class="diagram-container">
+            <h2>Ecosystem Map</h2>
+            <div class="architecture-diagram">
+                <svg viewBox="0 0 820 540" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+                    <defs>
+                        <marker id="ecoArrow" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
+                            <path d="M0,0 L0,6 L7,3 z" fill="#94a3b8"/>
+                        </marker>
+                    </defs>
+
+                    <!-- Central MCP node -->
+                    <ellipse cx="410" cy="270" rx="75" ry="50" fill="#3b82f6"/>
+                    <text x="410" y="265" text-anchor="middle" font-size="16" font-weight="bold" fill="white">MCP</text>
+                    <text x="410" y="283" text-anchor="middle" font-size="12" fill="#bfdbfe">Protocol</text>
+
+                    <!-- === MCP SERVER CATEGORIES === -->
+                    <!-- Top-left: Filesystem servers -->
+                    <ellipse cx="160" cy="100" rx="65" ry="38" fill="#10b981"/>
+                    <text x="160" y="96" text-anchor="middle" font-size="12" font-weight="bold" fill="white">Filesystem</text>
+                    <text x="160" y="112" text-anchor="middle" font-size="10" fill="#a7f3d0">Files, Git, Code</text>
+                    <line x1="215" y1="128" x2="345" y2="232" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#ecoArrow)"/>
+
+                    <!-- Top: Database servers -->
+                    <ellipse cx="410" cy="80" rx="70" ry="38" fill="#10b981"/>
+                    <text x="410" y="76" text-anchor="middle" font-size="12" font-weight="bold" fill="white">Databases</text>
+                    <text x="410" y="92" text-anchor="middle" font-size="10" fill="#a7f3d0">Postgres, SQLite, Redis</text>
+                    <line x1="410" y1="118" x2="410" y2="220" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#ecoArrow)"/>
+
+                    <!-- Top-right: API servers -->
+                    <ellipse cx="660" cy="100" rx="70" ry="38" fill="#10b981"/>
+                    <text x="660" y="96" text-anchor="middle" font-size="12" font-weight="bold" fill="white">API Servers</text>
+                    <text x="660" y="112" text-anchor="middle" font-size="10" fill="#a7f3d0">GitHub, Slack, Jira</text>
+                    <line x1="600" y1="128" x2="475" y2="232" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#ecoArrow)"/>
+
+                    <!-- Left: Web servers -->
+                    <ellipse cx="90" cy="270" rx="70" ry="38" fill="#10b981"/>
+                    <text x="90" y="266" text-anchor="middle" font-size="12" font-weight="bold" fill="white">Web Servers</text>
+                    <text x="90" y="282" text-anchor="middle" font-size="10" fill="#a7f3d0">Search, Fetch, Scrape</text>
+                    <line x1="160" y1="270" x2="335" y2="270" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#ecoArrow)"/>
+
+                    <!-- Right: Dev servers -->
+                    <ellipse cx="730" cy="270" rx="70" ry="38" fill="#10b981"/>
+                    <text x="730" y="266" text-anchor="middle" font-size="12" font-weight="bold" fill="white">Dev Servers</text>
+                    <text x="730" y="282" text-anchor="middle" font-size="10" fill="#a7f3d0">Analysis, Test, Deploy</text>
+                    <line x1="660" y1="270" x2="485" y2="270" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#ecoArrow)"/>
+
+                    <!-- === AGENT FRAMEWORKS === -->
+                    <!-- Bottom-left: LangChain/LangGraph -->
+                    <ellipse cx="160" cy="440" rx="75" ry="38" fill="#8b5cf6"/>
+                    <text x="160" y="436" text-anchor="middle" font-size="12" font-weight="bold" fill="white">LangChain/</text>
+                    <text x="160" y="451" text-anchor="middle" font-size="11" font-weight="bold" fill="white">LangGraph</text>
+                    <line x1="215" y1="412" x2="345" y2="308" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#ecoArrow)"/>
+
+                    <!-- Bottom: CrewAI + Autogen -->
+                    <ellipse cx="410" cy="460" rx="70" ry="38" fill="#8b5cf6"/>
+                    <text x="410" y="454" text-anchor="middle" font-size="12" font-weight="bold" fill="white">CrewAI</text>
+                    <text x="410" y="470" text-anchor="middle" font-size="10" fill="#e9d5ff">Autogen, AutoGPT</text>
+                    <line x1="410" y1="422" x2="410" y2="320" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#ecoArrow)"/>
+
+                    <!-- Bottom-right: Anthropic + Vercel -->
+                    <ellipse cx="660" cy="440" rx="75" ry="38" fill="#8b5cf6"/>
+                    <text x="660" y="434" text-anchor="middle" font-size="12" font-weight="bold" fill="white">Anthropic SDK</text>
+                    <text x="660" y="450" text-anchor="middle" font-size="10" fill="#e9d5ff">Vercel AI SDK</text>
+                    <line x1="600" y1="412" x2="475" y2="308" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#ecoArrow)"/>
+
+                    <!-- === IDE Integrations === -->
+                    <rect x="270" y="200" width="100" height="30" rx="4" fill="#f59e0b" opacity="0.2"/>
+
+                    <!-- Legend -->
+                    <rect x="30" y="495" width="14" height="14" rx="3" fill="#10b981"/>
+                    <text x="50" y="507" font-size="11" fill="#64748b">MCP Servers</text>
+                    <rect x="140" y="495" width="14" height="14" rx="3" fill="#8b5cf6"/>
+                    <text x="160" y="507" font-size="11" fill="#64748b">Agent Frameworks</text>
+                    <ellipse cx="285" cy="502" rx="20" ry="8" fill="#3b82f6"/>
+                    <text x="312" y="507" font-size="11" fill="#64748b">MCP Protocol Core</text>
+
+                    <!-- IDE labels inside central area -->
+                    <text x="410" y="248" text-anchor="middle" font-size="9" fill="#bfdbfe">Claude Code</text>
+                    <text x="410" y="260" text-anchor="middle" font-size="9" fill="#bfdbfe">Cursor · Windsurf</text>
+                </svg>
+            </div>
+        </div>
+
+        <!-- MCP Server Categories -->
+        <h2>MCP Server Categories</h2>
+        <div class="accordion" id="server-categories">
+
+            <div class="accordion-item">
+                <div class="accordion-header">Filesystem Servers</div>
+                <div class="accordion-content">
+                    <p>Filesystem servers are the foundation of code-aware agents. They expose the ability to read, write, list, search, and watch files — giving agents visibility into project structure and the ability to modify it. The official Anthropic filesystem MCP server is the reference implementation, covering the common operations any code agent needs.</p>
+                    <p><strong>Key capabilities:</strong> Directory listing with recursive options, file read with encoding detection, file write with atomic operations (write-then-rename to prevent partial writes), file search with pattern matching, and git status/diff operations when the server includes git integration.</p>
+                    <p><strong>Production consideration:</strong> Scope filesystem servers to specific directories using MCP Roots. An agent working on a frontend project should have no access to the database configuration directory or the secrets directory. Roots enforce this at the protocol level — the server literally cannot see paths outside the configured roots, regardless of what the agent requests.</p>
+                    <div class="card warning">
+                        <strong>Critical pattern:</strong> Implement read-before-write confirmation for any file that has been modified recently (within the last hour). This prevents race conditions when multiple agents or users are editing the same files simultaneously.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">Database Servers</div>
+                <div class="accordion-content">
+                    <p>Database MCP servers are among the highest-value and highest-risk servers in the ecosystem. They provide agents with direct query access to structured data — enabling powerful capabilities like schema introspection, data analysis, and automated reporting. The risk profile is proportional to the data's sensitivity and the permissions granted.</p>
+                    <p><strong>PostgreSQL:</strong> The most widely deployed database server. Mature implementations support schema discovery (allowing the agent to understand the database structure before querying), parameterized query execution (preventing SQL injection), and read replica routing (directing SELECT queries to replicas to protect the primary).</p>
+                    <p><strong>SQLite:</strong> Ideal for development, local analysis, and lightweight production use cases. SQLite servers enable agents to work with local data files — embedding SQLite as the data storage mechanism for agent state is a common pattern for persistent memory implementations.</p>
+                    <p><strong>Redis:</strong> Cache and session store access. Redis servers enable agents to read application cache state (useful for debugging) and interact with queue systems (useful for work coordination).</p>
+                    <p><strong>The safety architecture for database servers:</strong> Separate read and write permissions at the database user level. The read user has SELECT on all tables; the write user has INSERT/UPDATE on specific tables only; the admin user has no MCP exposure at all. Never expose a superuser through an MCP server.</p>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">API Servers (GitHub, Slack, Jira, etc.)</div>
+                <div class="accordion-content">
+                    <p>API servers are the connective tissue between agent systems and the services organizations already live in. They translate MCP's generic tool calling protocol into the specific API calls, authentication flows, and response formats of each service.</p>
+                    <p><strong>GitHub MCP server:</strong> Exposes repository management, issue and pull request operations, code search, and Actions workflow management. The GitHub server is the most widely used MCP server in production — nearly every engineering agent needs some GitHub integration. Well-designed implementations use fine-grained personal access tokens scoped to the specific repositories and operations the agent needs.</p>
+                    <p><strong>Slack MCP server:</strong> Enables agents to read channel history, search messages, post to channels, and manage notifications. The most common use case is agents that surface relevant Slack context during code review (linking to the discussion where a design decision was made) and agents that post progress updates to team channels without requiring manual status reporting.</p>
+                    <p><strong>Jira and Linear:</strong> Project management API servers enable agents to create issues, update ticket status, link code changes to tickets, and generate sprint reports. The bidirectional connection — agent reads Jira context to understand requirements, agent writes back to Jira to report progress — creates a closed feedback loop that dramatically reduces project management overhead.</p>
+                    <p><strong>The proliferation risk:</strong> API servers require API credentials. Each server requires careful credential management: scoped OAuth tokens, rotation schedules, and revocation procedures. As the number of API servers grows, credential management becomes its own operational discipline.</p>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">Web Servers (Search, Fetch, Scrape)</div>
+                <div class="accordion-content">
+                    <p>Web servers give agents access to the open internet — the ability to search for current information, fetch specific pages, and extract structured data from web content. This is what differentiates a knowledge-bounded agent (limited to its training data) from a knowledge-current agent (able to access any publicly available information).</p>
+                    <p><strong>Search servers:</strong> Wrap search APIs (Brave, Google Custom Search, Bing, DuckDuckGo) into standardized MCP tools. The key design challenge: returning results that are useful to the model without consuming excessive tokens. Best practice is to return title, URL, and a 150-character snippet per result — let the model decide which results to fetch in full.</p>
+                    <p><strong>Fetch servers:</strong> Given a URL, return the content of that page in a format the model can reason about. Raw HTML is inefficient — a good fetch server strips HTML, extracts the main content, converts to Markdown, and returns the cleaned text. This can reduce the token cost of a web page from 50,000 tokens (raw HTML) to 2,000 tokens (cleaned Markdown).</p>
+                    <p><strong>Scrape servers:</strong> More sophisticated web servers that handle JavaScript-rendered pages, navigate multi-step flows, and extract structured data from complex layouts. Scrape servers typically use headless browsers internally. They are more expensive (runtime cost) but handle a much wider range of web content.</p>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">Development Servers (Code Analysis, Testing, Deployment)</div>
+                <div class="accordion-content">
+                    <p>Development servers complete the code agent toolkit — going beyond reading and writing files to actually understanding code structure, executing tests, and deploying artifacts. These are the highest-leverage servers for engineering organizations.</p>
+                    <p><strong>Code analysis servers:</strong> Expose static analysis, dependency graphs, type information, and code metrics as MCP tools. Instead of the agent manually reading and parsing code to understand structure, it can ask the analysis server: "What functions does this module export? What tests cover this function? What is the cyclomatic complexity of this method?" This dramatically improves the quality of code modifications by giving the agent accurate structural context.</p>
+                    <p><strong>Testing servers:</strong> Enable agents to run test suites, parse test results, identify failing tests, and measure coverage deltas. The feedback loop from code change to test result is the core of reliable code-writing agents. Without a testing server, the agent is writing code blind — it has no way to verify its changes work.</p>
+                    <p><strong>Deployment servers:</strong> The highest-risk category. Deployment servers expose build, containerization, and deployment operations. The safety architecture described in the reference section is mandatory here: environment-explicit parameters, dry-run modes, confirmation gates for production, and rollback procedures accessible as tools.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Agent Frameworks -->
+        <h2>Agent Frameworks and MCP Integration</h2>
+        <div class="sections-grid">
+            <div class="section-card">
+                <h3>LangChain / LangGraph</h3>
+                <p>LangChain is the most widely adopted agent framework, providing abstractions for chains, agents, memory, and retrieval. LangGraph extends it with graph-based workflow orchestration — enabling complex multi-step agent systems where nodes in the graph are agent steps and edges are conditional transitions.</p>
+                <p>MCP integration: LangChain supports MCP through tool adapters that translate MCP tool definitions into LangChain's tool format. This allows any MCP server to be used as a LangChain tool source without custom integration code.</p>
+                <p><strong>Best for:</strong> Teams already invested in the LangChain ecosystem; complex RAG pipelines; production systems requiring the rich observability tooling LangSmith provides.</p>
+            </div>
+            <div class="section-card">
+                <h3>CrewAI</h3>
+                <p>CrewAI focuses specifically on multi-agent collaboration — the orchestration of specialized agents ("crew members") with defined roles, goals, and tools. The framework's primary abstraction is the crew: a group of agents that collaborate on a shared task by dividing it according to each member's specialty.</p>
+                <p>MCP integration: CrewAI can use MCP tools as the tool source for individual agents within a crew, connecting each specialist agent to the specific MCP servers relevant to its role.</p>
+                <p><strong>Best for:</strong> Use cases that are naturally multi-agent — code review, research synthesis, content generation pipelines. Less well-suited to single-agent use cases where its multi-agent scaffolding adds overhead.</p>
+            </div>
+            <div class="section-card">
+                <h3>Autogen (Microsoft)</h3>
+                <p>Autogen is Microsoft's multi-agent framework, notable for its conversational multi-agent model — agents communicate by sending messages to each other in a structured conversation. This model maps naturally to workflows where agents need to negotiate, critique, and refine each other's work.</p>
+                <p>MCP integration: Autogen supports function calling with any OpenAI-compatible API and is building native MCP client support. The framework's focus on Microsoft ecosystem integration (Azure, Teams, Office) makes it particularly relevant for enterprise deployments on Microsoft infrastructure.</p>
+                <p><strong>Best for:</strong> Enterprise teams on Microsoft infrastructure; use cases involving document review, compliance checking, and workflows that mirror human collaborative work patterns.</p>
+            </div>
+            <div class="section-card">
+                <h3>Anthropic Agent SDK</h3>
+                <p>The Anthropic Agent SDK is the reference implementation for building agents on Claude, designed with MCP as a first-class citizen from the start. It handles the MCP client lifecycle, capability negotiation, and tool call routing natively — no adapters or translation layers required.</p>
+                <p>The SDK's design reflects production lessons from Claude Code and other Anthropic products: explicit context management, built-in observability hooks, and safety architecture patterns baked into the framework rather than left to the developer.</p>
+                <p><strong>Best for:</strong> Teams building on Claude who want the tightest possible integration with Anthropic's models and MCP ecosystem. The reference choice for new projects starting in 2025.</p>
+            </div>
+            <div class="section-card">
+                <h3>Vercel AI SDK</h3>
+                <p>The Vercel AI SDK is the leading framework for building AI-powered web applications — it provides React hooks, streaming utilities, and multi-provider support (OpenAI, Anthropic, Google, etc.) in a single unified API. Its focus is on the frontend integration layer: streaming responses, generative UI, and tool call visualization.</p>
+                <p>MCP integration: Vercel AI SDK includes MCP client support, allowing web applications to connect to MCP servers and expose their capabilities through the SDK's unified tool interface. This enables browser-based agents with rich streaming UIs backed by MCP tool servers.</p>
+                <p><strong>Best for:</strong> Web application developers building AI features; products where streaming UI and generative interfaces are core to the experience; multi-provider deployments that need to swap models without changing application code.</p>
+            </div>
+            <div class="section-card">
+                <h3>Framework Selection Guide</h3>
+                <p>The right framework depends on your primary constraint:</p>
+                <ul>
+                    <li><strong>Multi-agent complexity is the concern:</strong> LangGraph or CrewAI</li>
+                    <li><strong>Enterprise / Microsoft ecosystem:</strong> Autogen</li>
+                    <li><strong>Tight Claude + MCP integration:</strong> Anthropic Agent SDK</li>
+                    <li><strong>Web application with streaming UI:</strong> Vercel AI SDK</li>
+                    <li><strong>Multi-model / provider flexibility:</strong> LangChain or Vercel AI SDK</li>
+                </ul>
+                <p>The ecosystem is converging — all frameworks are adding MCP support. The framework choice is increasingly about developer experience and deployment model rather than fundamental capability differences.</p>
+            </div>
+        </div>
+
+        <!-- IDE Integrations -->
+        <h2>IDE Integrations</h2>
+        <div class="card info">
+            <p>The IDE is where MCP becomes tangible for most developers. IDE integrations are MCP clients that use the protocol to extend the editor's AI capabilities — connecting the model to the developer's actual codebase, development environment, and workflow tools.</p>
+        </div>
+        <div class="sections-grid">
+            <div class="section-card">
+                <h3>Claude Code</h3>
+                <p>Claude Code is a terminal-first, high-autonomy coding agent built by Anthropic. It operates as a full MCP client, connecting to filesystem, git, and development MCP servers to build an accurate model of the codebase. Claude Code's design philosophy: give the agent the same access a senior developer would have, with safety guardrails enforced by the protocol layer rather than by restricting the agent's capability surface.</p>
+            </div>
+            <div class="section-card">
+                <h3>Cursor</h3>
+                <p>Cursor is a VS Code fork with deep AI integration. It uses MCP to extend beyond code assistance into broader development workflow — connecting to documentation, issue tracking, and test execution through MCP servers. Cursor's MCP integration is notably user-configurable, allowing developers to connect any MCP server to the IDE through a configuration file.</p>
+            </div>
+            <div class="section-card">
+                <h3>Windsurf (Codeium)</h3>
+                <p>Windsurf is Codeium's agent-first IDE, designed from the ground up around the flow state paradigm — the idea that the IDE should handle the mechanical work so the developer can focus on the creative work. Windsurf's Cascade agent is a deep MCP client with tight IDE integration: understanding the open tabs, the terminal session state, and the project structure as a unified context.</p>
+            </div>
+            <div class="section-card">
+                <h3>GitHub Copilot in VS Code</h3>
+                <p>GitHub Copilot's integration in VS Code is evolving from inline completion toward a full agent model. The @workspace context feature is an early form of MCP-like tool use — the model can query the workspace structure and file contents. Microsoft is actively investing in MCP support for Copilot, motivated by GitHub's position as the source of truth for code in most engineering organizations.</p>
+            </div>
+        </div>
+
+        <!-- Community & Governance -->
+        <h2>Community and Governance</h2>
+        <div class="accordion" id="governance">
+            <div class="accordion-item">
+                <div class="accordion-header">MCP Specification Process</div>
+                <div class="accordion-content">
+                    <p>The MCP specification is developed openly on GitHub under Anthropic's stewardship. The specification process follows a proposal-review-acceptance workflow similar to other open standards: community members propose changes through GitHub issues and pull requests; Anthropic's core team reviews for consistency, security implications, and backward compatibility; accepted proposals are incorporated into the specification.</p>
+                    <p>The specification is versioned using a date-based scheme. Clients and servers declare their protocol version during the capability negotiation handshake, enabling backward compatibility as the specification evolves.</p>
+                    <p><strong>The governance tension:</strong> MCP was created by Anthropic, and Anthropic has final say on the specification. This creates natural tension with the open ecosystem goal — will Anthropic's competitive interests ever conflict with the ecosystem's interests? The historical precedent from successful open standards (HTTP, OAuth) suggests that when a standard gains sufficient network effect, the creating organization's incentive shifts from control to stewardship. The MCP community is watching this dynamic carefully.</p>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <div class="accordion-header">Community Contributions and Server Registries</div>
+                <div class="accordion-content">
+                    <p>The Anthropic-maintained GitHub repository at modelcontextprotocol/servers is the primary registry for community MCP servers. It contains both official reference servers (maintained by Anthropic) and community-contributed servers spanning hundreds of integrations. The quality of community servers varies significantly — from production-grade implementations used by thousands of developers to exploratory prototypes.</p>
+                    <p>Third-party registries have emerged to provide curated access to the server ecosystem: mcp.so, Smithery, and others provide search, filtering by quality tier, and one-click installation. These registries are filling the gap between "a GitHub repository of links" and "a proper package registry with quality standards."</p>
+                    <p><strong>The quality signal problem:</strong> GitHub stars are a poor quality signal for MCP servers — a server can have many stars because it was the first to implement a popular integration, not because it's well-implemented. The community is developing better quality signals: automated testing of server tool calls, usage telemetry for adoption metrics, and community review processes for high-impact servers.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Network Effect -->
+        <h2>The Network Effect</h2>
+        <div class="card success">
+            <h2>Why Each New Server Makes Every Agent Smarter</h2>
+            <p>The MCP ecosystem exhibits a compounding network effect that is worth understanding precisely, because it explains why the ecosystem's growth rate matters as much as its current size.</p>
+            <p>When a new MCP server is published — say, a server for a specialized medical imaging database — it doesn't just benefit agents that work with medical imaging. It benefits:</p>
+            <ul>
+                <li>Every MCP client that could potentially connect to it (all current and future Claude Code users, Cursor users, custom agent deployments)</li>
+                <li>Every multi-agent system where one agent could use medical imaging data to inform another agent's decision</li>
+                <li>Every existing MCP server that could be composed with it (a diagnostic agent that combines medical imaging with electronic health records)</li>
+            </ul>
+            <p>The value isn't additive (each new server adds a fixed increment of value). It's multiplicative (each new server multiplies the value of existing servers through new composition opportunities). This is the Metcalfe's Law dynamic that explains why open protocol ecosystems tend to generate outsized value compared to closed ecosystems with the same number of integrations.</p>
+            <p>The practical implication for teams building on MCP: every MCP server your team publishes internally — even for your own proprietary data sources — makes every other agent in your organization more capable. The investment in building MCP servers rather than point integrations compounds over time in a way that point integrations do not.</p>
+        </div>
+    </main>
+
+    <footer class="section-footer">
+        <a href="reference.html" class="btn">Previous: Quick Reference</a>
+        <a href="next.html" class="btn">Next: What's Next</a>
+    </footer>
+
+    <script src="../../js/components.js"></script>
+</body>
+</html>

@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LangGraph Learning Journey — Complete Mastery Path</title>
+    <meta name="description" content="A comprehensive, production-focused guide to LangGraph — the stateful, graph-based framework for building reliable AI agent workflows with memory, human oversight, and complex reasoning patterns.">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* ── Hero ── */
+        .hero {
+            background: linear-gradient(135deg, #0D1117 0%, #1a0a2e 40%, #0e0526 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 80px 0 60px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 600px 300px at 30% 50%, rgba(139,92,246,0.12) 0%, transparent 70%),
+                radial-gradient(ellipse 400px 200px at 80% 30%, rgba(91,33,182,0.10) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .hero-eyebrow {
+            display: inline-block;
+            background: rgba(139,92,246,0.15);
+            border: 1px solid rgba(139,92,246,0.4);
+            color: var(--primary);
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 6px 18px;
+            border-radius: 20px;
+            margin-bottom: 28px;
+        }
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3.4rem);
+            font-weight: 800;
+            color: #fff;
+            border: none;
+            margin: 0 0 24px;
+            line-height: 1.15;
+        }
+        .hero h1 span { color: var(--primary); }
+        .hero-desc {
+            max-width: 680px;
+            margin: 0 auto 40px;
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            line-height: 1.8;
+        }
+        .hero-cta {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* ── Feature strip ── */
+        .feature-strip {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 0;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 48px 0;
+            background: var(--bg-secondary);
+        }
+        .feature-item {
+            padding: 28px 24px;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .feature-item:last-child { border-right: none; }
+        .feature-icon {
+            font-size: 1.6rem;
+            margin-bottom: 4px;
+        }
+        .feature-label {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--text);
+        }
+        .feature-sub {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        /* ── Section grid heading ── */
+        .section-heading {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 56px 0 28px;
+        }
+        .section-heading h2 {
+            margin: 0;
+            font-size: 1.6rem;
+        }
+        .section-heading::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* ── Nav cards grid ── */
+        .sections-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+            gap: 18px;
+            margin-bottom: 56px;
+        }
+        .nav-card {
+            position: relative;
+        }
+        .nav-card .card-tag {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            font-size: 0.7rem;
+            background: rgba(139,92,246,0.15);
+            color: var(--primary);
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        .nav-card .section-number {
+            font-size: 0.72rem;
+        }
+        .nav-card h3 {
+            font-size: 1.05rem;
+            margin: 10px 0 8px;
+        }
+        .nav-card p {
+            font-size: 0.88rem;
+            line-height: 1.55;
+        }
+
+        /* ── Ecosystem ── */
+        .eco-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+        .eco-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 22px 18px;
+            text-align: center;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: var(--text);
+        }
+        .eco-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(139,92,246,0.18);
+        }
+        .eco-card-icon {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+        .eco-card-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--primary);
+            margin-bottom: 6px;
+        }
+        .eco-card-desc {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* ── Analogy banner ── */
+        .analogy-banner {
+            background: linear-gradient(135deg, rgba(139,92,246,0.08) 0%, rgba(91,33,182,0.05) 100%);
+            border: 1px solid rgba(139,92,246,0.25);
+            border-radius: 12px;
+            padding: 32px 36px;
+            margin: 40px 0;
+            display: flex;
+            gap: 24px;
+            align-items: flex-start;
+        }
+        .analogy-icon {
+            font-size: 2.4rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .analogy-body h3 {
+            margin: 0 0 10px;
+            color: var(--primary);
+            font-size: 1.15rem;
+        }
+        .analogy-body p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+        .analogy-map {
+            margin-top: 16px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 8px;
+        }
+        .analogy-pair {
+            background: var(--bg);
+            border-radius: 6px;
+            padding: 10px 14px;
+            font-size: 0.85rem;
+        }
+        .analogy-pair .atc { color: var(--accent); font-weight: 600; }
+        .analogy-pair .lg { color: var(--primary); font-weight: 600; }
+        .analogy-pair .sep { color: var(--text-muted); margin: 0 6px; }
+
+        /* ── Footer ── */
+        .site-footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            padding: 32px 0;
+            margin-top: 64px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero { padding: 56px 0 40px; }
+            .analogy-banner { flex-direction: column; }
+            .feature-strip { grid-template-columns: 1fr 1fr; }
+            .feature-item { border-right: none; border-bottom: 1px solid var(--border); }
+            .feature-item:last-child { border-bottom: none; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════ NAVBAR ═══════════════════════════════════════ -->
+<nav class="navbar" role="navigation" aria-label="Main navigation">
+    <div class="container">
+        <span class="logo">&#9670; LangGraph Learning Journey</span>
+        <div class="nav-links">
+            <a href="#sections">Sections</a>
+            <a href="#ecosystem">Ecosystem</a>
+            <a href="01-foundation.html">Start Learning</a>
+        </div>
+    </div>
+</nav>
+
+<!-- ═══════════════════════════════════════ HERO ═══════════════════════════════════════ -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-eyebrow">Production-Grade AI Agent Framework</div>
+        <h1>Your Complete Path to<br><span>LangGraph Mastery</span></h1>
+        <p class="hero-desc">
+            LangGraph is the stateful, graph-based framework that transforms AI agents from unpredictable scripts
+            into reliable, production-grade workflows with memory, human oversight, and complex reasoning patterns.
+            This journey takes you from zero to architect — with real examples, war stories, and interview-ready answers.
+        </p>
+        <div class="hero-cta">
+            <a href="01-foundation.html" class="button primary">Begin with Foundation &rarr;</a>
+            <a href="#sections" class="button secondary">Browse All Sections</a>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════ FEATURES ═══════════════════════════════════════ -->
+<div class="container">
+    <div class="feature-strip">
+        <div class="feature-item">
+            <div class="feature-icon">&#128218;</div>
+            <div class="feature-label">17 Comprehensive Sections</div>
+            <div class="feature-sub">From first principles to production war stories — nothing skipped</div>
+        </div>
+        <div class="feature-item">
+            <div class="feature-icon">&#127891;</div>
+            <div class="feature-label">Interview Ready</div>
+            <div class="feature-sub">7 deep interview question trees with follow-ups and production narratives</div>
+        </div>
+        <div class="feature-item">
+            <div class="feature-icon">&#9881;</div>
+            <div class="feature-label">Production Focused</div>
+            <div class="feature-sub">Scale patterns, failure modes, debugging strategies from real systems</div>
+        </div>
+        <div class="feature-item">
+            <div class="feature-icon">&#127758;</div>
+            <div class="feature-label">Full Ecosystem Coverage</div>
+            <div class="feature-sub">LangSmith, Studio, Platform, LangChain integration — the entire stack</div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ ANALOGY BANNER ═══════════════════════════════════════ -->
+    <div class="analogy-banner">
+        <div class="analogy-icon">&#9992;</div>
+        <div class="analogy-body">
+            <h3>The Living Analogy Used Throughout This Journey: Air Traffic Control</h3>
+            <p>
+                Every concept in LangGraph maps cleanly onto the Air Traffic Control system. Once you internalize this
+                mental model, LangGraph's design decisions stop feeling arbitrary and start feeling inevitable.
+                The analogy shows up in every section — building your intuition before the code ever appears.
+            </p>
+            <div class="analogy-map">
+                <div class="analogy-pair">
+                    <span class="atc">&#9992; Airspace</span>
+                    <span class="sep">&rarr;</span>
+                    <span class="lg">StateGraph</span>
+                </div>
+                <div class="analogy-pair">
+                    <span class="atc">&#127963; Control Tower</span>
+                    <span class="sep">&rarr;</span>
+                    <span class="lg">Node</span>
+                </div>
+                <div class="analogy-pair">
+                    <span class="atc">&#128740; Flight Path</span>
+                    <span class="sep">&rarr;</span>
+                    <span class="lg">Edge</span>
+                </div>
+                <div class="analogy-pair">
+                    <span class="atc">&#9992; Airplane + Cargo</span>
+                    <span class="sep">&rarr;</span>
+                    <span class="lg">State</span>
+                </div>
+                <div class="analogy-pair">
+                    <span class="atc">&#128444; Flight Recorder</span>
+                    <span class="sep">&rarr;</span>
+                    <span class="lg">Checkpointer</span>
+                </div>
+                <div class="analogy-pair">
+                    <span class="atc">&#128104;&#8205;&#9992; ATC Controller</span>
+                    <span class="sep">&rarr;</span>
+                    <span class="lg">Human-in-the-Loop</span>
+                </div>
+                <div class="analogy-pair">
+                    <span class="atc">&#127758; Regional Airspace</span>
+                    <span class="sep">&rarr;</span>
+                    <span class="lg">Subgraph</span>
+                </div>
+                <div class="analogy-pair">
+                    <span class="atc">&#129516; The Pilot</span>
+                    <span class="sep">&rarr;</span>
+                    <span class="lg">LLM</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ SECTIONS GRID ═══════════════════════════════════════ -->
+    <div class="section-heading" id="sections">
+        <h2>All Sections</h2>
+    </div>
+
+    <div class="sections-grid">
+
+        <!-- Section 1 -->
+        <a href="01-foundation.html" class="nav-card">
+            <span class="section-number">Section 1</span>
+            <span class="card-tag">Start Here</span>
+            <h3>Foundation &amp; Context</h3>
+            <p>What LangGraph really is, the problems it solves, core architecture, and why it was built the way it was. Includes the essential terminology table and historical timeline from 2022 to 2025.</p>
+        </a>
+
+        <!-- Section 2 -->
+        <a href="02-analogy.html" class="nav-card">
+            <span class="section-number">Section 2</span>
+            <span class="card-tag">Mental Model</span>
+            <h3>Living Analogy — Air Traffic Control</h3>
+            <p>The complete Air Traffic Control analogy unpacked layer by layer. State as the airplane, nodes as control towers, edges as flight paths, checkpointer as the black box, and the human controller intervention pattern.</p>
+        </a>
+
+        <!-- Section 3A -->
+        <a href="03a-learning-journey.html" class="nav-card">
+            <span class="section-number">Section 3A</span>
+            <span class="card-tag">Skill Levels</span>
+            <h3>Learning Journey — 4 Levels</h3>
+            <p>Structured progression from Beginner (simple graphs, MemorySaver) through Intermediate (tools, HITL), Advanced (multi-agent, subgraphs), and Architect (design, scale, tradeoffs). Each level has projects and checkpoints.</p>
+        </a>
+
+        <!-- Section 3B -->
+        <a href="03b-interview.html" class="nav-card">
+            <span class="section-number">Section 3B</span>
+            <span class="card-tag">Interview Prep</span>
+            <h3>Interview Conversations</h3>
+            <p>Seven complete interview question trees — each with opening answer, follow-up questions, production stories you can tell, and signals to watch for. Covers architecture, debugging, scale, tradeoffs, and design.</p>
+        </a>
+
+        <!-- Section 4 -->
+        <a href="04-system-design.html" class="nav-card">
+            <span class="section-number">Section 4</span>
+            <span class="card-tag">Architecture</span>
+            <h3>System Design Integration</h3>
+            <p>How LangGraph fits into system design conversations. Reliability (retry, idempotency, checkpointing), Availability (stateless workers, persistent state), Latency (streaming, parallel nodes), and Observability (LangSmith tracing).</p>
+        </a>
+
+        <!-- Section 5 -->
+        <a href="05-ripple-effects.html" class="nav-card">
+            <span class="section-number">Section 5</span>
+            <span class="card-tag">Decision Impact</span>
+            <h3>Ripple Effects Map</h3>
+            <p>How architectural decisions cascade through your entire system. Change the checkpointer? Here is what breaks. Add a subgraph? Here is the operational cost. Remove human review? Here is the risk profile shift.</p>
+        </a>
+
+        <!-- Section 6 -->
+        <a href="06-evolution.html" class="nav-card">
+            <span class="section-number">Section 6</span>
+            <span class="card-tag">History</span>
+            <h3>Evolution Story</h3>
+            <p>From simple LangChain chains (2022) to sophisticated agent graphs (2025). Why LCEL wasn't enough, how LangGraph emerged from real production pain, the versioning story, and where the framework is heading next.</p>
+        </a>
+
+        <!-- Section 7 -->
+        <a href="07-patterns.html" class="nav-card">
+            <span class="section-number">Section 7</span>
+            <span class="card-tag">Best Practices</span>
+            <h3>Patterns &amp; Anti-Patterns</h3>
+            <p>Proven graph patterns: ReAct loop, supervisor multi-agent, hierarchical routing, parallel fan-out/fan-in, approval gate. Anti-patterns: God nodes, stateless graphs, missing cycle breakers, premature optimization.</p>
+        </a>
+
+        <!-- Section 8 -->
+        <a href="08-tradeoffs.html" class="nav-card">
+            <span class="section-number">Section 8</span>
+            <span class="card-tag">Decision Frameworks</span>
+            <h3>Trade-offs Analysis</h3>
+            <p>When to use MemorySaver vs PostgresSaver vs RedisSaver. When subgraphs are worth it. When HITL costs more than it protects. Structured decision frameworks for every major LangGraph architectural choice.</p>
+        </a>
+
+        <!-- Section 9 -->
+        <a href="09-at-scale.html" class="nav-card">
+            <span class="section-number">Section 9</span>
+            <span class="card-tag">Production Scale</span>
+            <h3>LangGraph at Scale</h3>
+            <p>What breaks at 1 million agent invocations and how to fix it. Checkpointer bottlenecks, thread ID design, state explosion, concurrent graph execution, horizontal scaling strategies, and cost management.</p>
+        </a>
+
+        <!-- Section 10 -->
+        <a href="10-landscape.html" class="nav-card">
+            <span class="section-number">Section 10</span>
+            <span class="card-tag">Ecosystem</span>
+            <h3>Technology Landscape</h3>
+            <p>LangGraph vs CrewAI vs AutoGen vs Haystack vs custom solutions. When each wins. Market positioning, migration considerations, and how to make the case internally for LangGraph vs alternatives.</p>
+        </a>
+
+        <!-- Section 11 -->
+        <a href="11-pitfalls.html" class="nav-card">
+            <span class="section-number">Section 11</span>
+            <span class="card-tag">War Stories</span>
+            <h3>Pitfalls &amp; War Stories</h3>
+            <p>Real production failures with root cause analysis. The infinite loop that brought down a production system. The state corruption bug that caused wrong answers. The checkpointer migration gone wrong. What they taught us.</p>
+        </a>
+
+        <!-- Section 12 -->
+        <a href="12-debugging.html" class="nav-card">
+            <span class="section-number">Section 12</span>
+            <span class="card-tag">Debugging</span>
+            <h3>Debugging Process</h3>
+            <p>Systematic debugging for agent loops, state corruption, infinite cycles, and unexpected routing. How to use LangSmith traces, time-travel debugging, interrupt-and-inspect patterns, and state snapshots.</p>
+        </a>
+
+        <!-- Section 13 -->
+        <a href="13-eloquent.html" class="nav-card">
+            <span class="section-number">Section 13</span>
+            <span class="card-tag">Communication</span>
+            <h3>Eloquent Conversation</h3>
+            <p>How to talk about LangGraph like a veteran — to a junior developer, a senior architect, a VP of Engineering, and a skeptical interviewer. The vocabulary, analogies, and narrative structures that signal deep expertise.</p>
+        </a>
+
+        <!-- Section 14 -->
+        <a href="14-exercises.html" class="nav-card">
+            <span class="section-number">Section 14</span>
+            <span class="card-tag">Hands-On</span>
+            <h3>Practice Exercises</h3>
+            <p>Fifteen exercises from warm-up to expert: build a simple ReAct agent, add persistence, implement HITL approval, build a multi-agent system, design a production-grade graph with observability. Each with starter code and hints.</p>
+        </a>
+
+        <!-- Section 15 -->
+        <a href="15-reference.html" class="nav-card">
+            <span class="section-number">Section 15</span>
+            <span class="card-tag">Reference</span>
+            <h3>Quick Reference</h3>
+            <p>Commands, API signatures, config options, common patterns in code form. The cheat sheet you will actually reach for during development. StateGraph API, checkpointer config, streaming modes, interrupt patterns, Send API.</p>
+        </a>
+
+        <!-- Section 16 -->
+        <a href="16-ecosystem.html" class="nav-card">
+            <span class="section-number">Section 16</span>
+            <span class="card-tag">Full Stack</span>
+            <h3>LangGraph Ecosystem</h3>
+            <p>LangSmith for observability, LangGraph Platform for deployment, LangGraph Studio for visual debugging, LangChain Core for components, LangServe for serving. How all the pieces fit together in a production stack.</p>
+        </a>
+
+    </div>
+
+    <!-- ═══════════════════════════════════════ ECOSYSTEM ═══════════════════════════════════════ -->
+    <div class="section-heading" id="ecosystem">
+        <h2>The LangGraph Ecosystem</h2>
+    </div>
+
+    <div class="section" style="margin-bottom: 0;">
+        <p style="color: var(--text-muted); margin-bottom: 24px; max-width: 700px;">
+            LangGraph does not exist in isolation. It is part of a tightly integrated ecosystem of tools that together
+            form a complete production AI engineering platform. Understanding how these pieces connect is essential for
+            building and operating real systems.
+        </p>
+
+        <div class="eco-grid">
+            <div class="eco-card">
+                <div class="eco-card-icon">&#128270;</div>
+                <div class="eco-card-name">LangSmith</div>
+                <div class="eco-card-desc">
+                    Observability and tracing platform. Every LLM call, node execution, and state
+                    transition is captured. Enables debugging, evaluation, and performance monitoring
+                    for production agent graphs.
+                </div>
+            </div>
+
+            <div class="eco-card">
+                <div class="eco-card-icon">&#9729;</div>
+                <div class="eco-card-name">LangGraph Platform</div>
+                <div class="eco-card-desc">
+                    Managed deployment infrastructure for LangGraph agents. Handles scaling,
+                    checkpointer persistence at cloud scale, and the operational complexity
+                    of running long-running agentic workflows.
+                </div>
+            </div>
+
+            <div class="eco-card">
+                <div class="eco-card-icon">&#127775;</div>
+                <div class="eco-card-name">LangGraph Studio</div>
+                <div class="eco-card-desc">
+                    Visual IDE for LangGraph development. See your graph structure rendered
+                    in real-time, step through execution node by node, inspect state at every
+                    checkpoint, and replay failed runs.
+                </div>
+            </div>
+
+            <div class="eco-card">
+                <div class="eco-card-icon">&#9935;</div>
+                <div class="eco-card-name">LangChain Core</div>
+                <div class="eco-card-desc">
+                    The component library that powers nodes. Provides LLM integrations,
+                    prompt templates, output parsers, retrievers, and tools. LangChain is the
+                    engine — LangGraph is the control system.
+                </div>
+            </div>
+
+            <div class="eco-card">
+                <div class="eco-card-icon">&#128257;</div>
+                <div class="eco-card-name">LangServe</div>
+                <div class="eco-card-desc">
+                    Deploy LangChain and LangGraph applications as REST APIs with a single
+                    decorator. Provides auto-generated schemas, streaming endpoints,
+                    and playground UIs for rapid API exposure.
+                </div>
+            </div>
+        </div>
+
+        <!-- Architecture overview SVG -->
+        <div class="diagram-container" style="margin-top: 32px;">
+            <h3 style="margin-bottom: 24px; color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.08em;">Ecosystem Architecture Overview</h3>
+            <svg viewBox="0 0 900 320" class="architecture-diagram" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="LangGraph Ecosystem Architecture">
+                <defs>
+                    <marker id="arrow-eco" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                        <path d="M0,0 L0,6 L8,3 z" fill="#5B21B6" />
+                    </marker>
+                    <filter id="glow-eco">
+                        <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                        <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                </defs>
+
+                <!-- Developer Layer -->
+                <rect x="10" y="10" width="880" height="60" rx="8" fill="#161B22" stroke="#30363D" stroke-width="1"/>
+                <text x="450" y="45" text-anchor="middle" fill="#8B949E" font-size="13" font-family="monospace">Developer writes graph logic: StateGraph + Nodes + Edges + Checkpointer config</text>
+
+                <!-- LangGraph Core Box -->
+                <rect x="300" y="100" width="300" height="80" rx="10" fill="#1e1b4b" stroke="#7C3AED" stroke-width="2" filter="url(#glow-eco)"/>
+                <text x="450" y="132" text-anchor="middle" fill="#C4B5FD" font-size="11" font-weight="bold" font-family="sans-serif">LANGGRAPH CORE</text>
+                <text x="450" y="152" text-anchor="middle" fill="#8B949E" font-size="10" font-family="monospace">StateGraph · Nodes · Edges</text>
+                <text x="450" y="168" text-anchor="middle" fill="#8B949E" font-size="10" font-family="monospace">Checkpointer · Interrupts · Streaming</text>
+
+                <!-- LangSmith -->
+                <rect x="10" y="100" width="230" height="80" rx="10" fill="#1a2640" stroke="#2563EB" stroke-width="1.5"/>
+                <text x="125" y="132" text-anchor="middle" fill="#93C5FD" font-size="11" font-weight="bold" font-family="sans-serif">LANGSMITH</text>
+                <text x="125" y="152" text-anchor="middle" fill="#8B949E" font-size="10" font-family="monospace">Traces · Evals · Datasets</text>
+                <text x="125" y="168" text-anchor="middle" fill="#8B949E" font-size="10" font-family="monospace">Monitoring · Feedback</text>
+
+                <!-- LangGraph Platform -->
+                <rect x="660" y="100" width="230" height="80" rx="10" fill="#1a2640" stroke="#2563EB" stroke-width="1.5"/>
+                <text x="775" y="132" text-anchor="middle" fill="#93C5FD" font-size="11" font-weight="bold" font-family="sans-serif">LANGGRAPH PLATFORM</text>
+                <text x="775" y="152" text-anchor="middle" fill="#8B949E" font-size="10" font-family="monospace">Deploy · Scale · Manage</text>
+                <text x="775" y="168" text-anchor="middle" fill="#8B949E" font-size="10" font-family="monospace">Cloud Checkpointing</text>
+
+                <!-- LangChain Core -->
+                <rect x="10" y="220" width="200" height="70" rx="8" fill="#161B22" stroke="#30363D" stroke-width="1.5"/>
+                <text x="110" y="250" text-anchor="middle" fill="#C9D1D9" font-size="10" font-weight="bold" font-family="sans-serif">LANGCHAIN CORE</text>
+                <text x="110" y="268" text-anchor="middle" fill="#8B949E" font-size="9" font-family="monospace">LLMs · Tools · Prompts</text>
+
+                <!-- LangGraph Studio -->
+                <rect x="230" y="220" width="200" height="70" rx="8" fill="#161B22" stroke="#30363D" stroke-width="1.5"/>
+                <text x="330" y="250" text-anchor="middle" fill="#C9D1D9" font-size="10" font-weight="bold" font-family="sans-serif">LANGGRAPH STUDIO</text>
+                <text x="330" y="268" text-anchor="middle" fill="#8B949E" font-size="9" font-family="monospace">Visual IDE · Debug · Replay</text>
+
+                <!-- LangServe -->
+                <rect x="450" y="220" width="180" height="70" rx="8" fill="#161B22" stroke="#30363D" stroke-width="1.5"/>
+                <text x="540" y="250" text-anchor="middle" fill="#C9D1D9" font-size="10" font-weight="bold" font-family="sans-serif">LANGSERVE</text>
+                <text x="540" y="268" text-anchor="middle" fill="#8B949E" font-size="9" font-family="monospace">REST API · Streaming</text>
+
+                <!-- LLM Providers -->
+                <rect x="650" y="220" width="240" height="70" rx="8" fill="#161B22" stroke="#30363D" stroke-width="1.5"/>
+                <text x="770" y="250" text-anchor="middle" fill="#C9D1D9" font-size="10" font-weight="bold" font-family="sans-serif">LLM PROVIDERS</text>
+                <text x="770" y="268" text-anchor="middle" fill="#8B949E" font-size="9" font-family="monospace">OpenAI · Anthropic · Gemini · Local</text>
+
+                <!-- Arrows: Developer to LangGraph -->
+                <line x1="450" y1="70" x2="450" y2="97" stroke="#5B21B6" stroke-width="1.5" marker-end="url(#arrow-eco)" stroke-dasharray="4,2"/>
+
+                <!-- Arrows: LangGraph to LangSmith -->
+                <line x1="300" y1="135" x2="242" y2="135" stroke="#2563EB" stroke-width="1.5" marker-end="url(#arrow-eco)"/>
+
+                <!-- Arrows: LangGraph to Platform -->
+                <line x1="600" y1="135" x2="658" y2="135" stroke="#2563EB" stroke-width="1.5" marker-end="url(#arrow-eco)"/>
+
+                <!-- Arrows: LangGraph to below -->
+                <line x1="380" y1="180" x2="200" y2="218" stroke="#5B21B6" stroke-width="1" marker-end="url(#arrow-eco)" stroke-dasharray="3,2"/>
+                <line x1="420" y1="180" x2="340" y2="218" stroke="#5B21B6" stroke-width="1" marker-end="url(#arrow-eco)" stroke-dasharray="3,2"/>
+                <line x1="480" y1="180" x2="530" y2="218" stroke="#5B21B6" stroke-width="1" marker-end="url(#arrow-eco)" stroke-dasharray="3,2"/>
+                <line x1="530" y1="180" x2="720" y2="218" stroke="#5B21B6" stroke-width="1" marker-end="url(#arrow-eco)" stroke-dasharray="3,2"/>
+            </svg>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ HOW TO USE ═══════════════════════════════════════ -->
+    <div class="section-heading" style="margin-top: 56px;">
+        <h2>How to Use This Resource</h2>
+    </div>
+
+    <div class="card-grid">
+        <div class="card info">
+            <h3>If you are new to LangGraph</h3>
+            <p>
+                Start at Section 1 (Foundation) and work through linearly. The Living Analogy in Section 2
+                will crystallize everything from Section 1. Sections 3A and 3B give you a structured learning path
+                with milestones. Do not skip ahead — each section builds on the previous.
+            </p>
+        </div>
+        <div class="card success">
+            <h3>If you are preparing for an interview</h3>
+            <p>
+                Jump to Section 3B (Interview Conversations) first to understand what will be asked. Then fill gaps
+                using the foundation sections. Section 13 (Eloquent Conversation) is critical — the vocabulary and
+                narrative structure you use matters as much as technical accuracy.
+            </p>
+        </div>
+        <div class="card warning">
+            <h3>If you are debugging a production system</h3>
+            <p>
+                Section 12 (Debugging Process) and Section 11 (Pitfalls and War Stories) are your immediate destination.
+                Section 9 (At Scale) covers the systemic issues that appear under production load. Section 15
+                (Quick Reference) has the commands you need right now.
+            </p>
+        </div>
+        <div class="card danger">
+            <h3>If you are designing a new system</h3>
+            <p>
+                Section 4 (System Design Integration), Section 8 (Trade-offs Analysis), and Section 5 (Ripple Effects)
+                form the architect's toolkit. Section 10 (Technology Landscape) helps you justify the choice of
+                LangGraph over alternatives in a design review.
+            </p>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ INSIGHT ═══════════════════════════════════════ -->
+    <div class="core-insight" style="margin: 56px 0 40px;">
+        <h2>The Central Insight of LangGraph</h2>
+        <p class="emphasis">
+            The insight that makes everything click: an AI agent is not a function call — it is a <em>process</em>.
+            Processes have state. Processes can pause and resume. Processes can fail partway through and be retried
+            from the last safe checkpoint. Processes can involve multiple actors. Processes need to be observed.
+        </p>
+        <p style="margin-top: 16px; color: var(--text-muted);">
+            LangGraph is the first framework that takes this seriously at a structural level. By representing agent
+            logic as a directed graph with persistent state, it makes all of these properties first-class — not
+            afterthoughts bolted on with middleware.
+        </p>
+        <p style="margin-top: 12px; color: var(--text-muted);">
+            That is why production teams building serious AI systems choose LangGraph. Not because it is new and exciting,
+            but because it maps cleanly onto how reliable distributed systems have always been built — with explicit state,
+            explicit transitions, and explicit failure modes.
+        </p>
+    </div>
+
+</div><!-- /container -->
+
+<!-- ═══════════════════════════════════════ FOOTER ═══════════════════════════════════════ -->
+<footer class="site-footer">
+    <div class="container">
+        <p>&#9670; LangGraph Learning Journey &mdash; Interview Preparation Resource</p>
+        <p style="margin-top: 8px; font-size: 0.8rem;">Use arrow keys &larr; &rarr; to navigate between sections when inside a topic page.</p>
+    </div>
+</footer>
+
+<script src="js/components.js"></script>
+</body>
+</html>

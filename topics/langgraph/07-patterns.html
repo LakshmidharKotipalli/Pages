@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Section 7 — Patterns &amp; Anti-Patterns | LangGraph Learning Journey</title>
+    <meta name="description" content="7 proven production patterns and 8 anti-patterns for LangGraph. Includes ReAct agent loop, supervisor multi-agent, human-in-the-loop, parallel research, iterative refinement, reducer patterns, and subgraph composition.">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* ── Progress bar ── */
+        #progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: var(--primary);
+            z-index: 9999;
+            transition: width 0.1s;
+        }
+
+        /* ── Section hero ── */
+        .section-hero {
+            background: linear-gradient(135deg, #0D1117 0%, #0f1a10 50%, #0D1117 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 64px 0 48px;
+            position: relative;
+            overflow: hidden;
+        }
+        .section-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 600px 300px at 10% 60%, rgba(63,185,80,0.08) 0%, transparent 70%),
+                radial-gradient(ellipse 500px 300px at 90% 30%, rgba(248,81,73,0.07) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .section-hero .container { position: relative; }
+        .section-label {
+            display: inline-block;
+            background: rgba(139,92,246,0.15);
+            border: 1px solid rgba(139,92,246,0.4);
+            color: var(--primary);
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 5px 16px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+        }
+        .section-hero h1 {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 800;
+            color: #fff;
+            border: none;
+            margin: 0 0 16px;
+            line-height: 1.2;
+        }
+        .section-hero h1 span { color: var(--primary); }
+        .section-hero p {
+            max-width: 680px;
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            line-height: 1.8;
+            margin: 0;
+        }
+
+        /* ── Page layout: tabs for Patterns vs Anti-Patterns ── */
+        .page-tabs {
+            display: flex;
+            gap: 4px;
+            padding: 6px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin: 40px 0 32px;
+            flex-wrap: wrap;
+        }
+        .page-tab-btn {
+            flex: 1;
+            min-width: 160px;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+            background: transparent;
+            color: var(--text-muted);
+            text-align: center;
+        }
+        .page-tab-btn.active {
+            background: var(--bg);
+            color: var(--text);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .page-tab-btn.patterns.active  { color: var(--success); border: 1px solid rgba(63,185,80,0.3); }
+        .page-tab-btn.antipatterns.active { color: var(--danger); border: 1px solid rgba(248,81,73,0.3); }
+        .page-tab-content { display: none; }
+        .page-tab-content.active { display: block; }
+
+        /* ── Pattern Cards ── */
+        .pattern-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            margin-bottom: 36px;
+            overflow: hidden;
+            transition: box-shadow 0.3s;
+        }
+        .pattern-card:hover { box-shadow: 0 6px 30px rgba(0,0,0,0.35); }
+
+        .pattern-card-header {
+            padding: 24px 28px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+        }
+        .pattern-number {
+            flex-shrink: 0;
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: white;
+        }
+        .pattern-number.success-bg { background: linear-gradient(135deg, #2d6a3c, #3FB950); }
+        .pattern-header-text { flex: 1; }
+        .pattern-header-text h3 {
+            margin: 0 0 6px;
+            font-size: 1.2rem;
+            color: #fff;
+        }
+        .pattern-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        .use-case-badge {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            background: var(--bg);
+            border: 1px solid var(--border);
+            padding: 3px 10px;
+            border-radius: 12px;
+        }
+
+        .pattern-card-body { padding: 28px; }
+
+        /* Content boxes inside patterns */
+        .pattern-box-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 20px 0;
+        }
+        .pattern-box-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+
+        .pbox {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px 18px;
+        }
+        .pbox h4 {
+            margin: 0 0 10px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+        .pbox ul { padding-left: 14px; margin: 0; }
+        .pbox li { font-size: 0.9rem; margin: 6px 0; color: var(--text); line-height: 1.5; }
+
+        .pbox.structure h4   { color: var(--info); }
+        .pbox.state-box h4   { color: var(--primary); }
+        .pbox.critical-d h4  { color: var(--warning); }
+        .pbox.prod-tip h4    { color: var(--success); }
+        .pbox.example h4     { color: #A78BFA; }
+
+        /* Critical detail highlight */
+        .critical-detail {
+            background: rgba(210,153,34,0.08);
+            border: 1px solid rgba(210,153,34,0.25);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 16px 0;
+        }
+        .critical-detail .cd-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--warning);
+            margin-bottom: 8px;
+        }
+        .critical-detail p { margin: 0; font-size: 0.93rem; color: var(--text); line-height: 1.7; }
+
+        /* Production tip */
+        .prod-tip-box {
+            background: rgba(63,185,80,0.06);
+            border: 1px solid rgba(63,185,80,0.2);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 16px 0;
+        }
+        .prod-tip-box .pt-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--success);
+            margin-bottom: 8px;
+        }
+        .prod-tip-box p { margin: 0; font-size: 0.93rem; color: var(--text); line-height: 1.7; }
+
+        /* Mini flow diagram within pattern */
+        .flow-diagram {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            margin: 16px 0;
+            font-family: monospace;
+            font-size: 0.88rem;
+            overflow-x: auto;
+        }
+        .flow-node {
+            display: inline-block;
+            background: rgba(139,92,246,0.15);
+            border: 1px solid rgba(139,92,246,0.4);
+            color: var(--primary);
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+        .flow-node.tool   { background: rgba(88,166,255,0.15); border-color: rgba(88,166,255,0.4); color: #58A6FF; }
+        .flow-node.end    { background: rgba(63,185,80,0.15);  border-color: rgba(63,185,80,0.4);  color: #3FB950; }
+        .flow-node.human  { background: rgba(248,81,73,0.15);  border-color: rgba(248,81,73,0.4);  color: #F85149; }
+        .flow-node.cond   { background: rgba(245,158,11,0.15); border-color: rgba(245,158,11,0.4); color: #F59E0B; }
+        .flow-arrow { color: var(--text-muted); margin: 0 6px; }
+        .flow-loop  { color: var(--text-muted); font-size: 0.8rem; margin-top: 6px; }
+
+        /* ══ Anti-Pattern Cards ══ */
+        .anti-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            margin-bottom: 28px;
+            overflow: hidden;
+            transition: box-shadow 0.3s;
+        }
+        .anti-card:hover { box-shadow: 0 6px 30px rgba(0,0,0,0.35); }
+
+        .anti-card-header {
+            padding: 20px 26px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+        .anti-number {
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 800;
+            color: white;
+            background: linear-gradient(135deg, #7f1d1d, #F85149);
+        }
+        .anti-header-text { flex: 1; }
+        .anti-header-text h3 {
+            margin: 0 0 6px;
+            font-size: 1.1rem;
+            color: #fff;
+        }
+        .anti-meta { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+        .severity-pill {
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 0.73rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+        .sev-critical { background: rgba(248,81,73,0.2); color: #F85149; border: 1px solid rgba(248,81,73,0.4); }
+        .sev-high     { background: rgba(245,158,11,0.2); color: #F59E0B; border: 1px solid rgba(245,158,11,0.4); }
+        .sev-medium   { background: rgba(210,153,34,0.2); color: #D29922; border: 1px solid rgba(210,153,34,0.4); }
+        .sev-low      { background: rgba(88,166,255,0.2); color: #58A6FF; border: 1px solid rgba(88,166,255,0.4); }
+
+        .anti-card-body {
+            padding: 22px 26px;
+        }
+
+        .anti-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 14px;
+            margin: 16px 0;
+        }
+        .abox {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px 16px;
+        }
+        .abox h4 {
+            margin: 0 0 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+        .abox p { margin: 0; font-size: 0.88rem; color: var(--text); line-height: 1.6; }
+        .abox ul { padding-left: 14px; margin: 0; }
+        .abox li { font-size: 0.88rem; margin: 5px 0; color: var(--text); line-height: 1.5; }
+
+        .abox.what-is h4     { color: var(--text-muted); }
+        .abox.why-feels h4   { color: var(--info); }
+        .abox.impact h4      { color: var(--danger); }
+        .abox.fix-col h4     { color: var(--success); }
+
+        .anti-fix {
+            background: rgba(63,185,80,0.06);
+            border: 1px solid rgba(63,185,80,0.2);
+            border-radius: 8px;
+            padding: 14px 18px;
+            margin-top: 14px;
+        }
+        .anti-fix .fix-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--success);
+            margin-bottom: 8px;
+        }
+        .anti-fix p { margin: 0; font-size: 0.9rem; color: var(--text); line-height: 1.7; }
+
+        /* Summary quick-ref */
+        .quick-ref-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 32px;
+            margin: 40px 0;
+        }
+        .quick-ref-section h2 { margin-top: 0; color: var(--primary); }
+
+        /* Analogy box */
+        .analogy-box {
+            background: rgba(88,166,255,0.06);
+            border-left: 4px solid var(--info);
+            border-radius: 0 10px 10px 0;
+            padding: 20px 24px;
+            margin: 24px 0;
+        }
+        .analogy-box .analogy-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--info);
+            margin-bottom: 8px;
+        }
+        .analogy-box p { margin: 0; font-size: 0.97rem; color: var(--text); line-height: 1.7; }
+
+        /* Copy button */
+        .copy-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(139,92,246,0.2);
+            border: 1px solid rgba(139,92,246,0.4);
+            color: var(--primary);
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .copy-button:hover { background: rgba(139,92,246,0.35); }
+
+        /* Section labels */
+        .section-divider {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 48px 0 32px;
+        }
+        .section-divider h2 { margin: 0; }
+        .section-divider-line {
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+        .section-count {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 3px 10px;
+            border-radius: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .pattern-box-grid, .pattern-box-grid.three, .anti-grid { grid-template-columns: 1fr; }
+            .pattern-card-header, .anti-card-header { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+<div id="progress-bar"></div>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="container">
+        <div class="logo">LangGraph</div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="06-evolution.html">Section 6</a>
+            <a href="08-interview-prep.html">Section 8</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero -->
+<div class="section-hero">
+    <div class="container">
+        <div class="breadcrumbs">
+            <a href="index.html">LangGraph</a>
+            <span class="separator">/</span>
+            <span>Section 7</span>
+        </div>
+        <span class="section-label">Section 7 of 10</span>
+        <h1>Patterns <span>&amp; Anti-Patterns</span></h1>
+        <p>Seven proven production patterns and eight anti-patterns — drawn from real production deployments. Patterns are about what to build; anti-patterns are about what to recognize and resist.</p>
+    </div>
+</div>
+
+<main id="main-content">
+<div class="container">
+
+    <!-- Analogy -->
+    <div class="analogy-box" style="margin-top: 40px;">
+        <div class="analogy-label">Air Traffic Control Analogy</div>
+        <p>ATC has standard approach patterns (ILS approach, visual approach, circling approach) because they have been proven safe under known conditions. Controllers do not improvise new patterns for each landing — they apply the proven one. Equally, ATC has anti-patterns that are never permitted: two aircraft on converging paths without separation, vectoring into terrain, clearing for takeoff without checking the runway. LangGraph patterns and anti-patterns work the same way: use the proven structures for their intended scenarios, and recognize the forbidden patterns before you build them into production.</p>
+    </div>
+
+    <!-- Tab navigation -->
+    <div class="page-tabs" role="tablist">
+        <button class="page-tab-btn patterns active" onclick="switchPageTab('patterns', this)" role="tab" aria-selected="true">
+            Proven Patterns (7)
+        </button>
+        <button class="page-tab-btn antipatterns" onclick="switchPageTab('antipatterns', this)" role="tab" aria-selected="false">
+            Anti-Patterns (8)
+        </button>
+        <button class="page-tab-btn" onclick="switchPageTab('quickref', this)" role="tab" aria-selected="false">
+            Quick Reference
+        </button>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════
+         PATTERNS TAB
+    ══════════════════════════════════════════════════════ -->
+    <div id="tab-patterns" class="page-tab-content active">
+
+        <!-- PATTERN 1: ReAct Agent Loop -->
+        <div class="pattern-card">
+            <div class="pattern-card-header">
+                <div class="pattern-number success-bg">P1</div>
+                <div class="pattern-header-text">
+                    <h3>ReAct Agent Loop</h3>
+                    <div class="pattern-meta">
+                        <span class="use-case-badge">Tool-using agents</span>
+                        <span class="use-case-badge">Research agents</span>
+                        <span class="use-case-badge">Code assistants</span>
+                    </div>
+                </div>
+            </div>
+            <div class="pattern-card-body">
+                <p>The foundational agent pattern. ReAct (Reason + Act) gives an LLM access to tools and lets it iteratively decide which tool to use, observe the result, and continue reasoning until it has an answer. It is the "flight loop" of agent patterns — the control cycle that underlies almost every agent you will build.</p>
+
+                <div class="flow-diagram">
+                    <div>
+                        <span class="flow-node">agent_node</span>
+                        <span class="flow-arrow">──[tool_calls?]──</span>
+                        <span class="flow-node cond">conditional_edge</span>
+                        <span class="flow-arrow">──yes──</span>
+                        <span class="flow-node tool">tools_node</span>
+                        <span class="flow-arrow">──</span>
+                        <span class="flow-node">agent_node</span>
+                    </div>
+                    <div class="flow-loop" style="margin-top:8px;">
+                        <span class="flow-node cond">conditional_edge</span>
+                        <span class="flow-arrow">──no──</span>
+                        <span class="flow-node end">END</span>
+                        <span style="color: var(--text-muted); margin-left:12px; font-size:0.8rem;">// Loop continues until LLM stops calling tools</span>
+                    </div>
+                </div>
+
+                <div class="pattern-box-grid three">
+                    <div class="pbox structure">
+                        <h4>Structure</h4>
+                        <ul>
+                            <li>agent_node: LLM call with bound tools</li>
+                            <li>tools_node: ToolNode executes called tools</li>
+                            <li>Conditional edge reads last message for tool_calls</li>
+                            <li>Loop continues until LLM returns without tool calls</li>
+                        </ul>
+                    </div>
+                    <div class="pbox state-box">
+                        <h4>State Design</h4>
+                        <ul>
+                            <li><code>messages: Annotated[list, operator.add]</code></li>
+                            <li>Messages accumulate tool calls AND observations</li>
+                            <li>LLM reads full message history each turn</li>
+                            <li>Add <code>iteration_count: int</code> — always</li>
+                        </ul>
+                    </div>
+                    <div class="pbox example">
+                        <h4>Real Example</h4>
+                        <ul>
+                            <li>Research agent: decide to search</li>
+                            <li>Run search tool, get results</li>
+                            <li>Decide to search for follow-up</li>
+                            <li>Run second search</li>
+                            <li>Synthesize → answer without tool call → END</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="critical-detail">
+                    <div class="cd-label">The Critical Detail</div>
+                    <p>The conditional edge function checks <code>state["messages"][-1].tool_calls</code>. If the last message has tool calls, route to <code>tools_node</code>. If not, route to <code>END</code>. This check must be the <em>only</em> logic in the edge — any additional routing logic belongs in a dedicated decision node that can be traced and checkpointed.</p>
+                </div>
+
+                <div class="prod-tip-box">
+                    <div class="pt-label">Production Tips</div>
+                    <p><strong>1. Always add max_iterations guard</strong> — the LLM will not always stop naturally. <strong>2. Log tool call names and counts</strong> via LangSmith custom metadata — see which tools are overused. <strong>3. Bind tools to the LLM at graph compile time</strong> (<code>llm.bind_tools(tools)</code>), not inside the node function — avoids recreating on every call.</p>
+                </div>
+
+                <pre><code>from langgraph.graph import StateGraph, END
+from langgraph.prebuilt import ToolNode
+from typing import Annotated
+import operator
+
+class AgentState(TypedDict):
+    messages: Annotated[list, operator.add]
+    iteration_count: int
+
+def agent_node(state: AgentState):
+    response = llm_with_tools.invoke(state["messages"])
+    return {
+        "messages": [response],
+        "iteration_count": state["iteration_count"] + 1
+    }
+
+def should_continue(state: AgentState) -> str:
+    if state["iteration_count"] >= 25:
+        return "end"  # Safety guard
+    return "tools" if state["messages"][-1].tool_calls else "end"
+
+graph = StateGraph(AgentState)
+graph.add_node("agent", agent_node)
+graph.add_node("tools", ToolNode(tools))
+graph.set_entry_point("agent")
+graph.add_conditional_edges("agent", should_continue, {"tools": "tools", "end": END})
+graph.add_edge("tools", "agent")</code></pre>
+            </div>
+        </div>
+
+        <!-- PATTERN 2: Supervisor Multi-Agent -->
+        <div class="pattern-card">
+            <div class="pattern-card-header">
+                <div class="pattern-number success-bg">P2</div>
+                <div class="pattern-header-text">
+                    <h3>Supervisor Multi-Agent</h3>
+                    <div class="pattern-meta">
+                        <span class="use-case-badge">Multiple specialized agents</span>
+                        <span class="use-case-badge">Enterprise assistants</span>
+                        <span class="use-case-badge">Task delegation</span>
+                    </div>
+                </div>
+            </div>
+            <div class="pattern-card-body">
+                <p>The air traffic control tower of agent patterns. A supervisor LLM coordinates specialist agents, deciding which specialist handles the current task, reviewing their output, and deciding whether to delegate further or report back to the user.</p>
+
+                <div class="flow-diagram">
+                    <div>
+                        <span class="flow-node">supervisor_node</span>
+                        <span class="flow-arrow">──routes to──</span>
+                        <span class="flow-node tool">search_agent</span>
+                        <span style="color:var(--text-muted)"> | </span>
+                        <span class="flow-node tool">calendar_agent</span>
+                        <span style="color:var(--text-muted)"> | </span>
+                        <span class="flow-node tool">email_agent</span>
+                    </div>
+                    <div class="flow-loop" style="margin-top:8px;">
+                        <span>All specialists</span>
+                        <span class="flow-arrow">──return to──</span>
+                        <span class="flow-node">supervisor_node</span>
+                        <span class="flow-arrow">──[done?]──</span>
+                        <span class="flow-node end">END</span>
+                    </div>
+                </div>
+
+                <div class="pattern-box-grid">
+                    <div class="pbox state-box">
+                        <h4>State Design</h4>
+                        <ul>
+                            <li><code>messages: Annotated[list, operator.add]</code></li>
+                            <li><code>next_agent: str</code> — who to delegate to next</li>
+                            <li><code>completed_tasks: list[str]</code> — what has been done</li>
+                            <li><code>current_task_result: str</code> — last specialist output</li>
+                            <li><code>iteration_count: int</code> — always include</li>
+                        </ul>
+                    </div>
+                    <div class="pbox example">
+                        <h4>Real Example</h4>
+                        <ul>
+                            <li>User: "Schedule a meeting and send invites"</li>
+                            <li>Supervisor: delegates to <code>calendar_agent</code></li>
+                            <li>Calendar agent: finds free slots, returns options</li>
+                            <li>Supervisor: reviews, delegates to <code>email_agent</code></li>
+                            <li>Email agent: drafts and sends invites</li>
+                            <li>Supervisor: task complete → END</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="critical-detail">
+                    <div class="cd-label">The Critical Detail</div>
+                    <p>The supervisor's system prompt must <strong>explicitly list all available agents and their capabilities</strong>. The supervisor LLM can only route to agents it knows about. It cannot discover agents dynamically. Format the agent list as a structured enum in the prompt and use structured output (response_format) to ensure the supervisor returns a valid agent name every time.</p>
+                </div>
+
+                <div class="prod-tip-box">
+                    <div class="pt-label">Production Tips</div>
+                    <p><strong>Supervisor should summarize completed work before routing</strong> — prevents the supervisor from asking a specialist to redo work already done. Include <code>completed_tasks</code> in the supervisor's prompt context. <strong>Implement a done condition</strong> as a separate route from the supervisor, not inferred from empty tool calls.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- PATTERN 3: Human-in-the-Loop Gate -->
+        <div class="pattern-card">
+            <div class="pattern-card-header">
+                <div class="pattern-number success-bg">P3</div>
+                <div class="pattern-header-text">
+                    <h3>Human-in-the-Loop Gate</h3>
+                    <div class="pattern-meta">
+                        <span class="use-case-badge">Email sending</span>
+                        <span class="use-case-badge">Financial transactions</span>
+                        <span class="use-case-badge">Code deployment</span>
+                        <span class="use-case-badge">Irreversible actions</span>
+                    </div>
+                </div>
+            </div>
+            <div class="pattern-card-body">
+                <p>The air traffic controller physically on duty — the human who must approve before the aircraft (agent) performs a maneuver with real-world consequences. This is the pattern that makes LangGraph safe for production use in high-stakes domains.</p>
+
+                <div class="flow-diagram">
+                    <div>
+                        <span class="flow-node">agent_node</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-node">prepare_review_node</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-node human" style="border-style:dashed;">[ INTERRUPT ]</span>
+                    </div>
+                    <div class="flow-loop" style="margin-top:8px;">
+                        <span style="color:var(--text-muted)">human reviews state, approves/rejects</span>
+                        <span class="flow-arrow">→ resume →</span>
+                        <span class="flow-node cond">route_on_decision</span>
+                        <span class="flow-arrow">→ approve →</span>
+                        <span class="flow-node tool">execute_node</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-node end">END</span>
+                    </div>
+                </div>
+
+                <div class="pattern-box-grid">
+                    <div class="pbox state-box">
+                        <h4>State Design</h4>
+                        <ul>
+                            <li><code>pending_action: dict</code> — what the agent wants to do</li>
+                            <li><code>human_decision: str | None</code> — "approve" / "reject" / None</li>
+                            <li><code>review_reason: str</code> — why this needs human review</li>
+                            <li><code>rejection_feedback: str | None</code> — human's instructions if rejected</li>
+                        </ul>
+                    </div>
+                    <div class="pbox prod-tip">
+                        <h4>When to Use</h4>
+                        <ul>
+                            <li>Any action that sends data externally (email, API calls)</li>
+                            <li>Financial transactions of any size</li>
+                            <li>Code deployment or infrastructure changes</li>
+                            <li>Deleting or modifying data that can't be undone</li>
+                            <li>Any action with regulatory or compliance requirements</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="critical-detail">
+                    <div class="cd-label">The Critical Detail</div>
+                    <p>Use <code>interrupt_before</code> the node that performs the actual action, <strong>not after</strong>. You want to intercept execution <em>before</em> the consequence occurs. The human reviews the <code>pending_action</code> in state and either approves (graph resumes and executes) or rejects (graph routes back for revision).</p>
+                </div>
+
+                <div class="prod-tip-box">
+                    <div class="pt-label">Production Tips</div>
+                    <p><strong>Set a timeout policy.</strong> If the human doesn't respond within X minutes, route to a default action (reject, escalate, or execute with reduced scope). <strong>Make the pending_action human-readable</strong> — don't show raw JSON; format it for the reviewer. <strong>Store the thread_id in your database</strong> so you can notify the human via email/Slack with a link to resume.</p>
+                </div>
+
+                <pre><code># Compile with interrupt_before the action node
+graph = graph_builder.compile(
+    checkpointer=PostgresSaver(conn),
+    interrupt_before=["execute_action_node"]  # Pause HERE
+)
+
+# Run until interrupt
+result = graph.invoke(initial_state, config={"configurable": {"thread_id": thread_id}})
+# Agent pauses, state saved to PostgreSQL
+
+# Later — human reviews and resumes
+graph.update_state(
+    config,
+    {"human_decision": "approve"},  # Or "reject" with feedback
+)
+final_result = graph.invoke(None, config=config)  # Resume from checkpoint</code></pre>
+            </div>
+        </div>
+
+        <!-- PATTERN 4: Parallel Research -->
+        <div class="pattern-card">
+            <div class="pattern-card-header">
+                <div class="pattern-number success-bg">P4</div>
+                <div class="pattern-header-text">
+                    <h3>Parallel Research — Fan-Out / Fan-Join</h3>
+                    <div class="pattern-meta">
+                        <span class="use-case-badge">Multi-source research</span>
+                        <span class="use-case-badge">Parallel API calls</span>
+                        <span class="use-case-badge">Concurrent processing</span>
+                    </div>
+                </div>
+            </div>
+            <div class="pattern-card-body">
+                <p>Multiple aircraft (agents) dispatched simultaneously to different destinations, with the controller (synthesizer) waiting for all reports before making the final decision. This pattern dramatically reduces latency for tasks that have independent subtasks.</p>
+
+                <div class="flow-diagram">
+                    <div>
+                        <span class="flow-node">router_node</span>
+                        <span class="flow-arrow">──Send()──</span>
+                        <span class="flow-node tool">research_a</span>
+                        <span style="color:var(--text-muted)"> ‖ </span>
+                        <span class="flow-node tool">research_b</span>
+                        <span style="color:var(--text-muted)"> ‖ </span>
+                        <span class="flow-node tool">research_c</span>
+                    </div>
+                    <div class="flow-loop" style="margin-top:8px;">
+                        <span style="color:var(--text-muted)">all run in parallel</span>
+                        <span class="flow-arrow">──all complete──</span>
+                        <span class="flow-node">synthesizer_node</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-node end">END</span>
+                    </div>
+                </div>
+
+                <div class="pattern-box-grid">
+                    <div class="pbox structure">
+                        <h4>How It Works</h4>
+                        <ul>
+                            <li>Import <code>Send</code> from <code>langgraph.constants</code></li>
+                            <li>Router node returns a list of <code>Send</code> objects — one per parallel task</li>
+                            <li>Each <code>Send</code> specifies a node name and its input state</li>
+                            <li>LangGraph executes all Send targets concurrently</li>
+                            <li>Results accumulate via reducer; synthesizer waits for all</li>
+                        </ul>
+                    </div>
+                    <div class="pbox state-box">
+                        <h4>State Design</h4>
+                        <ul>
+                            <li><code>search_queries: list[str]</code> — inputs to fan out</li>
+                            <li><code>search_results: Annotated[list, operator.add]</code> — reducer accumulates</li>
+                            <li><strong>The reducer is essential</strong> — without it, parallel branches overwrite each other</li>
+                            <li>Synthesizer reads the fully accumulated results list</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="critical-detail">
+                    <div class="cd-label">The Critical Detail</div>
+                    <p>The <code>Annotated[list, operator.add]</code> reducer is what makes this work. Without a reducer, parallel branches will overwrite each other's state (last writer wins). The <code>operator.add</code> reducer concatenates lists — each parallel branch appends its results to the accumulator. Design reducers to be <strong>commutative</strong>: the order parallel branches complete in is non-deterministic.</p>
+                </div>
+
+                <div class="prod-tip-box">
+                    <div class="pt-label">Production Tips</div>
+                    <p><strong>Set timeouts on individual parallel branches</strong> — one slow API call should not block the entire synthesis. Use <code>asyncio.wait_for</code> inside async nodes. <strong>Handle partial results gracefully</strong> — if one branch fails, the synthesizer should work with what it has. Include an <code>errors: list</code> field in state to capture branch failures without crashing the graph.</p>
+                </div>
+
+                <pre><code>from langgraph.constants import Send
+from typing import Annotated
+import operator
+
+class ResearchState(TypedDict):
+    queries: list[str]
+    results: Annotated[list[dict], operator.add]  # Reducer!
+
+def router(state: ResearchState) -> list[Send]:
+    # Fan out — create one Send per query
+    return [
+        Send("research_branch", {"query": q, "results": []})
+        for q in state["queries"]
+    ]
+
+def research_branch(state: dict) -> dict:
+    result = search_api(state["query"])
+    return {"results": [{"query": state["query"], "data": result}]}
+
+def synthesizer(state: ResearchState) -> dict:
+    # state["results"] contains ALL branch results (merged by reducer)
+    return {"answer": synthesize(state["results"])}</code></pre>
+            </div>
+        </div>
+
+        <!-- PATTERN 5: Iterative Refinement -->
+        <div class="pattern-card">
+            <div class="pattern-card-header">
+                <div class="pattern-number success-bg">P5</div>
+                <div class="pattern-header-text">
+                    <h3>Iterative Refinement Loop</h3>
+                    <div class="pattern-meta">
+                        <span class="use-case-badge">Code generation</span>
+                        <span class="use-case-badge">Content writing</span>
+                        <span class="use-case-badge">Report drafting</span>
+                        <span class="use-case-badge">Self-improvement</span>
+                    </div>
+                </div>
+            </div>
+            <div class="pattern-card-body">
+                <p>A pilot who files a flight plan, has it reviewed by ATC, revises based on feedback, and resubmits until approved. The generate-critique-revise cycle is one of the most powerful patterns for improving AI output quality beyond what a single pass can achieve.</p>
+
+                <div class="flow-diagram">
+                    <div>
+                        <span class="flow-node">generate_node</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-node cond">critique_node</span>
+                        <span class="flow-arrow">──[good enough?]──</span>
+                        <span class="flow-node end">END</span>
+                    </div>
+                    <div class="flow-loop" style="margin-top:8px;">
+                        <span class="flow-node cond">critique_node</span>
+                        <span class="flow-arrow">──[needs revision]──</span>
+                        <span class="flow-node">generate_node</span>
+                        <span style="color:var(--text-muted); margin-left:8px; font-size:0.8rem">// Loop with revision feedback</span>
+                    </div>
+                </div>
+
+                <div class="pattern-box-grid">
+                    <div class="pbox state-box">
+                        <h4>State Design</h4>
+                        <ul>
+                            <li><code>content: str</code> — current draft</li>
+                            <li><code>critique: str</code> — feedback from critic</li>
+                            <li><code>revision_count: int</code> — loop guard</li>
+                            <li><code>quality_score: float</code> — 0.0 to 1.0</li>
+                            <li><code>passed_criteria: list[str]</code></li>
+                            <li><code>failed_criteria: list[str]</code></li>
+                        </ul>
+                    </div>
+                    <div class="pbox example">
+                        <h4>Real Example: Code Generation</h4>
+                        <ul>
+                            <li>generate_node: LLM writes Python function</li>
+                            <li>test_node: runs pytest, captures output</li>
+                            <li>conditional: tests pass → END</li>
+                            <li>conditional: tests fail → generate_node with failure context</li>
+                            <li>Max 5 revisions, then accept best or escalate</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="critical-detail">
+                    <div class="cd-label">The Critical Detail</div>
+                    <p>The "good enough" exit condition must be <strong>explicit and deterministic</strong>. Do not rely on the LLM to decide when it's done — it will almost always say "looks good" regardless of quality. Use concrete criteria: quality_score >= 0.85, all unit tests pass, a checklist of required elements all present. The critic node should return a structured score, not freeform prose.</p>
+                </div>
+
+                <div class="prod-tip-box">
+                    <div class="pt-label">Production Tips</div>
+                    <p><strong>Track revision_count and always cap it</strong> (5-10 is typical). After max revisions: either accept the highest-scoring draft or route to human escalation. <strong>Include the critique in the generation prompt</strong> — the generator needs to know specifically what to fix, not just "make it better." <strong>Log quality scores over time</strong> via LangSmith to measure whether your generation/critique system is actually improving output.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- PATTERN 6: State Accumulation with Reducer -->
+        <div class="pattern-card">
+            <div class="pattern-card-header">
+                <div class="pattern-number success-bg">P6</div>
+                <div class="pattern-header-text">
+                    <h3>State Accumulation with Reducer</h3>
+                    <div class="pattern-meta">
+                        <span class="use-case-badge">Parallel branches</span>
+                        <span class="use-case-badge">Sequential accumulation</span>
+                        <span class="use-case-badge">Multi-node writes</span>
+                    </div>
+                </div>
+            </div>
+            <div class="pattern-card-body">
+                <p>Multiple aircraft reporting back to the tower simultaneously — the controller needs to merge all their status reports, not have each one overwrite the previous. Reducers are the mechanism that make parallel and sequential state accumulation safe.</p>
+
+                <div class="pattern-box-grid">
+                    <div class="pbox structure">
+                        <h4>How Reducers Work</h4>
+                        <ul>
+                            <li>Default behavior: new value <strong>replaces</strong> the field</li>
+                            <li>With reducer: new value is <strong>merged</strong> using your function</li>
+                            <li><code>operator.add</code>: concatenates lists — most common</li>
+                            <li>Custom reducer: implement any merge logic (dedup, sum, max)</li>
+                            <li>Applied when multiple nodes write to the same field</li>
+                        </ul>
+                    </div>
+                    <div class="pbox state-box">
+                        <h4>Common Reducer Patterns</h4>
+                        <ul>
+                            <li><code>Annotated[list, operator.add]</code> — accumulate items</li>
+                            <li><code>Annotated[int, lambda a,b: a+b]</code> — sum integers</li>
+                            <li><code>Annotated[dict, lambda a,b: {**a,**b}]</code> — merge dicts</li>
+                            <li>Custom: deduplicate by ID, keep only latest, etc.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="critical-detail">
+                    <div class="cd-label">The Critical Detail</div>
+                    <p><strong>Reducers must be commutative</strong> — the order in which parallel branches finish is non-deterministic. If your reducer's output depends on order (<code>a + b</code> vs <code>b + a</code>), your results will be inconsistent. For lists, <code>operator.add</code> is fine for accumulation (order doesn't affect the final set). For more complex merges, always ask: "Does it matter which result arrives first?"</p>
+                </div>
+
+                <pre><code>from typing import Annotated
+import operator
+
+class PipelineState(TypedDict):
+    # Without reducer: each parallel branch REPLACES this
+    naive_results: list  # Bug: last writer wins
+
+    # With reducer: each parallel branch APPENDS to this
+    search_results: Annotated[list[SearchResult], operator.add]
+
+    # Custom reducer: keep only the highest-scoring result
+    best_result: Annotated[
+        SearchResult | None,
+        lambda current, new: new if new.score > (current.score if current else -1) else current
+    ]
+
+# Both parallel branches write to search_results safely
+# The reducer ensures results are merged, not overwritten</code></pre>
+            </div>
+        </div>
+
+        <!-- PATTERN 7: Subgraph Composition -->
+        <div class="pattern-card">
+            <div class="pattern-card-header">
+                <div class="pattern-number success-bg">P7</div>
+                <div class="pattern-header-text">
+                    <h3>Subgraph Composition</h3>
+                    <div class="pattern-meta">
+                        <span class="use-case-badge">Large agents (20+ nodes)</span>
+                        <span class="use-case-badge">Multi-team development</span>
+                        <span class="use-case-badge">Reusable components</span>
+                    </div>
+                </div>
+            </div>
+            <div class="pattern-card-body">
+                <p>Separate terminal areas (TRACONs) in aviation — each with its own controllers, own procedures, own state — but all coordinated by the en-route center. Subgraphs compile independently, have private state, and expose a clean input/output interface to the parent graph.</p>
+
+                <div class="flow-diagram">
+                    <div>
+                        <span style="color:var(--text-muted); font-size:0.85rem;">Parent Graph:</span>
+                    </div>
+                    <div style="margin-top:6px;">
+                        <span class="flow-node">ingest_subgraph</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-node">extract_subgraph</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-node">validate_subgraph</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-node">store_subgraph</span>
+                    </div>
+                    <div class="flow-loop" style="margin-top:6px;">
+                        <span style="color:var(--text-muted); font-size:0.8rem;">Each subgraph is a compiled StateGraph added as a node via .add_node("name", subgraph.compile())</span>
+                    </div>
+                </div>
+
+                <div class="pattern-box-grid">
+                    <div class="pbox structure">
+                        <h4>Structure</h4>
+                        <ul>
+                            <li>Each subgraph is a full <code>StateGraph</code> with its own TypedDict state</li>
+                            <li>Subgraph compiles independently: <code>subgraph.compile()</code></li>
+                            <li>Parent adds subgraph as a node: <code>parent.add_node("sub", compiled_sub)</code></li>
+                            <li>Define explicit input/output state schemas for the interface</li>
+                            <li>Subgraph has private fields invisible to parent</li>
+                        </ul>
+                    </div>
+                    <div class="pbox prod-tip">
+                        <h4>When to Modularize</h4>
+                        <ul>
+                            <li>3+ logical domains in one graph</li>
+                            <li>Multiple teams need independent deployment</li>
+                            <li>CI is slow because full-graph tests are expensive</li>
+                            <li>You want to version subgraphs independently</li>
+                            <li>A subgraph is reused in multiple parent graphs</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="critical-detail">
+                    <div class="cd-label">The Critical Detail</div>
+                    <p>Define <strong>explicit input and output state schemas</strong> for the subgraph's interface. The parent graph passes data to the subgraph's input schema; the subgraph returns data to the parent via its output schema. Private subgraph state is not visible to the parent. This interface contract is what allows independent development and testing — treat it like an API.</p>
+                </div>
+
+                <div class="prod-tip-box">
+                    <div class="pt-label">Production Tips</div>
+                    <p><strong>Version subgraphs independently</strong> — parent graph specifies subgraph version in requirements. This enables gradual rollouts: test a new subgraph version in staging while production uses the stable version. <strong>Test each subgraph in isolation</strong> with its own test suite — this is the main benefit of decomposition. <strong>Start monolithic, refactor when the triggers appear</strong> — don't over-engineer from day one.</p>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- end patterns tab -->
+
+    <!-- ══════════════════════════════════════════════════════
+         ANTI-PATTERNS TAB
+    ══════════════════════════════════════════════════════ -->
+    <div id="tab-antipatterns" class="page-tab-content">
+
+        <div class="insight-callout" style="background:rgba(248,81,73,0.05);border-color:rgba(248,81,73,0.2);padding:20px 24px;border-radius:10px;margin-bottom:32px;">
+            <p style="margin:0;color:var(--text);line-height:1.7;"><strong style="color:var(--danger);">Anti-patterns are not theoretical.</strong> Each one below has caused production incidents. The severity ratings reflect real-world blast radius: Critical means "system down or data lost," High means "production incident," Medium means "velocity killer," Low means "technical debt."</p>
+        </div>
+
+        <!-- AP 1: Global State Creep -->
+        <div class="anti-card">
+            <div class="anti-card-header">
+                <div class="anti-number">AP1</div>
+                <div class="anti-header-text">
+                    <h3>Global State Creep</h3>
+                    <div class="anti-meta">
+                        <span class="severity-pill sev-high">HIGH Severity</span>
+                        <span class="use-case-badge">Common in all teams</span>
+                    </div>
+                </div>
+            </div>
+            <div class="anti-card-body">
+                <div class="anti-grid">
+                    <div class="abox what-is">
+                        <h4>What It Is</h4>
+                        <p>Adding every possible piece of data to State TypedDict "just in case" — user profile, raw document text, intermediate LLM responses, debug flags, timestamps, feature flags... all in one growing blob.</p>
+                    </div>
+                    <div class="abox why-feels">
+                        <h4>Why It Feels Right</h4>
+                        <p>"If I add it to State, any node can access it. Easier than passing it around explicitly." Also: no upfront design needed, just add a field whenever a node needs something.</p>
+                    </div>
+                    <div class="abox impact">
+                        <h4>Production Impact</h4>
+                        <ul>
+                            <li>50-field State is incomprehensible to new engineers</li>
+                            <li>Larger State = slower checkpointing</li>
+                            <li>If State is injected into LLM prompts: enormous context windows, high cost</li>
+                            <li>State becomes a cross-team API no one owns</li>
+                            <li>Debugging: find the relevant field in 200-field JSON</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="anti-fix">
+                    <div class="fix-label">The Fix</div>
+                    <p>State should contain only: (1) what nodes need to make routing decisions, and (2) what nodes need to do their core work. Large blobs (document text, raw API responses, binary data) belong in external storage — store only IDs or references in State. Apply the "If I deleted this field, would any conditional edge or node logic break?" test. If no: delete it.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- AP 2: Logic in Edges -->
+        <div class="anti-card">
+            <div class="anti-card-header">
+                <div class="anti-number">AP2</div>
+                <div class="anti-header-text">
+                    <h3>Logic in Edges Instead of Nodes</h3>
+                    <div class="anti-meta">
+                        <span class="severity-pill sev-medium">MEDIUM Severity</span>
+                        <span class="use-case-badge">Debugging killer</span>
+                    </div>
+                </div>
+            </div>
+            <div class="anti-card-body">
+                <div class="anti-grid">
+                    <div class="abox what-is">
+                        <h4>What It Is</h4>
+                        <p>Putting complex business logic — LLM calls, data transformation, scoring — inside the conditional edge router function instead of in a dedicated decision node.</p>
+                    </div>
+                    <div class="abox why-feels">
+                        <h4>Why It Feels Right</h4>
+                        <p>"It's just routing logic. The edge is already there. I'll add the condition check inline." Feels like avoiding unnecessary node proliferation.</p>
+                    </div>
+                    <div class="abox impact">
+                        <h4>Production Impact</h4>
+                        <ul>
+                            <li>Edge functions cannot be checkpointed — no state saved before routing</li>
+                            <li>Logic in edges is invisible to LangSmith traces</li>
+                            <li>Cannot unit test routing logic in isolation</li>
+                            <li>If the edge function throws, you lose all context</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="anti-fix">
+                    <div class="fix-label">The Fix</div>
+                    <p>If your router function does more than read 1-2 existing state fields, extract the logic into a dedicated decision node. The decision node runs as a normal node (checkpointed, traced, testable), writes its decision to state (e.g., <code>state["route_decision"] = "path_a"</code>), and then the edge function is a trivial 2-line read of that field. Rule: edge functions should be pure readers of state, never writers.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- AP 3: MemorySaver in Production -->
+        <div class="anti-card" style="border-color: rgba(248,81,73,0.35);">
+            <div class="anti-card-header" style="background: rgba(248,81,73,0.05);">
+                <div class="anti-number">AP3</div>
+                <div class="anti-header-text">
+                    <h3>MemorySaver in Production</h3>
+                    <div class="anti-meta">
+                        <span class="severity-pill sev-critical">CRITICAL Severity</span>
+                        <span class="use-case-badge">Most common fatal mistake</span>
+                    </div>
+                </div>
+            </div>
+            <div class="anti-card-body">
+                <div class="anti-grid">
+                    <div class="abox what-is">
+                        <h4>What It Is</h4>
+                        <p>Using <code>MemorySaver</code> — the in-process Python dict checkpointer — as the production checkpointer instead of a persistent database like PostgreSQL.</p>
+                    </div>
+                    <div class="abox why-feels">
+                        <h4>Why It Feels Right</h4>
+                        <p>"It works in development. Switching checkpointers seems like an unnecessary step. I'll do it later." Prototype worked fine, shipped it. The "later" never arrived before the first incident.</p>
+                    </div>
+                    <div class="abox impact">
+                        <h4>Production Impact</h4>
+                        <ul>
+                            <li>Any restart, crash, or deploy wipes all active sessions</li>
+                            <li>Horizontal scaling impossible — each pod has different state</li>
+                            <li>No post-mortem debugging — crash erases the evidence</li>
+                            <li>First production incident is typically within 48 hours of launch</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="anti-fix">
+                    <div class="fix-label">The Non-Negotiable Fix</div>
+                    <p><strong>Always use PostgresSaver in production.</strong> Add "MemorySaver in production?" as an explicit item on your PR checklist. Use environment-based configuration: <code>MemorySaver()</code> when <code>ENV=development</code>, <code>PostgresSaver(conn)</code> when <code>ENV=production</code>. The PostgreSQL connection overhead is measured in milliseconds. The MemorySaver failure mode is measured in lost user sessions and on-call pages.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- AP 4: Monolithic Nodes -->
+        <div class="anti-card">
+            <div class="anti-card-header">
+                <div class="anti-number">AP4</div>
+                <div class="anti-header-text">
+                    <h3>Monolithic Nodes</h3>
+                    <div class="anti-meta">
+                        <span class="severity-pill sev-medium">MEDIUM Severity</span>
+                        <span class="use-case-badge">Testability killer</span>
+                    </div>
+                </div>
+            </div>
+            <div class="anti-card-body">
+                <div class="anti-grid">
+                    <div class="abox what-is">
+                        <h4>What It Is</h4>
+                        <p>A single "mega node" that does data retrieval + LLM call + tool execution + result formatting + state updating — all in one 200-line function.</p>
+                    </div>
+                    <div class="abox why-feels">
+                        <h4>Why It Feels Right</h4>
+                        <p>"It's simpler. I don't need to split it up yet. I can always refactor." Each individual operation seems too small to be its own node.</p>
+                    </div>
+                    <div class="abox impact">
+                        <h4>Production Impact</h4>
+                        <ul>
+                            <li>Can't checkpoint between sub-steps — failure means restart from scratch</li>
+                            <li>Impossible to unit test individual operations</li>
+                            <li>Can't attribute latency: "Is it the retrieval or the LLM call that's slow?"</li>
+                            <li>Three different failure modes mixed in one exception handler</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="anti-fix">
+                    <div class="fix-label">The Fix</div>
+                    <p>Each node does one thing. The naming test: if you named a node <code>process_everything_node</code> or <code>main_node</code>, it needs to be split. The test heuristic: can you write a unit test for this node that (a) runs without a real LLM, (b) uses a fixed input, and (c) asserts a specific output? If not, the node is doing too much.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- AP 5: Missing Termination Guards -->
+        <div class="anti-card">
+            <div class="anti-card-header">
+                <div class="anti-number">AP5</div>
+                <div class="anti-header-text">
+                    <h3>Missing Termination Guards</h3>
+                    <div class="anti-meta">
+                        <span class="severity-pill sev-high">HIGH Severity</span>
+                        <span class="use-case-badge">Cost explosion risk</span>
+                    </div>
+                </div>
+            </div>
+            <div class="anti-card-body">
+                <div class="anti-grid">
+                    <div class="abox what-is">
+                        <h4>What It Is</h4>
+                        <p>Agent loops without explicit <code>max_iterations</code> or deterministic exit conditions — relying on the LLM to decide when to stop calling tools or looping.</p>
+                    </div>
+                    <div class="abox why-feels">
+                        <h4>Why It Feels Right</h4>
+                        <p>"The LLM is smart — it'll stop when it has a good answer." This is true 99% of the time. The 1% will be your most expensive production incident.</p>
+                    </div>
+                    <div class="abox impact">
+                        <h4>Production Impact</h4>
+                        <ul>
+                            <li>Runaway agent: $30–$100+/hour in LLM costs</li>
+                            <li>Fills PostgreSQL checkpoint tables continuously</li>
+                            <li>May consume rate-limit quota, blocking all other agents</li>
+                            <li>User-facing: agent never returns → support ticket → 4–8 hours engineering time</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="anti-fix">
+                    <div class="fix-label">The Always-Required Fix</div>
+                    <p>Add <code>iteration_count: int = 0</code> to every State that has a loop. Increment it in every looping node. Check it in every conditional edge that loops back. This is not optional — it is as mandatory as input validation. Default to 25 iterations as a conservative maximum; adjust based on your use case after measuring actual iteration counts in production.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- AP 6: Hardcoded LLM in Every Node -->
+        <div class="anti-card">
+            <div class="anti-card-header">
+                <div class="anti-number">AP6</div>
+                <div class="anti-header-text">
+                    <h3>Hardcoded LLM in Every Node</h3>
+                    <div class="anti-meta">
+                        <span class="severity-pill sev-medium">MEDIUM Severity</span>
+                        <span class="use-case-badge">Testability / Maintainability</span>
+                    </div>
+                </div>
+            </div>
+            <div class="anti-card-body">
+                <div class="anti-grid">
+                    <div class="abox what-is">
+                        <h4>What It Is</h4>
+                        <p>Each node creates its own LLM client: <code>llm = ChatOpenAI(model="gpt-4o", temperature=0.7, api_key=os.environ["OPENAI_KEY"])</code> — hardcoded inside the node function body.</p>
+                    </div>
+                    <div class="abox why-feels">
+                        <h4>Why It Feels Right</h4>
+                        <p>"Each node is self-contained. It knows what model it needs." Feels like good encapsulation. Actually creates global mutable state inside functions.</p>
+                    </div>
+                    <div class="abox impact">
+                        <h4>Production Impact</h4>
+                        <ul>
+                            <li>Changing models requires modifying every node file</li>
+                            <li>Testing requires real API calls — no mock injection point</li>
+                            <li>No centralized cost control or model governance</li>
+                            <li>Different nodes may use different model versions inconsistently</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="anti-fix">
+                    <div class="fix-label">The Fix</div>
+                    <p>Inject the LLM (or model name) via graph configuration: <code>config["configurable"]["model_name"]</code>. Create LLM instances once, outside nodes, and pass them in via closures or graph compilation config. This pattern enables: (1) testing with <code>FakeChatModel</code>, (2) swapping models without touching node code, (3) centralized cost control, (4) A/B testing different models via config.</p>
+                </div>
+                <pre><code>def make_agent_node(llm):  # Inject via closure
+    def agent_node(state: AgentState, config: RunnableConfig):
+        # llm is injected, not hardcoded
+        response = llm.invoke(state["messages"])
+        return {"messages": [response]}
+    return agent_node
+
+# At graph build time:
+llm = ChatOpenAI(model=config["model"])  # One place
+graph.add_node("agent", make_agent_node(llm))</code></pre>
+            </div>
+        </div>
+
+        <!-- AP 7: State Schema Without Validation -->
+        <div class="anti-card">
+            <div class="anti-card-header">
+                <div class="anti-number">AP7</div>
+                <div class="anti-header-text">
+                    <h3>State Schema Without Validation</h3>
+                    <div class="anti-meta">
+                        <span class="severity-pill sev-low">LOW–MEDIUM Severity</span>
+                        <span class="use-case-badge">Silent failures</span>
+                    </div>
+                </div>
+            </div>
+            <div class="anti-card-body">
+                <div class="anti-grid">
+                    <div class="abox what-is">
+                        <h4>What It Is</h4>
+                        <p>Using an untyped <code>dict</code> or loosely typed <code>TypedDict</code> for State — no type annotations, no defaults, no validation. Nodes write whatever they want, other nodes assume fields exist.</p>
+                    </div>
+                    <div class="abox why-feels">
+                        <h4>Why It Feels Right</h4>
+                        <p>"TypedDict is for documentation, not enforcement. I'll add proper types when things stabilize." The flexibility feels like speed. It is actually debt.</p>
+                    </div>
+                    <div class="abox impact">
+                        <h4>Production Impact</h4>
+                        <ul>
+                            <li>Type mismatches cause silent failures — wrong type coerced silently</li>
+                            <li><code>KeyError: "messages"</code> at step 8 after 2 minutes of work</li>
+                            <li>No IDE autocomplete for state fields — mistakes in field names discovered at runtime</li>
+                            <li>Onboarding new engineers: "Where are all the state fields documented?"</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="anti-fix">
+                    <div class="fix-label">The Fix</div>
+                    <p>Always use <code>TypedDict</code> with explicit field types and defaults. For mutable defaults, use <code>field(default_factory=list)</code> pattern. Consider <code>Pydantic BaseModel</code> for State if you need runtime validation — it catches type errors before they propagate into node logic. Treat the State TypedDict as a public API: document every field with a comment explaining what it contains and which nodes write to it.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- AP 8: No Thread ID Strategy -->
+        <div class="anti-card">
+            <div class="anti-card-header">
+                <div class="anti-number">AP8</div>
+                <div class="anti-header-text">
+                    <h3>No Thread ID Strategy</h3>
+                    <div class="anti-meta">
+                        <span class="severity-pill sev-medium">MEDIUM Severity</span>
+                        <span class="use-case-badge">Operational nightmare</span>
+                    </div>
+                </div>
+            </div>
+            <div class="anti-card-body">
+                <div class="anti-grid">
+                    <div class="abox what-is">
+                        <h4>What It Is</h4>
+                        <p>Using random UUIDs as thread IDs — <code>thread_id = str(uuid.uuid4())</code> — with no connection to business entities like users, sessions, or requests.</p>
+                    </div>
+                    <div class="abox why-feels">
+                        <h4>Why It Feels Right</h4>
+                        <p>"UUIDs are unique. Thread IDs just need to be unique." This is true — but uniqueness is not the only requirement for operational thread management.</p>
+                    </div>
+                    <div class="abox impact">
+                        <h4>Production Impact</h4>
+                        <ul>
+                            <li>Cannot query "all threads for user X" — no structured lookup</li>
+                            <li>"Debug the session from Tuesday afternoon" → search through random UUIDs</li>
+                            <li>Cannot implement access control — any thread_id access any state</li>
+                            <li>Cannot clean up old threads — no way to identify orphaned sessions</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="anti-fix">
+                    <div class="fix-label">The Fix</div>
+                    <p>Use structured, semantic thread IDs: <code>"user_{user_id}_session_{session_id}"</code> or <code>"org_{org_id}_task_{task_id}_{timestamp}"</code>. Store thread IDs in your application database linked to business entities (User table, Order table, etc.). This enables: querying all threads for a user, deleting threads when users delete accounts (GDPR), access control verification, and meaningful debugging via "find me thread user_abc123_session_456."</p>
+                </div>
+                <pre><code># WRONG: Opaque random ID
+thread_id = str(uuid.uuid4())  # "7f3a1b2c-..."
+
+# CORRECT: Semantic, queryable, linkable
+def create_thread_id(user_id: str, session_id: str) -> str:
+    return f"user_{user_id}_session_{session_id}"
+
+# Store in your DB:
+# INSERT INTO agent_threads (user_id, thread_id, created_at)
+# VALUES (%s, %s, NOW())
+
+config = {"configurable": {
+    "thread_id": create_thread_id(user.id, session.id)
+}}</code></pre>
+            </div>
+        </div>
+
+    </div><!-- end antipatterns tab -->
+
+    <!-- ══════════════════════════════════════════════════════
+         QUICK REFERENCE TAB
+    ══════════════════════════════════════════════════════ -->
+    <div id="tab-quickref" class="page-tab-content">
+
+        <div class="quick-ref-section">
+            <h2>Patterns — When to Use What</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Pattern</th>
+                        <th>When to Use</th>
+                        <th>Key State Fields</th>
+                        <th>Critical Requirement</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>P1: ReAct Loop</strong></td>
+                        <td>Any agent with tools that needs iterative reasoning</td>
+                        <td><code>messages</code>, <code>iteration_count</code></td>
+                        <td>max_iterations guard + check tool_calls on last message</td>
+                    </tr>
+                    <tr>
+                        <td><strong>P2: Supervisor</strong></td>
+                        <td>Multiple specialized agents with central coordination</td>
+                        <td><code>next_agent</code>, <code>completed_tasks</code>, <code>messages</code></td>
+                        <td>Supervisor prompt must explicitly list all available agents</td>
+                    </tr>
+                    <tr>
+                        <td><strong>P3: Human-in-Loop</strong></td>
+                        <td>Any action with irreversible real-world consequences</td>
+                        <td><code>pending_action</code>, <code>human_decision</code></td>
+                        <td>interrupt_before (not after) the action node</td>
+                    </tr>
+                    <tr>
+                        <td><strong>P4: Parallel Fan-Out</strong></td>
+                        <td>Multiple independent tasks that can run concurrently</td>
+                        <td><code>results: Annotated[list, operator.add]</code></td>
+                        <td>Reducer must be commutative; handle partial failures</td>
+                    </tr>
+                    <tr>
+                        <td><strong>P5: Iterative Refinement</strong></td>
+                        <td>Tasks that benefit from critique and revision cycles</td>
+                        <td><code>content</code>, <code>critique</code>, <code>revision_count</code></td>
+                        <td>Explicit exit criteria — never rely on LLM to self-stop</td>
+                    </tr>
+                    <tr>
+                        <td><strong>P6: Reducer Accumulation</strong></td>
+                        <td>Parallel branches writing to shared state fields</td>
+                        <td><code>Annotated[list, operator.add]</code></td>
+                        <td>Reducers must be commutative (order-independent)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>P7: Subgraphs</strong></td>
+                        <td>3+ logical domains, multi-team dev, reusable components</td>
+                        <td>Explicit input/output schemas</td>
+                        <td>Start monolithic; refactor when triggers appear</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="quick-ref-section">
+            <h2>Anti-Patterns — Severity Quick Reference</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Anti-Pattern</th>
+                        <th>Severity</th>
+                        <th>Blast Radius</th>
+                        <th>One-Line Fix</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>AP1: Global State Creep</strong></td>
+                        <td><span class="severity-pill sev-high">HIGH</span></td>
+                        <td>All teams, growing over time</td>
+                        <td>State = routing data + work data only; rest goes external</td>
+                    </tr>
+                    <tr>
+                        <td><strong>AP2: Logic in Edges</strong></td>
+                        <td><span class="severity-pill sev-medium">MEDIUM</span></td>
+                        <td>Debugging + testability</td>
+                        <td>Edge functions read state; nodes write state</td>
+                    </tr>
+                    <tr>
+                        <td><strong>AP3: MemorySaver in Prod</strong></td>
+                        <td><span class="severity-pill sev-critical">CRITICAL</span></td>
+                        <td>All users, entire service</td>
+                        <td>Always PostgresSaver in production — no exceptions</td>
+                    </tr>
+                    <tr>
+                        <td><strong>AP4: Monolithic Nodes</strong></td>
+                        <td><span class="severity-pill sev-medium">MEDIUM</span></td>
+                        <td>Testing, debugging, retry logic</td>
+                        <td>One node = one testable unit of work</td>
+                    </tr>
+                    <tr>
+                        <td><strong>AP5: No Termination Guard</strong></td>
+                        <td><span class="severity-pill sev-high">HIGH</span></td>
+                        <td>Cost, infrastructure, UX</td>
+                        <td>Always add iteration_count and check it</td>
+                    </tr>
+                    <tr>
+                        <td><strong>AP6: Hardcoded LLM</strong></td>
+                        <td><span class="severity-pill sev-medium">MEDIUM</span></td>
+                        <td>Testability, maintainability</td>
+                        <td>Inject LLM via config or closure, not hardcoded</td>
+                    </tr>
+                    <tr>
+                        <td><strong>AP7: No Schema Validation</strong></td>
+                        <td><span class="severity-pill sev-low">LOW-MED</span></td>
+                        <td>Silent failures, runtime errors</td>
+                        <td>TypedDict with types + defaults always</td>
+                    </tr>
+                    <tr>
+                        <td><strong>AP8: No Thread ID Strategy</strong></td>
+                        <td><span class="severity-pill sev-medium">MEDIUM</span></td>
+                        <td>Operations, debugging, compliance</td>
+                        <td>thread_id = "user_{id}_session_{id}" — semantic IDs</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="key-takeaway">
+            <h3>The Unifying Principle Behind All Patterns</h3>
+            <p>Every proven pattern and every anti-pattern in this section reflects one underlying principle: <strong>make the implicit explicit</strong>. Explicit state schema (not ad-hoc dicts). Explicit iteration limits (not "the LLM will stop"). Explicit routing in decision nodes (not buried in edge functions). Explicit persistent storage (not in-memory hope). Explicit thread IDs (not random UUIDs).</p>
+            <p style="margin-top: 12px;">LangGraph's core philosophy is that agent behavior should be visible, inspectable, and verifiable. Every anti-pattern violates this by hiding something — hiding state in bloated schemas, hiding routing logic in edges, hiding state loss in MemorySaver. The patterns enforce visibility. The anti-patterns erode it.</p>
+        </div>
+
+    </div><!-- end quickref tab -->
+
+    <!-- Navigation -->
+    <div class="navigation">
+        <a href="06-evolution.html" class="button secondary">← Section 6: Evolution Story</a>
+        <a href="08-interview-prep.html" class="button primary">Section 8: Interview Prep →</a>
+    </div>
+
+</div><!-- end container -->
+</main>
+
+<script src="js/components.js"></script>
+<script>
+    // Page-level tab switcher (different from global accordion)
+    function switchPageTab(tabName, btn) {
+        // Update buttons
+        document.querySelectorAll('.page-tab-btn').forEach(b => {
+            b.classList.remove('active');
+            b.setAttribute('aria-selected', 'false');
+        });
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+
+        // Update content
+        document.querySelectorAll('.page-tab-content').forEach(c => c.classList.remove('active'));
+        const target = document.getElementById('tab-' + tabName);
+        if (target) target.classList.add('active');
+    }
+</script>
+</body>
+</html>

@@ -1,11 +1,302 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="refresh" content="0; url=llm-benchmark-guide.html" />
-  <title>Redirecting…</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Engineering Hub</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:#0d1117;color:#c9d1d9;min-height:100vh}
+
+    /* ── Top bar ── */
+    .topbar{background:#161b22;border-bottom:1px solid #30363d;padding:0 2rem;display:flex;align-items:center;gap:1.5rem;height:54px;position:sticky;top:0;z-index:50}
+    .topbar-brand{font-weight:800;font-size:1rem;color:#e6edf3;letter-spacing:-0.01em}
+    .topbar-links{display:flex;gap:1rem;margin-left:auto}
+    .topbar-links a{font-size:0.8rem;color:#8b949e;text-decoration:none;transition:color .15s}
+    .topbar-links a:hover{color:#e6edf3}
+
+    /* ── Hero ── */
+    .hero{padding:72px 2rem 56px;text-align:center;background:radial-gradient(ellipse 90% 50% at 50% 0%,#1a1040 0%,#0d1117 65%)}
+    .hero-eyebrow{display:inline-block;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.35);color:#a78bfa;font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:5px 16px;border-radius:20px;margin-bottom:24px}
+    .hero h1{font-size:clamp(2rem,5vw,3rem);font-weight:800;color:#f0f6fc;margin-bottom:16px;line-height:1.15}
+    .hero h1 span{background:linear-gradient(135deg,#8B5CF6,#3B82F6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .hero-sub{color:#8b949e;font-size:1.05rem;max-width:560px;margin:0 auto 32px;line-height:1.7}
+    .hero-stats{display:flex;gap:3rem;justify-content:center;flex-wrap:wrap;margin-top:40px;padding-top:32px;border-top:1px solid #30363d}
+    .stat .v{font-size:1.8rem;font-weight:800;background:linear-gradient(135deg,#8B5CF6,#3B82F6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .stat .l{font-size:.75rem;color:#8b949e;margin-top:2px}
+
+    /* ── Benchmark link ── */
+    .benchmark-bar{display:flex;align-items:center;justify-content:center;gap:12px;padding:14px 2rem;background:rgba(88,166,255,.06);border-bottom:1px solid rgba(88,166,255,.12)}
+    .benchmark-bar a{color:#58a6ff;text-decoration:none;font-size:.88rem;font-weight:600}
+    .benchmark-bar a:hover{text-decoration:underline}
+    .benchmark-bar span{color:#8b949e;font-size:.82rem}
+
+    /* ── Main layout ── */
+    main{max-width:1200px;margin:0 auto;padding:48px 2rem 80px}
+
+    /* ── Category sections ── */
+    .category{margin-bottom:52px}
+    .cat-header{display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.06)}
+    .cat-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+    .cat-header h2{font-size:1.1rem;font-weight:700;color:#e6edf3}
+    .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+
+    /* ── Cards ── */
+    .card{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:20px;text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:10px;transition:border-color .2s,transform .2s,box-shadow .2s;position:relative;overflow:hidden}
+    .card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--card-accent,#8B5CF6);opacity:0;transition:opacity .2s}
+    .card:hover{border-color:#3d444d;transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.4)}
+    .card:hover::before{opacity:1}
+    .card-top{display:flex;align-items:center;justify-content:space-between}
+    .card-icon{font-size:1.4rem;line-height:1}
+    .badge{font-size:.68rem;font-weight:600;padding:.2rem .55rem;border-radius:4px;letter-spacing:.04em}
+    .card-title{font-size:1rem;font-weight:700;color:#e6edf3;line-height:1.3}
+    .card-desc{font-size:.82rem;color:#8b949e;line-height:1.6}
+
+    /* ── Footer ── */
+    footer{text-align:center;padding:2rem;color:#6e7681;font-size:.78rem;border-top:1px solid #21262d}
+
+    @media(max-width:640px){
+      .hero{padding:48px 1rem 40px}
+      .hero-stats{gap:2rem}
+      main{padding:32px 1rem 60px}
+      .topbar-links{display:none}
+    }
+  </style>
 </head>
 <body>
-  <p><a href="llm-benchmark-guide.html">Click here if not redirected</a></p>
+
+<nav class="topbar">
+  <div class="topbar-brand">⚡ AI Engineering Hub</div>
+  <div class="topbar-links">
+    <a href="llm-benchmark-guide.html">Benchmark Guide</a>
+    <a href="topics/summary.html">Summary</a>
+  </div>
+</nav>
+
+<div class="benchmark-bar">
+  <span>Also check out →</span>
+  <a href="llm-benchmark-guide.html">⚡ LLM Benchmark Reference Guide</a>
+  <span>— which benchmarks matter and why</span>
+</div>
+
+<section class="hero">
+  <div class="hero-eyebrow">AI Engineer Reference</div>
+  <h1>Everything you need to<br><span>build with AI</span></h1>
+  <p class="hero-sub">Comprehensive deep-dives into LLMs, agents, frameworks, and infrastructure — from first principles to production.</p>
+  <div class="hero-stats">
+    <div class="stat"><div class="v">20</div><div class="l">Guides & Deep Dives</div></div>
+    <div class="stat"><div class="v">5</div><div class="l">Topic Areas</div></div>
+    <div class="stat"><div class="v">160+</div><div class="l">Sections of Content</div></div>
+  </div>
+</section>
+
+<main>
+    <section class="category">
+      <div class="cat-header" style="--cat-color:#8B5CF6">
+        <div class="cat-dot" style="background:#8B5CF6"></div>
+        <h2>AI Foundations</h2>
+      </div>
+      <div class="cards-grid">
+        <a href="required/llm-fundamentals.html" class="card" style="--card-accent:#8B5CF6">
+          <div class="card-top">
+            <span class="card-icon">🧬</span>
+            <span class="badge" style="background:#374151;color:#9CA3AF">Guide</span>
+          </div>
+          <div class="card-title">LLM Fundamentals</div>
+          <div class="card-desc">Inside the mind of an AI — tokenisation to inference</div>
+        </a>
+        <a href="large-language-models.html" class="card" style="--card-accent:#F59E0B">
+          <div class="card-top">
+            <span class="card-icon">🧠</span>
+            <span class="badge" style="background:#1e1b4b;color:#F59E0B">Deep Dive</span>
+          </div>
+          <div class="card-title">Large Language Models</div>
+          <div class="card-desc">How LLMs work — architecture, training, and deployment</div>
+        </a>
+        <a href="required/ai-complete-guide.html" class="card" style="--card-accent:#3B82F6">
+          <div class="card-top">
+            <span class="card-icon">👁️</span>
+            <span class="badge" style="background:#374151;color:#9CA3AF">Guide</span>
+          </div>
+          <div class="card-title">AI Vision, Language & OCR</div>
+          <div class="card-desc">Complete guide to AI vision, language models, and OCR</div>
+        </a>
+        <a href="required/prompt-engineering.html" class="card" style="--card-accent:#A855F7">
+          <div class="card-top">
+            <span class="card-icon">✍️</span>
+            <span class="badge" style="background:#374151;color:#9CA3AF">Guide</span>
+          </div>
+          <div class="card-title">Prompt Engineering</div>
+          <div class="card-desc">The art of writing effective prompts for AI systems</div>
+        </a>
+      </div>
+    </section>
+    <section class="category">
+      <div class="cat-header" style="--cat-color:#3B82F6">
+        <div class="cat-dot" style="background:#3B82F6"></div>
+        <h2>LLM Frameworks</h2>
+      </div>
+      <div class="cards-grid">
+        <a href="required/langchain-langgraph-mastery.html" class="card" style="--card-accent:#6366F1">
+          <div class="card-top">
+            <span class="card-icon">⛓️</span>
+            <span class="badge" style="background:#374151;color:#9CA3AF">Guide</span>
+          </div>
+          <div class="card-title">LangChain + LangGraph</div>
+          <div class="card-desc">Complete mastery guide — chains, agents, and graphs</div>
+        </a>
+        <a href="langchain.html" class="card" style="--card-accent:#3B82F6">
+          <div class="card-top">
+            <span class="card-icon">⛓️</span>
+            <span class="badge" style="background:#1e1b4b;color:#3B82F6">Deep Dive</span>
+          </div>
+          <div class="card-title">LangChain</div>
+          <div class="card-desc">Orchestration layer for building LLM-powered applications</div>
+        </a>
+        <a href="langgraph.html" class="card" style="--card-accent:#8B5CF6">
+          <div class="card-top">
+            <span class="card-icon">🔀</span>
+            <span class="badge" style="background:#1e1b4b;color:#8B5CF6">Deep Dive</span>
+          </div>
+          <div class="card-title">LangGraph</div>
+          <div class="card-desc">Stateful graph-based AI agent orchestration framework</div>
+        </a>
+        <a href="required/rag-decoded.html" class="card" style="--card-accent:#10B981">
+          <div class="card-top">
+            <span class="card-icon">🔍</span>
+            <span class="badge" style="background:#374151;color:#9CA3AF">Guide</span>
+          </div>
+          <div class="card-title">RAG Decoded</div>
+          <div class="card-desc">Visual deep-dive into retrieval-augmented generation</div>
+        </a>
+        <a href="retrieval-augmented-generation.html" class="card" style="--card-accent:#10B981">
+          <div class="card-top">
+            <span class="card-icon">🔍</span>
+            <span class="badge" style="background:#1e1b4b;color:#10B981">Deep Dive</span>
+          </div>
+          <div class="card-title">RAG</div>
+          <div class="card-desc">Combining LLMs with external knowledge retrieval</div>
+        </a>
+      </div>
+    </section>
+    <section class="category">
+      <div class="cat-header" style="--cat-color:#10B981">
+        <div class="cat-dot" style="background:#10B981"></div>
+        <h2>AI Agents & Vision</h2>
+      </div>
+      <div class="cards-grid">
+        <a href="ai-agents-mcp-ecosystem.html" class="card" style="--card-accent:#6366F1">
+          <div class="card-top">
+            <span class="card-icon">🤖</span>
+            <span class="badge" style="background:#1e1b4b;color:#6366F1">Deep Dive</span>
+          </div>
+          <div class="card-title">AI Agents & MCP</div>
+          <div class="card-desc">Autonomous agents with tools, skills, and Model Context Protocol</div>
+        </a>
+        <a href="vision-language-models.html" class="card" style="--card-accent:#EC4899">
+          <div class="card-top">
+            <span class="card-icon">👁️</span>
+            <span class="badge" style="background:#1e1b4b;color:#EC4899">Deep Dive</span>
+          </div>
+          <div class="card-title">Vision-Language Models</div>
+          <div class="card-desc">Multimodal AI that fuses vision and language</div>
+        </a>
+        <a href="required/productionization.html" class="card" style="--card-accent:#F59E0B">
+          <div class="card-top">
+            <span class="card-icon">🚀</span>
+            <span class="badge" style="background:#374151;color:#9CA3AF">Guide</span>
+          </div>
+          <div class="card-title">LLM Productionization</div>
+          <div class="card-desc">Ship reliable AI systems in production</div>
+        </a>
+      </div>
+    </section>
+    <section class="category">
+      <div class="cat-header" style="--cat-color:#A855F7">
+        <div class="cat-dot" style="background:#A855F7"></div>
+        <h2>Claude Code</h2>
+      </div>
+      <div class="cards-grid">
+        <a href="required/claude-code-mastery.html" class="card" style="--card-accent:#EC4899">
+          <div class="card-top">
+            <span class="card-icon">⚡</span>
+            <span class="badge" style="background:#374151;color:#9CA3AF">Guide</span>
+          </div>
+          <div class="card-title">Claude Code Mastery</div>
+          <div class="card-desc">The complete guide to Claude Code CLI</div>
+        </a>
+        <a href="claude-code-mastery.html" class="card" style="--card-accent:#A855F7">
+          <div class="card-top">
+            <span class="card-icon">⚡</span>
+            <span class="badge" style="background:#1e1b4b;color:#A855F7">Deep Dive</span>
+          </div>
+          <div class="card-title">Claude Code Mastery</div>
+          <div class="card-desc">Best practices for AI-assisted software engineering</div>
+        </a>
+        <a href="claude-code-ecosystem.html" class="card" style="--card-accent:#8B5CF6">
+          <div class="card-top">
+            <span class="card-icon">🛠️</span>
+            <span class="badge" style="background:#1e1b4b;color:#8B5CF6">Deep Dive</span>
+          </div>
+          <div class="card-title">Claude Code Ecosystem</div>
+          <div class="card-desc">Agentic terminal AI orchestrating sub-agents and memory</div>
+        </a>
+      </div>
+    </section>
+    <section class="category">
+      <div class="cat-header" style="--cat-color:#2563EB">
+        <div class="cat-dot" style="background:#2563EB"></div>
+        <h2>Infrastructure & Cloud</h2>
+      </div>
+      <div class="cards-grid">
+        <a href="docker-ecosystem.html" class="card" style="--card-accent:#2563EB">
+          <div class="card-top">
+            <span class="card-icon">🐳</span>
+            <span class="badge" style="background:#1e1b4b;color:#2563EB">Deep Dive</span>
+          </div>
+          <div class="card-title">Docker Ecosystem</div>
+          <div class="card-desc">Containerisation, images, compose, and the full Docker stack</div>
+        </a>
+        <a href="kubernetes.html" class="card" style="--card-accent:#3B82F6">
+          <div class="card-top">
+            <span class="card-icon">☸️</span>
+            <span class="badge" style="background:#1e1b4b;color:#3B82F6">Deep Dive</span>
+          </div>
+          <div class="card-title">Kubernetes</div>
+          <div class="card-desc">Container orchestration at scale — clusters, pods, and beyond</div>
+        </a>
+        <a href="required/modern-backend-stack.html" class="card" style="--card-accent:#2563EB">
+          <div class="card-top">
+            <span class="card-icon">🏗️</span>
+            <span class="badge" style="background:#374151;color:#9CA3AF">Guide</span>
+          </div>
+          <div class="card-title">Modern Backend Stack</div>
+          <div class="card-desc">APIs, FastAPI, Docker, Kubernetes — the full stack</div>
+        </a>
+        <a href="required/gcp-explorer.html" class="card" style="--card-accent:#EA4335">
+          <div class="card-top">
+            <span class="card-icon">☁️</span>
+            <span class="badge" style="background:#374151;color:#9CA3AF">Guide</span>
+          </div>
+          <div class="card-title">GCP Explorer</div>
+          <div class="card-desc">Google Cloud Platform services decoded</div>
+        </a>
+        <a href="required/system%20design.html" class="card" style="--card-accent:#14B8A6">
+          <div class="card-top">
+            <span class="card-icon">📐</span>
+            <span class="badge" style="background:#374151;color:#9CA3AF">Guide</span>
+          </div>
+          <div class="card-title">System Design</div>
+          <div class="card-desc">AI engineer's system design mastery hub</div>
+        </a>
+      </div>
+    </section>
+</main>
+
+<footer>
+  <p>AI Engineering Hub · Built for engineers and researchers</p>
+</footer>
+
 </body>
 </html>

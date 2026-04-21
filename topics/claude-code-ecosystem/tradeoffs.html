@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trade-offs Analysis - Learn Claude Code Ecosystem</title>
+    <link rel="stylesheet" href="../../css/styles.css">
+    <link rel="stylesheet" href="theme.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <a href="index.html" class="nav-back">Back to Overview</a>
+        <span class="current-section">Trade-offs Analysis</span>
+        <div class="nav-links">
+            <a href="patterns.html">Previous</a>
+            <a href="scale.html">Next</a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <h1>Trade-offs Analysis</h1>
+            <p class="powerful-sentence">Every capability in Claude Code comes with an opposing cost — speed against safety, context richness against token expense, specialization against maintenance burden. Mastery is not adding everything; it is knowing precisely which trade-off serves the moment.</p>
+            <p class="explanation">A principal-level engineer does not just know the tools — they know when each tool makes the situation worse. This section maps every major decision axis in Claude Code so you can make deliberate choices instead of defaulting to "maximum power, always."</p>
+        </section>
+
+        <section>
+            <h2>The Five Axes of Decision</h2>
+            <p>Claude Code presents five recurring decision surfaces where the wrong default costs you time, money, safety, or maintainability. Understanding each axis — what you gain at each extreme, what you lose, and where the sweet spot lives — is the difference between a developer who fights the tool and one who bends it to their will.</p>
+
+            <div class="diagram-container">
+                <svg class="architecture-diagram" viewBox="0 0 860 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The five trade-off axes in Claude Code">
+                    <defs>
+                        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#6b7280"/>
+                        </marker>
+                    </defs>
+                    <!-- Axis 1 -->
+                    <rect x="20" y="20" width="140" height="50" rx="8" fill="#3b82f6" stroke="#1d4ed8" stroke-width="1.5"/>
+                    <text x="90" y="41" font-family="system-ui" font-size="10" font-weight="700" fill="white" text-anchor="middle">Autonomy</text>
+                    <text x="90" y="57" font-family="system-ui" font-size="9" fill="#bfdbfe" text-anchor="middle">vs. Control</text>
+                    <!-- Axis 2 -->
+                    <rect x="185" y="20" width="140" height="50" rx="8" fill="#8b5cf6" stroke="#6d28d9" stroke-width="1.5"/>
+                    <text x="255" y="41" font-family="system-ui" font-size="10" font-weight="700" fill="white" text-anchor="middle">Context Window</text>
+                    <text x="255" y="57" font-family="system-ui" font-size="9" fill="#ddd6fe" text-anchor="middle">vs. Cost</text>
+                    <!-- Axis 3 -->
+                    <rect x="350" y="20" width="160" height="50" rx="8" fill="#10b981" stroke="#059669" stroke-width="1.5"/>
+                    <text x="430" y="41" font-family="system-ui" font-size="10" font-weight="700" fill="white" text-anchor="middle">Skills vs. MCP</text>
+                    <text x="430" y="57" font-family="system-ui" font-size="9" fill="#d1fae5" text-anchor="middle">vs. Plugins</text>
+                    <!-- Axis 4 -->
+                    <rect x="530" y="20" width="150" height="50" rx="8" fill="#f59e0b" stroke="#d97706" stroke-width="1.5"/>
+                    <text x="605" y="41" font-family="system-ui" font-size="10" font-weight="700" fill="white" text-anchor="middle">Sub-Agents</text>
+                    <text x="605" y="57" font-family="system-ui" font-size="9" fill="#fef3c7" text-anchor="middle">vs. Agent Teams</text>
+                    <!-- Axis 5 -->
+                    <rect x="700" y="20" width="145" height="50" rx="8" fill="#ef4444" stroke="#dc2626" stroke-width="1.5"/>
+                    <text x="772" y="41" font-family="system-ui" font-size="10" font-weight="700" fill="white" text-anchor="middle">Centralized</text>
+                    <text x="772" y="57" font-family="system-ui" font-size="9" fill="#fee2e2" text-anchor="middle">vs. Distributed Config</text>
+
+                    <!-- Common theme -->
+                    <rect x="150" y="110" width="560" height="55" rx="8" fill="#f9fafb" stroke="#e5e7eb" stroke-width="1.5"/>
+                    <text x="430" y="133" font-family="system-ui" font-size="11" font-weight="600" fill="#374151" text-anchor="middle">Film Production Parallel</text>
+                    <text x="430" y="152" font-family="system-ui" font-size="10" fill="#6b7280" text-anchor="middle">Every decision is a budget allocation: screen time, crew size, equipment rental, and revision cycles all have a price</text>
+                </svg>
+            </div>
+
+            <div class="tabs" data-default-tab="0">
+                <div class="tab-headers" role="tablist">
+                    <button role="tab" data-tab="0" aria-selected="true">Autonomy vs. Control</button>
+                    <button role="tab" data-tab="1" aria-selected="false">Context vs. Cost</button>
+                    <button role="tab" data-tab="2" aria-selected="false">Skills vs. MCP vs. Plugins</button>
+                    <button role="tab" data-tab="3" aria-selected="false">Sub-Agents vs. Agent Teams</button>
+                    <button role="tab" data-tab="4" aria-selected="false">Centralized vs. Distributed Config</button>
+                </div>
+                <div class="tab-panels">
+
+                    <!-- Tab 0: Autonomy vs Control -->
+                    <div data-panel="0" role="tabpanel">
+                        <h3>Autonomy vs. Control: Choosing Your Permission Mode</h3>
+                        <p>Claude Code ships with three permission modes that sit at different points on the autonomy spectrum. Each mode makes a different bet about your current context — how much you trust the codebase, how much you trust the task definition, and how costly a mistake would be. This is not a permanent setting. The best engineers switch modes deliberately for each task.</p>
+
+                        <div class="card error">
+                            <h4>Full-Auto Mode (YOLO) — Maximum Speed, Maximum Risk</h4>
+                            <p>Claude executes every action without pausing for approval: file edits, shell commands, git operations, deletions. There are no checkpoints. The session runs at machine speed rather than conversation speed. For a senior engineer working alone on a personal project, full-auto compresses an hour of back-and-forth into ten minutes of autonomous execution.</p>
+                            <p>The risk is real and underestimated by newcomers. Full-auto mode has no circuit breaker. Claude does not distinguish between "run tests" and "drop database" in terms of whether to pause. Unreviewed changes accumulate silently. If the initial prompt was ambiguous, Claude may make a rational but wrong interpretation and execute it across 40 files before you notice. It once deleted a migration file because it appeared to be a duplicate — it was not.</p>
+                            <p><strong>When it earns its place:</strong> Greenfield personal project with no production implications. Exploratory work where you expect to throw the output away. Local feature branch where git reset is a complete recovery. Never on shared branches, never with push access to main, never on code that has already been deployed.</p>
+                        </div>
+
+                        <div class="card success">
+                            <h4>Auto-Edit Mode — The Professional Sweet Spot</h4>
+                            <p>Claude can read and modify files freely, but must pause and ask before executing any shell command. This asymmetry is the key insight: file edits are reviewable and reversible through git; shell commands may not be. Auto-edit mode lets Claude work at speed on the thing that consumes most of the work — reading and writing code — while maintaining a human checkpoint before anything irreversible happens.</p>
+                            <p>In practice this means Claude drafts an entire feature, refactors across files, and updates tests without interruption. Then it pauses at "now I need to run the migration" and shows you the exact command. You review it, approve it, and it continues. The rhythm is interrupted only at the moments that actually carry risk.</p>
+                            <p><strong>When it earns its place:</strong> Active feature development on a team project. Code review prep where you want to see all changes before any command runs. Production repositories where file edits are gated by PR review anyway, so the shell command checkpoint is the actual safety moment.</p>
+                        </div>
+
+                        <div class="card info">
+                            <h4>Ask Mode (Default) — Maximum Control, Maximum Learning</h4>
+                            <p>Claude pauses before every action and shows you exactly what it intends to do. Every file read, every edit, every command requires your explicit approval. The session moves at conversation speed. You see each step's reasoning before it executes. Nothing happens without your sign-off.</p>
+                            <p>This is the recommended mode for the first few weeks with Claude Code — not because Claude cannot be trusted, but because watching each decision teaches you what Claude is actually doing inside a task. You learn the tool's reasoning patterns, which makes you better at prompting it, better at spotting when it has gone off-track, and better at building the mental model needed to use full-auto responsibly later.</p>
+                            <p><strong>When it earns its place:</strong> Sensitive production hotfix where every action is high-stakes. New team member learning the tool. Legacy codebase with undocumented dependencies where you need to verify Claude's assumptions. Any work touching security configurations, access controls, or billing logic.</p>
+                        </div>
+
+                        <div class="card warning">
+                            <h4>Decision Framework: A Quick-Reference Matrix</h4>
+                            <p>The film analogy applies directly here. Full-auto is like trusting your director of photography to make every camera decision without calling you — brilliant when they know your vision perfectly, catastrophic on day one of a new production. Ask mode is like reviewing every frame before moving on — thorough, but you will never make your release date. Auto-edit is the working director's mode: trust the craft, checkpoint the commits.</p>
+
+                            <div class="comparison-table">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Context</th>
+                                            <th>Recommended Mode</th>
+                                            <th>Why</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Solo project, personal repo</td>
+                                            <td>Full-auto</td>
+                                            <td>Recovery cost is low, git is full safety net</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Team project, feature branch</td>
+                                            <td>Auto-edit</td>
+                                            <td>Commands carry real risk; file edits are reviewed via PR</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Production hotfix</td>
+                                            <td>Ask mode</td>
+                                            <td>Every step is high-stakes; you need full visibility</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Onboarding / learning</td>
+                                            <td>Ask mode</td>
+                                            <td>Watching each step builds the mental model</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Legacy / undocumented codebase</td>
+                                            <td>Ask mode</td>
+                                            <td>Claude cannot know what it does not know; you must verify</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 1: Context vs Cost -->
+                    <div data-panel="1" role="tabpanel" style="display:none">
+                        <h3>Context Window vs. Cost: Managing Your Token Budget</h3>
+                        <p>The context window is simultaneously Claude Code's greatest strength and its most pressing constraint. Every file read, every response, every system prompt, every memory file, and every MCP tool description consumes tokens from a finite pool. More context means Claude has more information to reason from and makes fewer wrong assumptions. More context also means more API cost and, eventually, degraded performance as the window fills.</p>
+
+                        <div class="diagram-container">
+                            <svg viewBox="0 0 760 180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Context window token budget allocation diagram">
+                                <defs>
+                                    <marker id="arr2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+                                        <polygon points="0 0, 8 3, 0 6" fill="#6b7280"/>
+                                    </marker>
+                                </defs>
+                                <!-- Full bar background -->
+                                <rect x="40" y="40" width="680" height="50" rx="6" fill="#e5e7eb" stroke="#d1d5db"/>
+                                <text x="380" y="25" font-family="system-ui" font-size="11" font-weight="700" fill="#374151" text-anchor="middle">~200K Token Context Window — How it Fills Up</text>
+
+                                <!-- Segments -->
+                                <rect x="40" y="40" width="136" height="50" rx="0" fill="#ef4444"/>
+                                <text x="108" y="62" font-family="system-ui" font-size="9" font-weight="700" fill="white" text-anchor="middle">CLAUDE.md</text>
+                                <text x="108" y="76" font-family="system-ui" font-size="8" fill="#fee2e2" text-anchor="middle">~20% system context</text>
+
+                                <rect x="176" y="40" width="102" height="50" fill="#f59e0b"/>
+                                <text x="227" y="62" font-family="system-ui" font-size="9" font-weight="700" fill="white" text-anchor="middle">MCP Tools</text>
+                                <text x="227" y="76" font-family="system-ui" font-size="8" fill="#fef3c7" text-anchor="middle">~15% descriptions</text>
+
+                                <rect x="278" y="40" width="136" height="50" fill="#3b82f6"/>
+                                <text x="346" y="62" font-family="system-ui" font-size="9" font-weight="700" fill="white" text-anchor="middle">Files Read</text>
+                                <text x="346" y="76" font-family="system-ui" font-size="8" fill="#bfdbfe" text-anchor="middle">~20% codebase context</text>
+
+                                <rect x="414" y="40" width="170" height="50" fill="#8b5cf6"/>
+                                <text x="499" y="62" font-family="system-ui" font-size="9" font-weight="700" fill="white" text-anchor="middle">Conversation History</text>
+                                <text x="499" y="76" font-family="system-ui" font-size="8" fill="#ede9fe" text-anchor="middle">~25% grows over time</text>
+
+                                <rect x="584" y="40" width="136" height="50" rx="0" fill="#10b981" stroke="#059669"/>
+                                <text x="652" y="62" font-family="system-ui" font-size="9" font-weight="700" fill="white" text-anchor="middle">Available Space</text>
+                                <text x="652" y="76" font-family="system-ui" font-size="8" fill="#d1fae5" text-anchor="middle">~20% left for work</text>
+
+                                <text x="380" y="150" font-family="system-ui" font-size="10" fill="#6b7280" text-anchor="middle">After 2 hours of work without management, available space shrinks to near zero — quality degrades</text>
+                            </svg>
+                        </div>
+
+                        <div class="card info">
+                            <h4>/clear — The Hard Reset (Cheapest Option, Highest Context Loss)</h4>
+                            <p>Running <code>/clear</code> wipes the entire conversation history. Token cost drops to baseline immediately. The next prompt starts fresh: no accumulated understanding of what was discussed, no memory of decisions made, no awareness of files already read. Claude must re-orient from scratch.</p>
+                            <p>Use <code>/clear</code> between completely separate tasks — finishing the authentication feature and starting work on the payment system. The two tasks share nothing in context, so clearing between them costs you nothing meaningful while resetting your token meter. Avoid it mid-task: if you clear while debugging a complex issue, Claude loses the chain of reasoning that was actually making progress.</p>
+                        </div>
+
+                        <div class="card warning">
+                            <h4>/compact [focus] — The Intelligent Compression (Moderate Cost, Preserves Intent)</h4>
+                            <p>The <code>/compact</code> command asks Claude to summarize the conversation history into a dense representation of what matters, then discards the verbose original. A two-hour session that consumed 80,000 tokens of history might compact down to 8,000 tokens of distilled understanding. Claude retains the key decisions, the files touched, the outstanding issues.</p>
+                            <p>The optional <code>[focus]</code> parameter directs what to preserve. <code>/compact focus on the authentication bug</code> tells Claude to keep the context most relevant to that thread and discard the rest. This is a powerful technique: before starting a complex next step, compact to preserve what you need for that step specifically. The film analogy is a good one — it is the production editor cutting a 10-hour dailies reel to the 2 minutes that will appear in the final film.</p>
+                        </div>
+
+                        <div class="card success">
+                            <h4>Auto-Compaction — Convenient but Unpredictable</h4>
+                            <p>When the context window reaches approximately 95% capacity, Claude Code triggers automatic compaction. This is convenient: you never hit the hard wall that breaks the session. It is also unpredictable: the compaction happens at a threshold you did not choose, discarding what the algorithm considers low-value, which may not match what you consider low-value. Critical early requirements specified in the first message are particularly vulnerable to auto-compaction.</p>
+                            <p>Teams that have worked with Claude Code at scale consistently report that manual, intentional compaction at natural breakpoints produces better results than relying on auto-compaction. The discipline of <code>/compact focus on [next objective]</code> at each task transition is a professional habit worth developing early.</p>
+                        </div>
+
+                        <div class="card info">
+                            <h4>Model Selection: The Cost-Quality Dial</h4>
+                            <p>Model choice is the highest-leverage cost lever. Claude Opus costs roughly 10 times more per token than Claude Haiku, and roughly 3 times more than Claude Sonnet. For simple sub-agent tasks — searching for a file, checking a value, summarizing a log — Haiku performs identically to Opus at a fraction of the cost. For architectural analysis, complex multi-step reasoning, or ambiguous requirements interpretation, Opus earns its premium.</p>
+                            <p>The film analogy is screen time budget. Every scene in the film needs to earn its place. You do not use your lead actor for every scene — some scenes need a day player, and that is both correct and professional. Routing Haiku for sub-agent work and Sonnet for daily development is not compromising quality; it is allocating your budget where the quality premium creates real value.</p>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: Skills vs MCP vs Plugins -->
+                    <div data-panel="2" role="tabpanel" style="display:none">
+                        <h3>Skills vs. MCP vs. Plugins: The Extensibility Decision</h3>
+                        <p>Claude Code has three extension mechanisms that look superficially similar — they all "add capabilities" — but they operate at completely different architectural levels and serve completely different purposes. Choosing the wrong mechanism for a problem is like using a hammer when the job calls for a screw driver: it might technically work, but the result will be fragile and harder to maintain.</p>
+
+                        <div class="diagram-container">
+                            <svg viewBox="0 0 780 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Skills vs MCP vs Plugins comparison diagram">
+                                <!-- Skills column -->
+                                <rect x="30" y="20" width="210" height="180" rx="10" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+                                <text x="135" y="45" font-family="system-ui" font-size="13" font-weight="700" fill="#1e40af" text-anchor="middle">Skills</text>
+                                <text x="135" y="65" font-family="system-ui" font-size="9" fill="#1d4ed8" text-anchor="middle">Procedural knowledge</text>
+                                <text x="135" y="85" font-family="system-ui" font-size="9" fill="#374151" text-anchor="middle">Runs inside Claude's context</text>
+                                <text x="135" y="105" font-family="system-ui" font-size="9" fill="#374151" text-anchor="middle">SKILL.md with YAML frontmatter</text>
+                                <text x="135" y="125" font-family="system-ui" font-size="9" fill="#374151" text-anchor="middle">Works offline, no external deps</text>
+                                <text x="135" y="150" font-family="system-ui" font-size="10" font-weight="600" fill="#1e40af" text-anchor="middle">Best for: workflows,</text>
+                                <text x="135" y="165" font-family="system-ui" font-size="10" font-weight="600" fill="#1e40af" text-anchor="middle">code patterns, domain expertise</text>
+                                <text x="135" y="185" font-family="system-ui" font-size="9" fill="#6b7280" text-anchor="middle">Film: shooting script</text>
+
+                                <!-- MCP column -->
+                                <rect x="285" y="20" width="210" height="180" rx="10" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
+                                <text x="390" y="45" font-family="system-ui" font-size="13" font-weight="700" fill="#065f46" text-anchor="middle">MCP Servers</text>
+                                <text x="390" y="65" font-family="system-ui" font-size="9" fill="#059669" text-anchor="middle">External tool connectivity</text>
+                                <text x="390" y="85" font-family="system-ui" font-size="9" fill="#374151" text-anchor="middle">External process, separate lifecycle</text>
+                                <text x="390" y="105" font-family="system-ui" font-size="9" fill="#374151" text-anchor="middle">JSON schema tool definitions</text>
+                                <text x="390" y="125" font-family="system-ui" font-size="9" fill="#374151" text-anchor="middle">Network access, APIs, DBs</text>
+                                <text x="390" y="150" font-family="system-ui" font-size="10" font-weight="600" fill="#065f46" text-anchor="middle">Best for: databases, GitHub,</text>
+                                <text x="390" y="165" font-family="system-ui" font-size="10" font-weight="600" fill="#065f46" text-anchor="middle">CI/CD, external APIs</text>
+                                <text x="390" y="185" font-family="system-ui" font-size="9" fill="#6b7280" text-anchor="middle">Film: external rental equipment</text>
+
+                                <!-- Plugins column -->
+                                <rect x="540" y="20" width="210" height="180" rx="10" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+                                <text x="645" y="45" font-family="system-ui" font-size="13" font-weight="700" fill="#92400e" text-anchor="middle">Plugins</text>
+                                <text x="645" y="65" font-family="system-ui" font-size="9" fill="#d97706" text-anchor="middle">Bundled collections</text>
+                                <text x="645" y="85" font-family="system-ui" font-size="9" fill="#374151" text-anchor="middle">Package of commands + agents + MCP</text>
+                                <text x="645" y="105" font-family="system-ui" font-size="9" fill="#374151" text-anchor="middle">/plugin install command</text>
+                                <text x="645" y="125" font-family="system-ui" font-size="9" fill="#374151" text-anchor="middle">Versioned, shareable units</text>
+                                <text x="645" y="150" font-family="system-ui" font-size="10" font-weight="600" fill="#92400e" text-anchor="middle">Best for: team standardization,</text>
+                                <text x="645" y="165" font-family="system-ui" font-size="10" font-weight="600" fill="#92400e" text-anchor="middle">reproducible setups</text>
+                                <text x="645" y="185" font-family="system-ui" font-size="9" fill="#6b7280" text-anchor="middle">Film: production kit package</text>
+                            </svg>
+                        </div>
+
+                        <div class="card info">
+                            <h4>Skills: Procedural Intelligence Baked In</h4>
+                            <p>A skill teaches Claude how to do something using the tools and knowledge it already has. It is pure instruction: "when asked to create a new API endpoint, follow these steps, observe these conventions, check these places." Skills have zero external dependencies. They work in offline environments, in airgapped systems, and in restricted corporate networks. They consume context window space when active but nothing else.</p>
+                            <p>Skills shine brightest for domain-specific expertise that is codebase-particular: your team's PR naming convention, your migration generation pattern, your specific test structure. The 20K+ skills on public marketplaces are starting points; the most valuable skills are usually the ones your team writes for your specific workflows.</p>
+                        </div>
+
+                        <div class="card success">
+                            <h4>MCP Servers: The Bridge to the External World</h4>
+                            <p>MCP servers are the right tool the moment the task requires data or actions that live outside the Claude context window and outside the local filesystem. Querying a production database, creating a GitHub PR, triggering a CI pipeline, searching internal documentation — these are MCP jobs. No skill can replace MCP for external connectivity because skills have no outbound network capability.</p>
+                            <p>The critical discipline with MCP is restraint. Each server's tool definitions consume context window space whether or not you use them during a given task. Lazy loading (the default in Claude Code) mitigates this significantly — about 95% context savings — but the overhead is non-zero. Start with three to five MCP servers covering your core workflows. Add more only when you repeatedly hit a wall that an existing server cannot address.</p>
+                        </div>
+
+                        <div class="card warning">
+                            <h4>Plugins: The Coordination Layer</h4>
+                            <p>Plugins are not a third capability category — they are the distribution and governance mechanism for skills, agents, and MCP configurations. A plugin is the answer to: "How do I ensure everyone on my team has the same deploy skill, the same GitHub MCP config, and the same code review agent?" You define it once, version it in git, and every developer installs it with a single command.</p>
+                            <p>Plugins become essential at team scale. Without them, skills proliferate locally, MCP configs drift, and capabilities become siloed to individual developers. With them, your team operates from a shared, versioned, auditable toolset. The 9K+ public plugins are useful starting points; the team plugin you build and maintain internally is often worth more than all of them combined.</p>
+                        </div>
+
+                        <div class="comparison-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Task</th>
+                                        <th>Right Tool</th>
+                                        <th>Wrong Tool and Why</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Generate a migration following team convention</td>
+                                        <td>Skill</td>
+                                        <td>Not MCP — no external data needed; not plugin — too granular</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Query production database for debugging</td>
+                                        <td>MCP</td>
+                                        <td>Not skill — no outbound connectivity; not plugin — single capability</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Create a GitHub PR with review checklist</td>
+                                        <td>MCP + Skill</td>
+                                        <td>MCP for the API call, skill for the checklist format</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Standardize tooling across 15 developers</td>
+                                        <td>Plugin</td>
+                                        <td>Not individual skills — no distribution mechanism without plugin</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Tab 3: Sub-Agents vs Agent Teams -->
+                    <div data-panel="3" role="tabpanel" style="display:none">
+                        <h3>Sub-Agents vs. Agent Teams: Choosing Your Collaboration Model</h3>
+                        <p>Claude Code supports two very different models for multi-agent work. Sub-agents are the established, production-ready pattern: a parent agent spawns child agents for specific tasks, children complete their work, and results flow back up the hierarchy. Agent teams are the experimental frontier: peer agents communicate directly, share a task list, and coordinate without a central orchestrator. The choice between them is a choice between depth of control and breadth of collaboration.</p>
+
+                        <div class="card info">
+                            <h4>Sub-Agents: The Reliable Workhorse</h4>
+                            <p>Sub-agents work by the parent-child model that software engineers already understand well. The main agent is the orchestrator: it defines what needs to be done, spawns a sub-agent to do it, receives the result, and decides what to do next. Each sub-agent has its own context window, its own tool permissions, and its own prompt. It is isolated by design — it cannot see the parent's conversation history and cannot take actions beyond its tool grant.</p>
+                            <p>This isolation is the feature, not the limitation. A sub-agent exploring the codebase cannot accidentally trigger a deployment. A sub-agent writing a test plan cannot access the production database. The parent retains total authority over what each child can do. For tasks with clear boundaries — "research these five files and summarize the architecture," "run these three test suites in parallel," "generate documentation for each of these modules" — sub-agents are the right and obvious choice.</p>
+                            <p>Git worktrees pair naturally with sub-agents for maximum isolation. Each sub-agent working on a distinct problem can operate in its own worktree on its own branch, with zero risk of conflicts between concurrent changes. The parent agent merges results at a controlled integration point.</p>
+                        </div>
+
+                        <div class="card warning">
+                            <h4>Agent Teams: The Experimental Frontier (TeammateTool)</h4>
+                            <p>Agent teams (powered by TeammateTool, experimental as of early 2026) replace the hierarchy with a peer network. Multiple agents can exchange messages directly, coordinate on a shared task list, and divide work without a central orchestrator making every decision. An agent team working on a large feature might have one agent handling the API layer, another handling the data model, and a third handling tests — all communicating their findings and dependencies to each other in real time.</p>
+                            <p>The coordination overhead is genuine. Each inter-agent message consumes tokens in both agents' context windows. Shared task lists require synchronization logic. The lack of a central orchestrator means decisions that would be trivial for a single agent may require several rounds of peer communication. Teams that have piloted agent teams consistently report that they shine for large, cross-cutting features where the alternative is a single massive context window — and struggle for smaller tasks where the overhead-to-work ratio is unfavorable.</p>
+                        </div>
+
+                        <div class="diagram-container">
+                            <svg viewBox="0 0 760 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Sub-agents hierarchical model vs agent teams peer model">
+                                <!-- Sub-agent model (left) -->
+                                <text x="180" y="20" font-family="system-ui" font-size="12" font-weight="700" fill="#374151" text-anchor="middle">Sub-Agent Model (Hierarchical)</text>
+                                <rect x="110" y="35" width="140" height="40" rx="6" fill="#8b5cf6" stroke="#6d28d9" stroke-width="2"/>
+                                <text x="180" y="60" font-family="system-ui" font-size="11" font-weight="600" fill="white" text-anchor="middle">Main Agent (Director)</text>
+                                <!-- arrows down -->
+                                <line x1="140" y1="75" x2="80" y2="120" stroke="#8b5cf6" stroke-width="1.5" marker-end="url(#arr2)"/>
+                                <line x1="180" y1="75" x2="180" y2="120" stroke="#8b5cf6" stroke-width="1.5" marker-end="url(#arr2)"/>
+                                <line x1="220" y1="75" x2="280" y2="120" stroke="#8b5cf6" stroke-width="1.5" marker-end="url(#arr2)"/>
+                                <!-- sub-agent boxes -->
+                                <rect x="40" y="120" width="90" height="38" rx="6" fill="#a78bfa" stroke="#7c3aed" stroke-width="1.5"/>
+                                <text x="85" y="142" font-family="system-ui" font-size="9" fill="white" text-anchor="middle">Explore Agent</text>
+                                <rect x="140" y="120" width="90" height="38" rx="6" fill="#a78bfa" stroke="#7c3aed" stroke-width="1.5"/>
+                                <text x="185" y="142" font-family="system-ui" font-size="9" fill="white" text-anchor="middle">Plan Agent</text>
+                                <rect x="245" y="120" width="90" height="38" rx="6" fill="#a78bfa" stroke="#7c3aed" stroke-width="1.5"/>
+                                <text x="290" y="142" font-family="system-ui" font-size="9" fill="white" text-anchor="middle">Bash Agent</text>
+                                <text x="180" y="190" font-family="system-ui" font-size="9" fill="#6b7280" text-anchor="middle">Results flow up. Parent controls everything.</text>
+
+                                <!-- divider -->
+                                <line x1="380" y1="20" x2="380" y2="200" stroke="#e5e7eb" stroke-width="1.5" stroke-dasharray="4 3"/>
+
+                                <!-- Agent team model (right) -->
+                                <text x="570" y="20" font-family="system-ui" font-size="12" font-weight="700" fill="#374151" text-anchor="middle">Agent Team Model (Peer)</text>
+                                <rect x="500" y="60" width="100" height="38" rx="6" fill="#f59e0b" stroke="#d97706" stroke-width="2"/>
+                                <text x="550" y="82" font-family="system-ui" font-size="9" font-weight="600" fill="white" text-anchor="middle">API Agent</text>
+                                <rect x="630" y="60" width="100" height="38" rx="6" fill="#f59e0b" stroke="#d97706" stroke-width="2"/>
+                                <text x="680" y="82" font-family="system-ui" font-size="9" font-weight="600" fill="white" text-anchor="middle">Data Agent</text>
+                                <rect x="565" y="140" width="100" height="38" rx="6" fill="#f59e0b" stroke="#d97706" stroke-width="2"/>
+                                <text x="615" y="162" font-family="system-ui" font-size="9" font-weight="600" fill="white" text-anchor="middle">Test Agent</text>
+                                <!-- bi-directional arrows -->
+                                <line x1="600" y1="79" x2="630" y2="79" stroke="#d97706" stroke-width="1.5" marker-end="url(#arr2)"/>
+                                <line x1="630" y1="85" x2="600" y2="85" stroke="#d97706" stroke-width="1.5" marker-end="url(#arr2)"/>
+                                <line x1="560" y1="98" x2="590" y2="140" stroke="#d97706" stroke-width="1.5" stroke-dasharray="3 2"/>
+                                <line x1="670" y1="98" x2="640" y2="140" stroke="#d97706" stroke-width="1.5" stroke-dasharray="3 2"/>
+                                <!-- shared task list -->
+                                <rect x="480" y="195" width="220" height="22" rx="4" fill="#fef3c7" stroke="#f59e0b"/>
+                                <text x="590" y="210" font-family="system-ui" font-size="9" fill="#92400e" text-anchor="middle">Shared Task List — coordination overhead</text>
+                            </svg>
+                        </div>
+
+                        <div class="comparison-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Dimension</th>
+                                        <th>Sub-Agents</th>
+                                        <th>Agent Teams</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Maturity</td>
+                                        <td>Production-ready</td>
+                                        <td>Experimental (early 2026)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Coordination overhead</td>
+                                        <td>Low — parent routes everything</td>
+                                        <td>Higher — peer messaging round trips</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Isolation</td>
+                                        <td>Strong — parent controls tool grants</td>
+                                        <td>Requires explicit design</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Best task size</td>
+                                        <td>Discrete, bounded tasks</td>
+                                        <td>Large cross-cutting features</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Parallelism</td>
+                                        <td>Via worktrees + parent spawning</td>
+                                        <td>Native peer parallelism</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Tab 4: Centralized vs Distributed Config -->
+                    <div data-panel="4" role="tabpanel" style="display:none">
+                        <h3>Centralized vs. Distributed Configuration: The CLAUDE.md Architecture Decision</h3>
+                        <p>Every project starts with a single CLAUDE.md file. That is the right starting point. The question of whether to keep it that way or evolve to a modular configuration structure is one of the most consequential architectural decisions a team makes — and it is usually made badly, by accident, when the single file becomes unmanageable and someone frantically splits it up without a coherent strategy.</p>
+
+                        <div class="card success">
+                            <h4>Single CLAUDE.md: Perfect for Getting Started</h4>
+                            <p>One file. One place to look. New team members find it immediately. The entire project's AI context is auditable in a single <code>git diff</code>. There is no question of "which rule file takes precedence" or "why is this in rules/security.md and not CLAUDE.md." The cognitive overhead of managing configuration is near zero.</p>
+                            <p>The problem is not the approach itself — it is entropy. CLAUDE.md files reliably grow. Every team member adds their preferred rule. Every incident produces a new "never do X" entry. Every project phase adds new conventions. Six months in, the file is 800 lines, Claude is spending 20% of its context window on standing instructions, and the most important rules (the ones added first) are now buried under layers of late additions. The 200-line loading priority means rules beyond line 200 load with degraded priority.</p>
+                        </div>
+
+                        <div class="card warning">
+                            <h4>Modular .claude/rules/: Organized but Opaque</h4>
+                            <p>The modular approach moves domain-specific rules into separate files: <code>.claude/rules/security.md</code>, <code>.claude/rules/testing.md</code>, <code>.claude/rules/deployment.md</code>. Each file is focused and reviewable in isolation. When the security rules need updating, you go to one focused file instead of hunting through a monolith.</p>
+                            <p>The downsides are real. There is no single file that shows the complete picture. Conflicts between rule files require careful ordering. Team members are less likely to read multiple files thoroughly, leading to blind spots. And the question of what belongs in CLAUDE.md versus a rules file creates ongoing debate that distracts from actual work. Modular structure solves the size problem while creating a discoverability problem.</p>
+                        </div>
+
+                        <div class="card info">
+                            <h4>The Hybrid Approach: The Recommended Pattern</h4>
+                            <p>The pattern that survives real-world use is a deliberate hybrid: a lean CLAUDE.md under 100 lines that contains only three things — the project's core identity, the most critical non-negotiable rules, and references to the modular rule files. The rule files handle depth; CLAUDE.md handles breadcrumbs and the essentials that must be in every session.</p>
+                            <p>Think of it as a film's production bible (CLAUDE.md) and departmental guidelines (rule files). The production bible tells everyone what the film is and its ten commandments. The camera department's guidelines tell the DP how to handle specific shot types. The production bible references the departmental guides but does not contain them. Every crew member reads the bible; department members read their own guide. Together they make a coherent whole without drowning any individual in irrelevant detail.</p>
+                        </div>
+
+                        <div class="diagram-container">
+                            <svg viewBox="0 0 760 180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hybrid CLAUDE.md configuration structure">
+                                <!-- CLAUDE.md center -->
+                                <rect x="280" y="20" width="200" height="60" rx="8" fill="#ef4444" stroke="#dc2626" stroke-width="2"/>
+                                <text x="380" y="43" font-family="system-ui" font-size="12" font-weight="700" fill="white" text-anchor="middle">CLAUDE.md</text>
+                                <text x="380" y="63" font-family="system-ui" font-size="9" fill="#fee2e2" text-anchor="middle">Under 100 lines. Core identity + essentials.</text>
+
+                                <!-- Rule files -->
+                                <rect x="30" y="110" width="140" height="40" rx="6" fill="#fca5a5" stroke="#ef4444" stroke-width="1.5"/>
+                                <text x="100" y="134" font-family="system-ui" font-size="9" font-weight="600" fill="#7f1d1d" text-anchor="middle">rules/security.md</text>
+
+                                <rect x="195" y="110" width="140" height="40" rx="6" fill="#fca5a5" stroke="#ef4444" stroke-width="1.5"/>
+                                <text x="265" y="134" font-family="system-ui" font-size="9" font-weight="600" fill="#7f1d1d" text-anchor="middle">rules/testing.md</text>
+
+                                <rect x="425" y="110" width="140" height="40" rx="6" fill="#fca5a5" stroke="#ef4444" stroke-width="1.5"/>
+                                <text x="495" y="134" font-family="system-ui" font-size="9" font-weight="600" fill="#7f1d1d" text-anchor="middle">rules/deployment.md</text>
+
+                                <rect x="590" y="110" width="140" height="40" rx="6" fill="#fca5a5" stroke="#ef4444" stroke-width="1.5"/>
+                                <text x="660" y="134" font-family="system-ui" font-size="9" font-weight="600" fill="#7f1d1d" text-anchor="middle">rules/style.md</text>
+
+                                <!-- arrows -->
+                                <line x1="320" y1="80" x2="160" y2="110" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4 3"/>
+                                <line x1="350" y1="80" x2="300" y2="110" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4 3"/>
+                                <line x1="410" y1="80" x2="460" y2="110" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4 3"/>
+                                <line x1="440" y1="80" x2="620" y2="110" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4 3"/>
+
+                                <text x="380" y="175" font-family="system-ui" font-size="9" fill="#6b7280" text-anchor="middle">CLAUDE.md references modules. Lean at the top; depth in the branches.</text>
+                            </svg>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>The Universal Trade-off Principle</h2>
+            <div class="card success">
+                <p class="powerful-sentence">The engineers who get the most from Claude Code are not the ones who push every setting to maximum. They are the ones who develop a precise vocabulary for what each setting costs and what it buys — and switch settings deliberately as the task changes.</p>
+                <p>A production hotfix is not a greenfield project. An exploratory research task is not a deployment pipeline. Treating all tasks with the same mode, the same model, and the same configuration is the hallmark of a developer who learned Claude Code once and stopped learning. The tool is designed to be tuned. Tune it.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="section-footer">
+        <a href="patterns.html" class="btn">Previous: Patterns</a>
+        <a href="scale.html" class="btn">Next: At Scale</a>
+    </footer>
+
+    <script src="../../js/components.js"></script>
+</body>
+</html>

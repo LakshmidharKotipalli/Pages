@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What's Next - RAG Learning Journey</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="theme-dark">
+    <div class="container">
+        <header class="section-header">
+            <div class="breadcrumbs">
+                <a href="index.html">Home</a>
+                <span>/</span>
+                <span>Section 16: What's Next</span>
+            </div>
+            <h1>What's Next</h1>
+            <p class="section-subtitle">Related Topics and Your Learning Path Forward</p>
+        </header>
+
+        <nav class="nav-buttons">
+            <a id="prevBtn" class="nav-btn" href="section15-reference.html">
+                ← Previous
+            </a>
+            <button id="completeBtn" class="nav-btn" data-section="section16-whats-next">
+                ✓ Mark Complete
+            </button>
+        </nav>
+
+        <main>
+            <section class="content-section">
+                <h2>Your RAG Learning Journey Continues</h2>
+
+                <div class="highlight success">
+                    <h4>🎉 Congratulations!</h4>
+                    <p>You've completed the comprehensive RAG learning journey. But this is just the beginning. RAG sits within a broader ecosystem of AI, data engineering, and system design.</p>
+
+                    <p><strong>This section covers:</strong> What to learn next, how RAG connects to other topics, and how to continue your growth.</p>
+                </div>
+            </section>
+
+            <!-- Related Topics -->
+            <section class="content-section">
+                <h2>Related Topics to Explore</h2>
+
+                <div class="cards-grid">
+                    <div class="info-card">
+                        <h4>1. Vector Databases Deep Dive</h4>
+                        <p><strong>Connection to RAG:</strong> Vector databases are RAG's foundation</p>
+                        <p><strong>What to learn:</strong></p>
+                        <ul>
+                            <li>Vector indexing algorithms (HNSW, IVF, PQ)</li>
+                            <li>Database operations (sharding, replication)</li>
+                            <li>Performance tuning and optimization</li>
+                            <li>Vector database alternatives (brute force, approximate)</li>
+                        </ul>
+                        <p><strong>Difficulty:</strong> Intermediate | <strong>Prerequisites:</strong> Basic RAG knowledge</p>
+                        <p><strong>Why it matters:</strong> Understanding vector DBs helps optimize RAG performance and cost</p>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>2. LLM Fine-Tuning</h4>
+                        <p><strong>Connection to RAG:</strong> Complementary approaches often used together</p>
+                        <p><strong>What to learn:</strong></p>
+                        <ul>
+                            <li>Fine-tuning techniques (LoRA, QLoRA, full fine-tuning)</li>
+                            <li>When to fine-tune vs use RAG</li>
+                            <li>Dataset preparation for fine-tuning</li>
+                            <li>Evaluation of fine-tuned models</li>
+                        </ul>
+                        <p><strong>Difficulty:</strong> Advanced | <strong>Prerequisites:</strong> ML fundamentals, PyTorch</p>
+                        <p><strong>Why it matters:</strong> Best systems combine RAG (facts) with fine-tuning (style/behavior)</p>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>3. Prompt Engineering</h4>
+                        <p><strong>Connection to RAG:</strong> Critical for RAG prompt assembly</p>
+                        <p><strong>What to learn:</strong></p>
+                        <ul>
+                            <li>Prompt structures and patterns</li>
+                            <li>Few-shot learning in prompts</li>
+                            <li>Chain-of-thought prompting</li>
+                            <li>Prompt optimization and testing</li>
+                        </ul>
+                        <p><strong>Difficulty:</strong> Beginner | <strong>Prerequisites:</strong> None</p>
+                        <p><strong>Why it matters:</strong> Better prompts = better RAG outputs, regardless of other components</p>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>4. Knowledge Graphs</h4>
+                        <p><strong>Connection to RAG:</strong> Graph RAG combines both approaches</p>
+                        <p><strong>What to learn:</strong></p>
+                        <ul>
+                            <li>Graph databases (Neo4j, Amazon Neptune)</li>
+                            <li>Knowledge graph construction</li>
+                            <li>Graph traversal algorithms</li>
+                            <li>Graph embeddings and node2vec</li>
+                        </ul>
+                        <p><strong>Difficulty:</strong> Advanced | <strong>Prerequisites:</strong> Graph theory concepts</p>
+                        <p><strong>Why it matters:</strong> Graph RAG handles complex relationships better than vector-only RAG</p>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>5. MLOps for LLMs</h4>
+                        <p><strong>Connection to RAG:</strong> Production deployment and maintenance</p>
+                        <p><strong>What to learn:</strong></p>
+                        <ul>
+                            <li>LLMOps pipelines and infrastructure</li>
+                            <li>Monitoring and observability</li>
+                            <li>Continuous evaluation and deployment</li>
+                            <li>Model versioning and A/B testing</li>
+                        </ul>
+                        <p><strong>Difficulty:</strong> Intermediate | <strong>Prerequisites:</strong> DevOps basics</p>
+                        <p><strong>Why it matters:</strong> RAG systems need production-grade MLOps for reliability</p>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>6. Information Retrieval</h4>
+                        <p><strong>Connection to RAG:</strong> RAG is built on IR foundations</p>
+                        <p><strong>What to learn:</strong></p>
+                        <ul>
+                            <li>Classic IR algorithms (BM25, TF-IDF)</li>
+                            <li>Evaluation metrics (precision, recall, MAP, NDCG)</li>
+                            <li>Query understanding and expansion</li>
+                            <li>Search relevance tuning</li>
+                        </ul>
+                        <p><strong>Difficulty:</strong> Intermediate | <strong>Prerequisites:</strong> None</p>
+                        <p><strong>Why it matters:</strong> RAG retrieval is just modern IR - foundations still apply</p>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>7. Data Engineering</h4>
+                        <p><strong>Connection to RAG:</strong> Pipelines move data from source to vector DB</p>
+                        <p><strong>What to learn:</strong></p>
+                        <ul>
+                            <li>ETL/ELT pipelines</li>
+                            <li>Stream processing (Kafka, Kinesis)</li>
+                            <li>Data quality and validation</li>
+                            <li>Orchestration (Airflow, Prefect)</li>
+                        </ul>
+                        <p><strong>Difficulty:</strong> Intermediate | <strong>Prerequisites:</strong> SQL, programming</p>
+                        <p><strong>Why it matters:</strong> RAG systems need robust data pipelines to stay current</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Learning Paths -->
+            <section class="content-section">
+                <h2>Recommended Learning Paths</h2>
+
+                <div class="highlight info">
+                    <h4>🎯 Choose Your Path Based on Goals</h4>
+                </div>
+
+                <h3>Path 1: RAG Engineer (Build and Optimize RAG Systems)</h3>
+                <div class="cards-grid">
+                    <div class="info-card">
+                        <h4>Next Steps</h4>
+                        <ol>
+                            <li>Master Vector Databases</li>
+                            <li>Learn MLOps for LLMs</li>
+                            <li>Study advanced RAG patterns</li>
+                            <li>Practice building production systems</li>
+                        </ol>
+                    </div>
+                    <div class="info-card">
+                        <h4>Projects to Build</h4>
+                        <ul>
+                            <li>Multi-tenant RAG system</li>
+                            <li>Real-time news RAG</li>
+                            <li>Domain-specific RAG (medical, legal)</li>
+                            <li>RAG evaluation framework</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>Path 2: ML Engineer (Models and Algorithms)</h3>
+                <div class="cards-grid">
+                    <div class="info-card">
+                        <h4>Next Steps</h4>
+                        <ol>
+                            <li>Study embedding models in depth</li>
+                            <li>Learn fine-tuning techniques</li>
+                            <li>Explore reranker architectures</li>
+                            <li>Research latest RAG papers</li>
+                        </ol>
+                    </div>
+                    <div class="info-card">
+                        <h4>Research Areas</h4>
+                        <ul>
+                            <li>Domain-specific embeddings</li>
+                            <li>Multimodal RAG</li>
+                            <li>Efficient retrieval algorithms</li>
+                            <li>Adaptive routing optimization</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>Path 3: AI Architect (System Design and Strategy)</h3>
+                <div class="cards-grid">
+                    <div class="info-card">
+                        <h4>Next Steps</h4>
+                        <ol>
+                            <li>Study distributed systems</ol>
+                            <li>Learn system design principles</li>
+                            <li>Understand cost optimization</li>
+                            <li>Practice architecture design</li>
+                        </ol>
+                    </div>
+                    <div class="info-card">
+                        <h4>Focus Areas</h4>
+                        <ul>
+                            <li>Scalable RAG architectures</li>
+                            <li>Cost optimization strategies</li>
+                            <li>Multi-region deployment</li>
+                            <li>Vendor selection and evaluation</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Staying Current -->
+            <section class="content-section">
+                <h2>Staying Current in a Fast-Moving Field</h2>
+
+                <div class="highlight warning">
+                    <h4>⚡ RAG Evolves Rapidly</h4>
+                    <p>The RAG field moves fast. What's cutting-edge today may be standard practice tomorrow. Here's how to stay current.</p>
+                </div>
+
+                <h3>Resources to Follow</h3>
+
+                <table class="matrix-table">
+                    <thead>
+                        <tr>
+                            <th>Resource Type</th>
+                            <th>Recommendations</th>
+                            <th>Frequency</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Research Papers</strong></td>
+                            <td>ArXiv (cs.CL, cs.IR), ACL, EMNLP, NeurIPS</td>
+                            <td>Weekly</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Blogs</strong></td>
+                            <td>OpenAI, Anthropic, Weights & Biases, Pinecone, Weaviate</td>
+                            <td>Weekly</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Twitter/X</strong></td>
+                            <td>Follow researchers and practitioners in RAG/LLMs</td>
+                            <td>Daily</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Newsletters</strong></td>
+                            <td>The Batch (DeepLearning.AI), TLDR AI, Machine Learning Mastery</td>
+                            <td>Weekly</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Conferences</strong></td>
+                            <td>NeurIPS, ICML, ACL, EMNLP, vendor events</td>
+                            <td>Quarterly/Annually</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Open Source</strong></td>
+                            <td>LangChain, LlamaIndex, RAGAS, Hugging Face</td>
+                            <td>Monthly releases</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Learning Strategy</h3>
+                <div class="accordion-group">
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>The T-Shaped Approach</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Deep expertise in:</strong> RAG fundamentals, one vector DB, one framework</p>
+                            <p><strong>Broad knowledge in:</strong> Related areas (fine-tuning, MLOps, data engineering)</p>
+                            <p><strong>Benefits:</strong> Specialized enough to be valuable, broad enough to adapt to changes</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>The Project-Based Approach</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Learn by building:</strong> Don't just read - implement</p>
+                            <p><strong>Project ideas:</strong> Build different RAG systems for different use cases</p>
+                            <p><strong>Benefits:</strong> Practical experience reveals what tutorials don't cover</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>The Community Approach</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Engage with community:</strong> Forums, Discord, Slack groups</p>
+                            <p><strong>Share knowledge:</strong> Blog posts, talks, open source contributions</p>
+                            <p><strong>Benefits:</strong> Learn from others' experiences, build reputation</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Career Opportunities -->
+            <section class="content-section">
+                <h2>Career Opportunities in RAG</h2>
+
+                <div class="highlight success">
+                    <h4>💼 The RAG Job Market</h4>
+                    <p>RAG skills are in high demand. Every company implementing AI needs RAG expertise.</p>
+                </div>
+
+                <h3>Role Titles</h3>
+                <div class="cards-grid">
+                    <div class="info-card">
+                        <h4>ML Engineer - RAG</h4>
+                        <p><strong>Responsibilities:</strong> Build and maintain RAG systems</p>
+                        <p><strong>Skills:</strong> RAG patterns, vector DBs, Python, ML fundamentals</p>
+                        <p><strong>Salary:</strong> $150K-$250K</p>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>RAG Architect</h4>
+                        <p><strong>Responsibilities:</strong> Design RAG systems at scale</p>
+                        <p><strong>Skills:</strong> System design, scalability, cost optimization</p>
+                        <p><strong>Salary:</strong> $200K-$350K</p>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>Applied AI Engineer</h4>
+                        <p><strong>Responsibilities:</strong> Implement AI solutions including RAG</p>
+                        <p><strong>Skills:</strong> RAG, fine-tuning, MLOps, deployment</p>
+                        <p><strong>Salary:</strong> $150K-$250K</p>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>LLM Engineer</h4>
+                        <p><strong>Responsibilities:</strong> Work with LLMs including RAG systems</p>
+                        <p><strong>Skills:</strong> LLM APIs, prompt engineering, RAG, fine-tuning</p>
+                        <p><strong>Salary:</strong> $150K-$250K</p>
+                    </div>
+                </div>
+
+                <h3>Industries Hiring</h3>
+                <ul>
+                    <li><strong>Tech:</strong> OpenAI, Anthropic, startups, big tech</li>
+                    <li><strong>Finance:</strong> Banks, hedge funds, fintech</li>
+                    <li><strong>Healthcare:</strong> Hospitals, medical AI, pharma</li>
+                    <li><strong>Legal:</strong> Law firms, legal tech, compliance</li>
+                    <li><strong>Consulting:</strong> McKinsey, BCG, Deloitte (AI practices)</li>
+                    <li><strong>Enterprise:</strong> Any company with internal knowledge needs</li>
+                </ul>
+            </section>
+
+            <!-- Final Words -->
+            <section class="content-section">
+                <h2>Final Words: Your Journey Continues</h2>
+
+                <div class="highlight info">
+                    <h4>🎓 You've Completed the RAG Learning Journey</h4>
+                    <p><strong>But this isn't an end - it's a beginning.</strong></p>
+
+                    <p>You now have:</p>
+                    <ul>
+                        <li>✅ Solid understanding of RAG fundamentals</li>
+                        <li>✅ Knowledge of advanced patterns (Adaptive RAG, Agentic RAG)</li>
+                        <li>✅ Production experience through war stories and pitfalls</li>
+                        <li>✅ Interview preparation materials</li>
+                        <li>✅ Quick reference for daily use</li>
+                    </ul>
+
+                    <p><strong>What comes next is up to you:</strong></p>
+                    <ul>
+                        <li>Build RAG systems (the best way to learn is by doing)</li>
+                        <li>Stay current with rapid developments</li>
+                        <li>Engage with the community</li>
+                        <li>Share your knowledge (blog, talks, open source)</li>
+                        <li>Explore related topics</li>
+                    </ul>
+
+                    <p><strong>Remember:</strong> The field is young and moving fast. Today's expert techniques may be tomorrow's basics. Stay curious, keep learning, and don't be afraid to experiment.</p>
+
+                    <p><strong>Good luck on your RAG journey! 🚀</strong></p>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2>Congratulations! 🎉</h2>
+
+                <div class="highlight success">
+                    <h4>You've Completed the Comprehensive RAG Learning Journey!</h4>
+
+                    <p><strong>Review what you've learned:</strong></p>
+                    <ul>
+                        <li>Foundation & Context</li>
+                        <li>Living Analogy (Library Metaphor)</li>
+                        <li>Learning Journey (4 Levels of Mastery)</li>
+                        <li>Interview Conversations</li>
+                        <li>System Design Integration</li>
+                        <li>Ripple Effects Map</li>
+                        <li>Evolution Story</li>
+                        <li>Patterns & Anti-Patterns</li>
+                        <li>Trade-offs Analysis</li>
+                        <li>At Scale</li>
+                        <li>Technology Landscape</li>
+                        <li>Pitfalls & War Stories</li>
+                        <li>Debugging Process</li>
+                        <li>Eloquent Conversation</li>
+                        <li>Practice Exercises</li>
+                        <li>Quick Reference</li>
+                        <li>What's Next</li>
+                    </ul>
+
+                    <p><strong>You're now equipped to:</strong></p>
+                    <ul>
+                        <li>Build production-ready RAG systems</li>
+                        <li>Make informed architectural decisions</li>
+                        <li>Debug and optimize RAG systems</li>
+                        <li>Talk about RAG like an expert</li>
+                        <li>Ace RAG-related interviews</li>
+                    </ul>
+
+                    <p><strong>Keep learning, keep building, and stay curious!</strong></p>
+                </div>
+            </section>
+        </main>
+
+        <footer class="main-footer">
+            <p><strong>You've reached the end!</strong> Return to <a href="index.html">main hub</a> to review any section</p>
+        </footer>
+    </div>
+
+    <script src="js/components.js"></script>
+</body>
+</html>

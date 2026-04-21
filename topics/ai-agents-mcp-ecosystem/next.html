@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What's Next - Learn AI Agents, Skills, Tools & MCP</title>
+    <link rel="stylesheet" href="../../css/styles.css">
+    <link rel="stylesheet" href="theme.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <a href="index.html" class="nav-back">Back to Overview</a>
+        <span class="current-section">What's Next</span>
+        <div class="nav-links">
+            <a href="ecosystem.html">Previous</a>
+            <a href="index.html">Next</a>
+        </div>
+    </nav>
+
+    <main>
+        <h1>What's Next</h1>
+
+        <div class="hero">
+            <p class="powerful-sentence">You understand agents, tools, skills, and MCP. Now the question is: which direction do you go deeper?</p>
+            <p class="explanation">Each topic below builds on the foundation you've built here. They are ordered by their natural dependency — topics earlier in the sequence unlock topics later. The difficulty ratings reflect the conceptual and practical complexity, not the importance. All seven topics are worth studying; the sequence recommendation tells you the highest-leverage order.</p>
+        </div>
+
+        <!-- Topic Mindmap SVG -->
+        <div class="diagram-container">
+            <h2>Topic Connection Map</h2>
+            <div class="architecture-diagram">
+                <svg viewBox="0 0 820 440" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+                    <defs>
+                        <marker id="nextArrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                            <path d="M0,0 L0,6 L8,3 z" fill="#94a3b8"/>
+                        </marker>
+                        <marker id="nextArrowGreen" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                            <path d="M0,0 L0,6 L8,3 z" fill="#22c55e"/>
+                        </marker>
+                    </defs>
+
+                    <!-- Center: Current Topic -->
+                    <ellipse cx="410" cy="220" rx="80" ry="48" fill="#3b82f6"/>
+                    <text x="410" y="215" text-anchor="middle" font-size="13" font-weight="bold" fill="white">AI Agents</text>
+                    <text x="410" y="231" text-anchor="middle" font-size="12" font-weight="bold" fill="white">MCP</text>
+                    <text x="410" y="247" text-anchor="middle" font-size="10" fill="#bfdbfe">(You are here)</text>
+
+                    <!-- Topic 1: RAG - top left -->
+                    <ellipse cx="140" cy="100" rx="80" ry="42" fill="#10b981"/>
+                    <text x="140" y="96" text-anchor="middle" font-size="12" font-weight="bold" fill="white">RAG</text>
+                    <text x="140" y="112" text-anchor="middle" font-size="10" fill="#a7f3d0">Knowledge Access</text>
+                    <text x="140" y="126" text-anchor="middle" font-size="9" fill="#a7f3d0">Medium</text>
+                    <line x1="215" y1="118" x2="340" y2="192" stroke="#10b981" stroke-width="2" marker-end="url(#nextArrowGreen)"/>
+
+                    <!-- Topic 2: Prompt Engineering - top -->
+                    <ellipse cx="410" cy="75" rx="90" ry="42" fill="#10b981"/>
+                    <text x="410" y="69" text-anchor="middle" font-size="12" font-weight="bold" fill="white">Prompt Eng.</text>
+                    <text x="410" y="85" text-anchor="middle" font-size="10" fill="#a7f3d0">for Agents</text>
+                    <text x="410" y="100" text-anchor="middle" font-size="9" fill="#a7f3d0">Medium</text>
+                    <line x1="410" y1="117" x2="410" y2="172" stroke="#10b981" stroke-width="2" marker-end="url(#nextArrowGreen)"/>
+
+                    <!-- Topic 3: Multi-Agent Orchestration - top right -->
+                    <ellipse cx="680" cy="100" rx="90" ry="42" fill="#f59e0b"/>
+                    <text x="680" y="94" text-anchor="middle" font-size="12" font-weight="bold" fill="white">Multi-Agent</text>
+                    <text x="680" y="110" text-anchor="middle" font-size="10" fill="#fef3c7">Orchestration</text>
+                    <text x="680" y="125" text-anchor="middle" font-size="9" fill="#fef3c7">Hard</text>
+                    <line x1="595" y1="122" x2="488" y2="190" stroke="#f59e0b" stroke-width="2" marker-end="url(#nextArrow)"/>
+
+                    <!-- Topic 4: Production Observability - right -->
+                    <ellipse cx="720" cy="270" rx="90" ry="42" fill="#8b5cf6"/>
+                    <text x="720" y="264" text-anchor="middle" font-size="12" font-weight="bold" fill="white">Production</text>
+                    <text x="720" y="280" text-anchor="middle" font-size="10" fill="#e9d5ff">Observability</text>
+                    <text x="720" y="295" text-anchor="middle" font-size="9" fill="#e9d5ff">Medium</text>
+                    <line x1="630" y1="262" x2="490" y2="246" stroke="#8b5cf6" stroke-width="2" marker-end="url(#nextArrow)"/>
+
+                    <!-- Topic 5: Agent Safety - bottom right -->
+                    <ellipse cx="650" cy="380" rx="90" ry="42" fill="#ef4444"/>
+                    <text x="650" y="374" text-anchor="middle" font-size="12" font-weight="bold" fill="white">Agent Safety</text>
+                    <text x="650" y="390" text-anchor="middle" font-size="10" fill="#fecaca">and Alignment</text>
+                    <text x="650" y="405" text-anchor="middle" font-size="9" fill="#fecaca">Hard</text>
+                    <line x1="565" y1="366" x2="480" y2="298" stroke="#ef4444" stroke-width="2" marker-end="url(#nextArrow)"/>
+
+                    <!-- Topic 6: LLM Fine-tuning - bottom left -->
+                    <ellipse cx="170" cy="380" rx="90" ry="42" fill="#ef4444"/>
+                    <text x="170" y="374" text-anchor="middle" font-size="12" font-weight="bold" fill="white">LLM Fine-tuning</text>
+                    <text x="170" y="390" text-anchor="middle" font-size="10" fill="#fecaca">for Tool Use</text>
+                    <text x="170" y="405" text-anchor="middle" font-size="9" fill="#fecaca">Hard</text>
+                    <line x1="255" y1="366" x2="345" y2="298" stroke="#ef4444" stroke-width="2" marker-end="url(#nextArrow)"/>
+
+                    <!-- Topic 7: Edge AI - bottom -->
+                    <ellipse cx="410" cy="390" rx="90" ry="42" fill="#f59e0b"/>
+                    <text x="410" y="384" text-anchor="middle" font-size="12" font-weight="bold" fill="white">Edge AI</text>
+                    <text x="410" y="400" text-anchor="middle" font-size="10" fill="#fef3c7">Local Agents</text>
+                    <text x="410" y="415" text-anchor="middle" font-size="9" fill="#fef3c7">Hard</text>
+                    <line x1="410" y1="348" x2="410" y2="300" stroke="#f59e0b" stroke-width="2" marker-end="url(#nextArrow)"/>
+
+                    <!-- Difficulty Legend -->
+                    <rect x="30" y="395" width="12" height="12" rx="3" fill="#10b981"/>
+                    <text x="48" y="405" font-size="10" fill="#64748b">Medium — Start here</text>
+                    <rect x="170" y="395" width="12" height="12" rx="3" fill="#f59e0b"/>
+                    <text x="188" y="405" font-size="10" fill="#64748b">Hard — After medium</text>
+                    <rect x="310" y="395" width="12" height="12" rx="3" fill="#ef4444"/>
+                    <text x="328" y="405" font-size="10" fill="#64748b">Hard (specialist track)</text>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Related Topics -->
+        <h2>Related Topics</h2>
+
+        <div class="accordion" id="related-topics">
+
+            <div class="accordion-item" style="border-left: 4px solid #10b981;">
+                <div class="accordion-header">
+                    RAG (Retrieval Augmented Generation) — Medium
+                </div>
+                <div class="accordion-content">
+                    <div class="sections-grid">
+                        <div class="section-card">
+                            <h3>Connection to This Topic</h3>
+                            <p>RAG is the "how agents access knowledge" layer. You've learned that agents use tools to interact with the world — RAG is the specialized tooling pattern for accessing large, dynamic knowledge bases. A knowledge base MCP server is a RAG system packaged for agent consumption. Understanding RAG deeply will make you dramatically better at building agents that work with proprietary information.</p>
+                        </div>
+                        <div class="section-card">
+                            <h3>What You'll Learn</h3>
+                            <ul>
+                                <li>How embeddings work and why semantic similarity enables knowledge retrieval</li>
+                                <li>Vector database design: indexing strategies, distance metrics, filtering</li>
+                                <li>Chunking strategies: fixed-size, semantic, hierarchical</li>
+                                <li>Retrieval quality: precision vs. recall trade-offs</li>
+                                <li>Hybrid search: combining vector similarity with keyword matching</li>
+                                <li>Re-ranking retrieved results for relevance</li>
+                            </ul>
+                        </div>
+                        <div class="section-card">
+                            <h3>Prerequisites</h3>
+                            <ul>
+                                <li>Understanding of how LLMs process context (you have this)</li>
+                                <li>Basic familiarity with embeddings as vector representations</li>
+                                <li>Comfort with database concepts (indexes, queries)</li>
+                            </ul>
+                            <div class="card success">
+                                <strong>Recommended starting point:</strong> Study the concepts of semantic search and vector similarity before diving into specific vector databases. The concept is more important than the implementation choice.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item" style="border-left: 4px solid #10b981;">
+                <div class="accordion-header">
+                    Prompt Engineering for Agents — Medium
+                </div>
+                <div class="accordion-content">
+                    <div class="sections-grid">
+                        <div class="section-card">
+                            <h3>Connection to This Topic</h3>
+                            <p>You've learned what the agent loop is and how tools work. Prompt engineering for agents is the discipline of writing the system prompts and task descriptions that make the loop reliable. This is the highest-leverage skill improvement available to anyone who has just learned the basics — better prompts immediately improve the performance of every agent you build.</p>
+                        </div>
+                        <div class="section-card">
+                            <h3>What You'll Learn</h3>
+                            <ul>
+                                <li>System prompt architecture: persona, capabilities, constraints, output format</li>
+                                <li>Tool descriptions that guide selection without over-constraining</li>
+                                <li>Chain-of-thought patterns for complex reasoning tasks</li>
+                                <li>Few-shot examples for tool use patterns</li>
+                                <li>Exit condition specification that prevents loops</li>
+                                <li>Prompt testing and evaluation methodologies</li>
+                            </ul>
+                        </div>
+                        <div class="section-card">
+                            <h3>Prerequisites</h3>
+                            <ul>
+                                <li>Basic prompt engineering knowledge (complete this topic first)</li>
+                                <li>Understanding of tool schemas (covered here)</li>
+                                <li>Hands-on experience with at least one agent loop failure — debugging a broken prompt is the best teacher</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item" style="border-left: 4px solid #f59e0b;">
+                <div class="accordion-header">
+                    Multi-Agent Orchestration — Hard
+                </div>
+                <div class="accordion-content">
+                    <div class="sections-grid">
+                        <div class="section-card">
+                            <h3>Connection to This Topic</h3>
+                            <p>You've learned single-agent architecture with tools. Multi-agent orchestration is the next order of complexity — how do you coordinate multiple agents with different specializations, tools, and contexts to accomplish tasks that no single agent could handle reliably? This topic is where the hospital analogy becomes most precise: the attending physician coordinating a trauma team is the orchestrator agent.</p>
+                        </div>
+                        <div class="section-card">
+                            <h3>What You'll Learn</h3>
+                            <ul>
+                                <li>Orchestrator vs. worker agent patterns</li>
+                                <li>Shared state management across agent boundaries</li>
+                                <li>Agent communication: direct vs. event-based vs. shared state</li>
+                                <li>Failure handling in multi-agent systems</li>
+                                <li>Avoiding circular dependencies between agents</li>
+                                <li>Cost management at scale — multi-agent systems can be expensive</li>
+                            </ul>
+                        </div>
+                        <div class="section-card">
+                            <h3>Prerequisites</h3>
+                            <ul>
+                                <li>Single agent proficiency — you should have built and debugged at least 3 single-agent systems</li>
+                                <li>Distributed systems fundamentals: consistency models, failure modes, eventual consistency</li>
+                                <li>Experience with message queues or event-driven architectures (helpful but not required)</li>
+                            </ul>
+                            <div class="card warning">
+                                <strong>Warning:</strong> Don't reach for multi-agent architecture until you've exhausted single-agent solutions. Multi-agent systems multiply both capability and complexity. Start with the simplest architecture that could work.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item" style="border-left: 4px solid #8b5cf6;">
+                <div class="accordion-header">
+                    Production Observability for AI — Medium
+                </div>
+                <div class="accordion-content">
+                    <div class="sections-grid">
+                        <div class="section-card">
+                            <h3>Connection to This Topic</h3>
+                            <p>The debugging section of this course focused on how to diagnose failures when they happen. Production observability is the discipline of building the infrastructure so that failures are visible before they become user-impacting incidents. You cannot run agents in production reliably without observability — you're flying blind.</p>
+                        </div>
+                        <div class="section-card">
+                            <h3>What You'll Learn</h3>
+                            <ul>
+                                <li>Distributed tracing for multi-step agent workflows</li>
+                                <li>Metrics: latency, token costs, tool success rates, loop iteration counts</li>
+                                <li>Logging: structured event logs vs. conversation transcripts</li>
+                                <li>Alerting: what thresholds indicate a problem vs. normal variance</li>
+                                <li>LLM-specific observability tools: LangSmith, Helicone, Arize</li>
+                                <li>Cost attribution: which agents, tasks, and tools are driving spend</li>
+                            </ul>
+                        </div>
+                        <div class="section-card">
+                            <h3>Prerequisites</h3>
+                            <ul>
+                                <li>Familiarity with standard observability tools (Datadog, Grafana, Prometheus)</li>
+                                <li>Understanding of distributed tracing concepts (spans, traces, correlation IDs)</li>
+                                <li>Experience operating at least one agent in a non-trivial context</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item" style="border-left: 4px solid #ef4444;">
+                <div class="accordion-header">
+                    Agent Safety and Alignment — Hard
+                </div>
+                <div class="accordion-content">
+                    <div class="sections-grid">
+                        <div class="section-card">
+                            <h3>Connection to This Topic</h3>
+                            <p>The security checklist and safety architecture patterns in this course are the operational layer of agent safety. This topic goes deeper — the theoretical and practical foundations of ensuring agents act within intended boundaries across a range of operating conditions, including adversarial ones. As agents gain more autonomy and higher-stakes access, safety becomes the non-negotiable constraint.</p>
+                        </div>
+                        <div class="section-card">
+                            <h3>What You'll Learn</h3>
+                            <ul>
+                                <li>Formal specification of agent goals and constraints</li>
+                                <li>Prompt injection: attack vectors, defenses, and detection</li>
+                                <li>Tool use safety: blast radius analysis, reversibility requirements</li>
+                                <li>Human oversight patterns: when and how to require human approval</li>
+                                <li>Constitutional AI and policy-based constraints</li>
+                                <li>Red-teaming agent systems: adversarial testing methodologies</li>
+                            </ul>
+                        </div>
+                        <div class="section-card">
+                            <h3>Prerequisites</h3>
+                            <ul>
+                                <li>Understanding of failure modes (covered here in debugging and pitfalls)</li>
+                                <li>Security fundamentals: threat modeling, defense in depth</li>
+                                <li>Experience with at least one agent system that had a safety incident — the lessons are most salient after a real failure</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item" style="border-left: 4px solid #ef4444;">
+                <div class="accordion-header">
+                    LLM Fine-tuning for Tool Use — Hard
+                </div>
+                <div class="accordion-content">
+                    <div class="sections-grid">
+                        <div class="section-card">
+                            <h3>Connection to This Topic</h3>
+                            <p>This course focused on prompting general-purpose models to use tools reliably. Fine-tuning takes a different approach: training a model specifically on tool-use data for your domain, producing a model that is faster, cheaper, and more reliable on your specific tool set. This is a specialist track — most teams won't need it, but for high-volume production deployments, the economics can be compelling.</p>
+                        </div>
+                        <div class="section-card">
+                            <h3>What You'll Learn</h3>
+                            <ul>
+                                <li>Supervised fine-tuning on tool use examples</li>
+                                <li>Dataset construction: curating tool call examples from production logs</li>
+                                <li>Evaluation: how to measure tool selection accuracy and parameter correctness</li>
+                                <li>LoRA and PEFT: parameter-efficient fine-tuning approaches</li>
+                                <li>Deployment: serving fine-tuned models alongside standard models</li>
+                                <li>Trade-offs: fine-tuned specialists vs. general-purpose frontier models</li>
+                            </ul>
+                        </div>
+                        <div class="section-card">
+                            <h3>Prerequisites</h3>
+                            <ul>
+                                <li>ML fundamentals: training loops, loss functions, gradient descent</li>
+                                <li>Training infrastructure: GPU cluster access or managed training services</li>
+                                <li>Production agent deployment experience — you need real usage data to build a good fine-tuning dataset</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item" style="border-left: 4px solid #f59e0b;">
+                <div class="accordion-header">
+                    Edge AI and Local Agents — Hard
+                </div>
+                <div class="accordion-content">
+                    <div class="sections-grid">
+                        <div class="section-card">
+                            <h3>Connection to This Topic</h3>
+                            <p>This course focused on cloud-hosted models accessed via API. Edge AI is the emerging frontier where agents run on-device — no cloud API call, no latency, no data leaving the device. This matters for latency-critical applications (real-time agent assistance), privacy-critical applications (healthcare, legal), and connectivity-limited deployments (industrial, remote locations). MCP servers that work with local models follow the same protocol — the transport layer changes, but the architecture is identical.</p>
+                        </div>
+                        <div class="section-card">
+                            <h3>What You'll Learn</h3>
+                            <ul>
+                                <li>Local model options: Ollama, llama.cpp, MLX for Apple Silicon</li>
+                                <li>Quantization: reducing model size for edge deployment without unacceptable quality loss</li>
+                                <li>Model selection: which models are capable of tool use at small sizes?</li>
+                                <li>Local MCP server patterns: stdio transport for zero-network-overhead tool calls</li>
+                                <li>Hybrid architectures: local model for fast operations, cloud for complex reasoning</li>
+                                <li>Hardware considerations: which edge hardware enables useful agent capabilities?</li>
+                            </ul>
+                        </div>
+                        <div class="section-card">
+                            <h3>Prerequisites</h3>
+                            <ul>
+                                <li>Understanding of LLM architectures: transformer basics, model size trade-offs</li>
+                                <li>Systems knowledge: memory constraints, compute budgets, thermal management</li>
+                                <li>Practical experience: having run at least one local model (Ollama is the fastest starting point)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Learning Sequence Recommendation -->
+        <h2>Recommended Learning Sequence</h2>
+        <div class="card info">
+            <p>Based on dependency relationships and typical learner profiles, here are three learning paths from this foundation:</p>
+        </div>
+
+        <div class="sections-grid">
+            <div class="section-card" style="border-top: 4px solid #10b981;">
+                <h3>Path A: Production Engineer</h3>
+                <p><em>Goal: Deploy reliable agents in production</em></p>
+                <ol>
+                    <li><strong>Prompt Engineering for Agents</strong> — Immediately improves everything you build</li>
+                    <li><strong>RAG</strong> — Most agents need knowledge access</li>
+                    <li><strong>Production Observability</strong> — Can't operate what you can't see</li>
+                    <li><strong>Agent Safety</strong> — Required before high-stakes access</li>
+                    <li><strong>Multi-Agent Orchestration</strong> — When single agents aren't enough</li>
+                </ol>
+            </div>
+            <div class="section-card" style="border-top: 4px solid #8b5cf6;">
+                <h3>Path B: Research and Exploration</h3>
+                <p><em>Goal: Understand the frontier of agent capabilities</em></p>
+                <ol>
+                    <li><strong>Multi-Agent Orchestration</strong> — Frontier capability area</li>
+                    <li><strong>Agent Safety and Alignment</strong> — Necessary constraint on capability</li>
+                    <li><strong>LLM Fine-tuning for Tool Use</strong> — Specialized capability optimization</li>
+                    <li><strong>Edge AI and Local Agents</strong> — Emerging deployment paradigm</li>
+                    <li><strong>RAG</strong> — Foundation for knowledge-intensive agents</li>
+                </ol>
+            </div>
+            <div class="section-card" style="border-top: 4px solid #f59e0b;">
+                <h3>Path C: Platform Builder</h3>
+                <p><em>Goal: Build infrastructure other teams use</em></p>
+                <ol>
+                    <li><strong>Production Observability</strong> — Platform teams own the monitoring layer</li>
+                    <li><strong>Agent Safety and Alignment</strong> — Platform teams set safety standards</li>
+                    <li><strong>Multi-Agent Orchestration</strong> — Platform teams enable complex workflows</li>
+                    <li><strong>RAG</strong> — Platform teams build the knowledge layer</li>
+                    <li><strong>Edge AI</strong> — Platform teams enable new deployment models</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="card success">
+            <h2>The One Thing to Do Next</h2>
+            <p>Regardless of which path fits you: <strong>build something real before studying the next topic.</strong></p>
+            <p>The pattern that distinguishes engineers who compound their learning from those who plateau: they implement each concept before moving to the next. You cannot understand prompt engineering for agents until you've written a prompt that failed and iterated to fix it. You cannot understand production observability until you've been surprised by an agent failure in production.</p>
+            <p>The hospital analogy applies here too: a medical student who reads every textbook without clinical rotations knows the vocabulary but not the medicine. The rotations are not supplementary to the education — they are the education. Build. Debug. Observe. Then study the next topic with real experience to anchor the new concepts to.</p>
+        </div>
+    </main>
+
+    <footer class="section-footer">
+        <a href="ecosystem.html" class="btn">Previous: The Ecosystem</a>
+        <a href="index.html" class="btn">Next: Back to Overview</a>
+    </footer>
+
+    <script src="../../js/components.js"></script>
+</body>
+</html>

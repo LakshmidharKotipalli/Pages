@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>At Scale - Learn AI Agents, Skills, Tools &amp; MCP</title>
+    <link rel="stylesheet" href="../../css/styles.css">
+    <link rel="stylesheet" href="theme.css">
+    <style>
+        .bottleneck-block {
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            margin: 2.5rem 0;
+        }
+        .bottleneck-header {
+            background: rgba(239, 68, 68, 0.12);
+            border-bottom: 2px solid var(--error-color);
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .bottleneck-badge {
+            background: var(--error-color);
+            color: white;
+            padding: 0.2rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .bottleneck-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin: 0;
+        }
+        .bottleneck-body {
+            padding: 1.5rem;
+        }
+        .solution-block {
+            background: rgba(16, 185, 129, 0.08);
+            border-left: 4px solid var(--success-color);
+            border-radius: 0 8px 8px 0;
+            padding: 1rem 1.25rem;
+            margin: 1rem 0;
+        }
+        .solution-block strong {
+            color: var(--success-color);
+        }
+        .scale-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        .scale-stat {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: block;
+        }
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.75;
+            margin-top: 0.25rem;
+        }
+        .product-example {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        .product-example h4 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            font-size: 1rem;
+        }
+        .architecture-row {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin: 1.5rem 0;
+        }
+        .arch-card {
+            flex: 1;
+            min-width: 200px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+        .arch-card h5 {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+        .arch-card ul {
+            padding-left: 1.2rem;
+            font-size: 0.88rem;
+        }
+        .warning-callout {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid var(--warning-color);
+            padding: 1rem 1.25rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1rem 0;
+        }
+        .takeaways-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.25rem;
+            margin: 1.5rem 0;
+        }
+        .takeaway-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.25rem;
+        }
+        .takeaway-card h4 {
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="main-nav">
+        <a href="index.html" class="nav-back">Back to Overview</a>
+        <span class="current-section">At Scale</span>
+        <div class="nav-links">
+            <a href="tradeoffs.html">Previous</a>
+            <a href="landscape.html">Next</a>
+        </div>
+    </nav>
+
+    <main>
+        <h1>AI Agents at Scale</h1>
+        <p class="powerful-sentence">Thousands of concurrent agents are not just a bigger version of one agent — they surface entirely new failure classes that don't exist in single-agent deployments.</p>
+        <p class="explanation">What works perfectly at ten concurrent agents often collapses at ten thousand. Rate limits become walls. Context windows become garbage collectors. MCP connections become connection pools. Tool latency becomes the critical path. This section is a map of where the walls are and how production systems have learned to work around them.</p>
+
+        <div class="card info">
+            <h3>The Hospital at Scale Analogy</h3>
+            <p>A small clinic with three doctors works fine without formal systems. One hospital with 300 staff across five departments requires strict protocols, centralized records, triage queues, and resource allocation systems. Scaling the same informal approach from clinic to hospital is a recipe for chaos. Agent systems at scale face the same organizational physics: informal coordination patterns that work at small scale become bottlenecks at large scale.</p>
+        </div>
+
+        <div class="scale-stats">
+            <div class="scale-stat">
+                <span class="stat-value">~$0.15</span>
+                <div class="stat-label">Typical cost per agent task (frontier model, 5 tool calls)</div>
+            </div>
+            <div class="scale-stat">
+                <span class="stat-value">10K+</span>
+                <div class="stat-label">Concurrent agent sessions at large IDEs like Cursor</div>
+            </div>
+            <div class="scale-stat">
+                <span class="stat-value">60–200ms</span>
+                <div class="stat-label">Median tool call latency in production MCP deployments</div>
+            </div>
+            <div class="scale-stat">
+                <span class="stat-value">128K–1M</span>
+                <div class="stat-label">Context window token limits (2024–2025 models)</div>
+            </div>
+            <div class="scale-stat">
+                <span class="stat-value">40–70%</span>
+                <div class="stat-label">Cost reduction achievable via prompt caching at scale</div>
+            </div>
+        </div>
+
+        <!-- BOTTLENECK 1 -->
+        <div class="bottleneck-block">
+            <div class="bottleneck-header">
+                <span class="bottleneck-badge">BOTTLENECK 1</span>
+                <h2 class="bottleneck-title">LLM API Rate Limits and Throughput</h2>
+            </div>
+            <div class="bottleneck-body">
+                <p>LLM providers enforce rate limits at multiple layers: requests per minute, tokens per minute, and tokens per day. A single agent consumes tokens at a rate that, when multiplied by hundreds of concurrent agents, immediately saturates provider-level limits.</p>
+
+                <div class="warning-callout">
+                    <strong>What breaks first:</strong> The agent orchestrator starts receiving HTTP 429 responses. Without proper backoff logic, agents retry immediately, creating a thundering herd that amplifies the rate limit problem. The system enters a retry loop where agents are spending most of their time waiting, not working.
+                </div>
+
+                <div class="accordion" data-multiple-open="true">
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>How Production Systems Handle This</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="solution-block">
+                                <strong>Token Budget Management:</strong> Track token consumption per agent session with hard caps. An agent that would exceed its per-session budget is paused or terminated, not allowed to consume unboundedly.
+                            </div>
+                            <div class="solution-block">
+                                <strong>Request Queuing with Priority:</strong> A centralized queue absorbs spikes. Requests are prioritized by urgency (user-initiated vs background), and the queue controller manages submission rate to stay within provider limits with exponential backoff on 429s.
+                            </div>
+                            <div class="solution-block">
+                                <strong>Multi-Provider Pooling:</strong> Route agent requests across multiple provider accounts or regions. This is especially effective for teams that have hit per-organization limits — routing across anthropic/aws-bedrock/azure-openai multiplies effective throughput.
+                            </div>
+                            <div class="solution-block">
+                                <strong>Prompt Caching at Scale:</strong> Identical or near-identical system prompts shared across many agent sessions can be cached. At scale, this can eliminate 40–70% of input token costs and reduce effective load on provider limits simultaneously.
+                            </div>
+
+                            <div class="diagram-container" style="margin: 1.5rem 0;">
+                                <svg width="100%" height="220" viewBox="0 0 720 220" style="max-width:720px; display:block; margin:0 auto;">
+                                    <text x="360" y="18" text-anchor="middle" fill="var(--text-color)" font-size="13" font-weight="bold">Request Flow at Scale</text>
+                                    <!-- Agents -->
+                                    <rect x="10" y="40" width="90" height="28" rx="6" fill="#3b82f6" opacity="0.7"/>
+                                    <text x="55" y="59" text-anchor="middle" fill="white" font-size="11">Agent Pool</text>
+                                    <rect x="10" y="78" width="90" height="28" rx="6" fill="#3b82f6" opacity="0.5"/>
+                                    <text x="55" y="97" text-anchor="middle" fill="white" font-size="11">Agent Pool</text>
+                                    <rect x="10" y="116" width="90" height="28" rx="6" fill="#3b82f6" opacity="0.3"/>
+                                    <text x="55" y="135" text-anchor="middle" fill="white" font-size="11">Agent Pool</text>
+                                    <!-- Arrows to queue -->
+                                    <line x1="100" y1="54" x2="160" y2="90" stroke="#6b7280" stroke-width="2" marker-end="url(#arr)"/>
+                                    <line x1="100" y1="92" x2="160" y2="100" stroke="#6b7280" stroke-width="2" marker-end="url(#arr)"/>
+                                    <line x1="100" y1="130" x2="160" y2="112" stroke="#6b7280" stroke-width="2" marker-end="url(#arr)"/>
+                                    <!-- Queue -->
+                                    <rect x="162" y="60" width="120" height="80" rx="8" fill="#f59e0b" opacity="0.75"/>
+                                    <text x="222" y="95" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Priority</text>
+                                    <text x="222" y="112" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Queue</text>
+                                    <!-- Arrow to rate limiter -->
+                                    <line x1="282" y1="100" x2="340" y2="100" stroke="#6b7280" stroke-width="2" marker-end="url(#arr)"/>
+                                    <!-- Rate Limiter -->
+                                    <rect x="342" y="68" width="120" height="64" rx="8" fill="#8b5cf6" opacity="0.75"/>
+                                    <text x="402" y="98" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Rate</text>
+                                    <text x="402" y="116" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Controller</text>
+                                    <!-- Arrow to providers -->
+                                    <line x1="462" y1="100" x2="520" y2="70" stroke="#6b7280" stroke-width="2" marker-end="url(#arr)"/>
+                                    <line x1="462" y1="100" x2="520" y2="100" stroke="#6b7280" stroke-width="2" marker-end="url(#arr)"/>
+                                    <line x1="462" y1="100" x2="520" y2="130" stroke="#6b7280" stroke-width="2" marker-end="url(#arr)"/>
+                                    <!-- Providers -->
+                                    <rect x="522" y="52" width="120" height="28" rx="6" fill="#10b981" opacity="0.75"/>
+                                    <text x="582" y="71" text-anchor="middle" fill="white" font-size="11">Anthropic API</text>
+                                    <rect x="522" y="86" width="120" height="28" rx="6" fill="#10b981" opacity="0.55"/>
+                                    <text x="582" y="105" text-anchor="middle" fill="white" font-size="11">AWS Bedrock</text>
+                                    <rect x="522" y="120" width="120" height="28" rx="6" fill="#10b981" opacity="0.35"/>
+                                    <text x="582" y="139" text-anchor="middle" fill="white" font-size="11">Azure OpenAI</text>
+                                    <!-- Labels -->
+                                    <text x="222" y="160" text-anchor="middle" fill="var(--text-color)" font-size="11" opacity="0.7">Absorbs spikes</text>
+                                    <text x="402" y="148" text-anchor="middle" fill="var(--text-color)" font-size="11" opacity="0.7">Enforces limits</text>
+                                    <text x="582" y="165" text-anchor="middle" fill="var(--text-color)" font-size="11" opacity="0.7">Multi-provider pool</text>
+                                    <defs>
+                                        <marker id="arr" markerWidth="8" markerHeight="6" refX="6" refY="3" orient="auto">
+                                            <polygon points="0 0, 8 3, 0 6" fill="#6b7280"/>
+                                        </marker>
+                                    </defs>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-example">
+                    <h4>How Cursor Handles This</h4>
+                    <p>Cursor manages thousands of concurrent editor sessions, each with an active agent context. Their approach: per-user token budgets enforced client-side, request coalescing for similar contexts, and transparent queuing UI when users hit limits. The user sees "processing" rather than an error, and the queue drains as capacity becomes available. Critically, they separate interactive requests (user waiting) from background indexing requests and give interactive requests strict priority.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTTLENECK 2 -->
+        <div class="bottleneck-block">
+            <div class="bottleneck-header">
+                <span class="bottleneck-badge">BOTTLENECK 2</span>
+                <h2 class="bottleneck-title">MCP Server Connection Management</h2>
+            </div>
+            <div class="bottleneck-body">
+                <p>MCP uses persistent connections (stdio, SSE, or HTTP streaming). At small scale, one connection per agent is fine. At scale, you face three bad outcomes: too many persistent connections exhausting server resources, too few connections creating queuing delays, or connections that drop silently and leave agents in a confused state.</p>
+
+                <div class="warning-callout">
+                    <strong>What breaks first:</strong> Each agent holds an open connection to each MCP server it uses. At 500 agents each connected to 5 MCP servers, you have 2,500 open connections. Most MCP server processes were not designed to handle this. File descriptor limits, memory per connection, and per-process connection limits all become walls.
+                </div>
+
+                <div class="accordion" data-multiple-open="true">
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>Persistent vs Pooled vs Serverless MCP</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="architecture-row">
+                                <div class="arch-card">
+                                    <h5>Persistent Per-Agent (Simple)</h5>
+                                    <ul>
+                                        <li>Each agent owns its connections</li>
+                                        <li>Simple implementation</li>
+                                        <li>Breaks at scale — O(agents × servers) connections</li>
+                                        <li>Best for: development, small teams</li>
+                                    </ul>
+                                </div>
+                                <div class="arch-card">
+                                    <h5>Connection Pooling (Production)</h5>
+                                    <ul>
+                                        <li>Shared pool of connections to each MCP server</li>
+                                        <li>Agents check out/return connections</li>
+                                        <li>Pool size tuned to server capacity</li>
+                                        <li>Best for: multi-agent production deployments</li>
+                                    </ul>
+                                </div>
+                                <div class="arch-card">
+                                    <h5>Serverless MCP (Emerging)</h5>
+                                    <ul>
+                                        <li>Stateless HTTP request/response</li>
+                                        <li>No persistent connection overhead</li>
+                                        <li>Higher per-call latency (+50–150ms)</li>
+                                        <li>Best for: burst workloads, elastic scale</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="solution-block">
+                                <strong>Practical pattern:</strong> Run a connection proxy/multiplexer in front of each MCP server. The proxy accepts many agent connections and manages a small pool of real server connections. This decouples agent concurrency from MCP server connection capacity.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>Health Checks and Reconnection Logic</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <p>Silent connection drops are particularly insidious in MCP. An agent assumes its connection is live, calls a tool, and receives no response — not an error, just silence. Without proper health monitoring, the agent may wait indefinitely or report a hallucinated result.</p>
+                            <div class="solution-block">
+                                <strong>Production requirements:</strong> Implement TCP keepalive on all MCP connections. Add application-level ping/pong heartbeat every 30 seconds. When a health check fails, immediately reconnect and replay any in-flight requests. Expose connection pool health as a metric with alerts on pool exhaustion.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTTLENECK 3 -->
+        <div class="bottleneck-block">
+            <div class="bottleneck-header">
+                <span class="bottleneck-badge">BOTTLENECK 3</span>
+                <h2 class="bottleneck-title">Tool Execution Latency and Parallelism</h2>
+            </div>
+            <div class="bottleneck-body">
+                <p>In a sequential agent loop, total latency is the sum of all tool call latencies plus LLM inference time. A workflow with 8 sequential tool calls, each taking 200ms, adds 1.6 seconds of pure tool wait time before the agent can reason about the results. At scale, this serialized pattern also leaves LLM capacity idle while waiting for tool responses.</p>
+
+                <div class="warning-callout">
+                    <strong>What breaks first:</strong> User-facing agents miss SLA targets. Background agents create a queue backlog. Timeouts are set too tight — agents fail on slow-but-valid tool responses. Set too loose — agents block forever on hung tools.
+                </div>
+
+                <div class="accordion" data-multiple-open="true">
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>Parallel Tool Calls: The Primary Optimization</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <p>When an agent needs results from multiple independent tools, issuing them in parallel rather than serially transforms latency from sum to maximum. Claude and other modern models support requesting multiple tool calls in a single response turn, and executing them concurrently.</p>
+
+                            <div class="diagram-container" style="margin: 1.5rem 0;">
+                                <svg width="100%" height="200" viewBox="0 0 700 200" style="max-width:700px; display:block; margin:0 auto;">
+                                    <!-- Sequential -->
+                                    <text x="175" y="22" text-anchor="middle" fill="var(--text-color)" font-size="12" font-weight="bold">Sequential (Sum of latencies)</text>
+                                    <rect x="10" y="35" width="80" height="30" rx="5" fill="#ef4444" opacity="0.7"/>
+                                    <text x="50" y="55" text-anchor="middle" fill="white" font-size="11">Tool A 200ms</text>
+                                    <rect x="98" y="35" width="80" height="30" rx="5" fill="#ef4444" opacity="0.7"/>
+                                    <text x="138" y="55" text-anchor="middle" fill="white" font-size="11">Tool B 300ms</text>
+                                    <rect x="186" y="35" width="80" height="30" rx="5" fill="#ef4444" opacity="0.7"/>
+                                    <text x="226" y="55" text-anchor="middle" fill="white" font-size="11">Tool C 150ms</text>
+                                    <text x="290" y="55" fill="#ef4444" font-size="13" font-weight="bold">= 650ms</text>
+                                    <!-- Parallel -->
+                                    <text x="530" y="22" text-anchor="middle" fill="var(--text-color)" font-size="12" font-weight="bold">Parallel (Max latency)</text>
+                                    <rect x="360" y="35" width="80" height="22" rx="5" fill="#10b981" opacity="0.7"/>
+                                    <text x="400" y="51" text-anchor="middle" fill="white" font-size="11">Tool A 200ms</text>
+                                    <rect x="360" y="63" width="120" height="22" rx="5" fill="#10b981" opacity="0.7"/>
+                                    <text x="420" y="79" text-anchor="middle" fill="white" font-size="11">Tool B 300ms</text>
+                                    <rect x="360" y="91" width="60" height="22" rx="5" fill="#10b981" opacity="0.7"/>
+                                    <text x="390" y="107" text-anchor="middle" fill="white" font-size="11">Tool C 150ms</text>
+                                    <text x="510" y="79" fill="#10b981" font-size="13" font-weight="bold">= 300ms</text>
+                                    <!-- Savings label -->
+                                    <text x="350" y="155" text-anchor="middle" fill="var(--primary-color)" font-size="13">54% latency reduction by parallelizing independent tool calls</text>
+                                </svg>
+                            </div>
+
+                            <div class="solution-block">
+                                <strong>Design pattern:</strong> Structure agent prompts and tool schemas so the LLM recognizes when multiple tools can be called simultaneously. Use dependency analysis in your orchestration layer — if Tool B's input doesn't depend on Tool A's output, they are candidates for parallel execution.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>Timeout Management</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <p>Every tool call needs a timeout. The timeout must be calibrated per tool category: a filesystem read might timeout at 2 seconds, a web search at 10 seconds, a complex database query at 30 seconds. A single global timeout is always wrong — too tight for slow-but-valid calls, too loose for fast tools that indicate a hung state.</p>
+                            <ul>
+                                <li><strong>Per-tool timeout budgets:</strong> Define in the tool schema metadata, not the agent prompt.</li>
+                                <li><strong>Timeout escalation:</strong> On timeout, return a structured error with context. Let the agent decide whether to retry, use an alternative tool, or escalate to the user.</li>
+                                <li><strong>Circuit breakers:</strong> If a tool times out 5 times in 60 seconds, mark it degraded and stop sending it requests. Alert operations. Resume after a cooldown period with a single probe request.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-example">
+                    <h4>How Claude Code Handles Tool Latency</h4>
+                    <p>Claude Code, operating as an IDE agent, issues parallel tool calls for independent file reads, directory listings, and search operations. The architecture allows the LLM to request multiple tools in one response and processes them concurrently in the background. The user interface shows intermediate results as they arrive rather than waiting for all tools to complete, significantly improving perceived performance even when total wall-clock time is similar.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTTLENECK 4 -->
+        <div class="bottleneck-block">
+            <div class="bottleneck-header">
+                <span class="bottleneck-badge">BOTTLENECK 4</span>
+                <h2 class="bottleneck-title">Context Window Exhaustion</h2>
+            </div>
+            <div class="bottleneck-body">
+                <p>Long-running agent sessions accumulate conversation history, tool call transcripts, and intermediate results. Eventually the context window fills. What happens next determines whether the agent degrades gracefully or fails catastrophically.</p>
+
+                <div class="warning-callout">
+                    <strong>What breaks first:</strong> The LLM either truncates the input silently (losing critical earlier context) or returns a context length error that the agent isn't equipped to handle. In either case, the agent's behavior becomes unpredictable — it may "forget" instructions given early in the session or repeat tool calls it already made.
+                </div>
+
+                <div class="accordion" data-multiple-open="true">
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>Context Management Strategies</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="architecture-row">
+                                <div class="arch-card">
+                                    <h5>Summarization (Most Common)</h5>
+                                    <ul>
+                                        <li>At 70% context fill, trigger a summarization step</li>
+                                        <li>Compress completed sub-task history into a compact summary</li>
+                                        <li>Retain full context only for the last N turns</li>
+                                        <li>Risk: summarization itself consumes tokens and time</li>
+                                    </ul>
+                                </div>
+                                <div class="arch-card">
+                                    <h5>Rolling Window</h5>
+                                    <ul>
+                                        <li>Maintain only the last K exchanges in context</li>
+                                        <li>Simple, deterministic</li>
+                                        <li>Risk: loses early context that may still be relevant</li>
+                                        <li>Mitigate: pin important context (system prompt, key facts)</li>
+                                    </ul>
+                                </div>
+                                <div class="arch-card">
+                                    <h5>External Memory</h5>
+                                    <ul>
+                                        <li>Store agent state in a vector store or key-value store</li>
+                                        <li>Retrieve relevant memories at each step</li>
+                                        <li>Enables theoretically unbounded long-running agents</li>
+                                        <li>Risk: retrieval quality determines agent quality</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>Tool Response Bloat</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <p>A tool that returns a 50,000-word document in response to a search query will instantly consume a significant fraction of the context window. This is one of the most common causes of premature context exhaustion.</p>
+                            <div class="solution-block">
+                                <strong>Prevention:</strong> Every MCP tool and custom tool should have a configurable response size limit. Implement summarization middleware that compresses large tool responses before returning them to the agent. The agent should never receive a raw unprocessed response larger than a defined token budget (typically 2,000–5,000 tokens per tool call).
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTTLENECK 5 -->
+        <div class="bottleneck-block">
+            <div class="bottleneck-header">
+                <span class="bottleneck-badge">BOTTLENECK 5</span>
+                <h2 class="bottleneck-title">Observability at Scale</h2>
+            </div>
+            <div class="bottleneck-body">
+                <p>Debugging a single agent that made a wrong decision is hard. Debugging why 3% of agents across 50,000 sessions are making wrong decisions on a specific tool call pattern requires a fundamentally different observability infrastructure than traditional software monitoring.</p>
+
+                <div class="warning-callout">
+                    <strong>What breaks first:</strong> Standard logging drowns in volume. A single agent session can produce thousands of log entries. Without structured tracing that ties every tool call to its parent agent decision, the logs are useless for debugging. Cost attribution — knowing which user, feature, or workflow is responsible for expensive LLM usage — is impossible without purpose-built instrumentation.
+                </div>
+
+                <div class="accordion" data-multiple-open="true">
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>What to Instrument</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <ul>
+                                <li><strong>Agent decision traces:</strong> Every LLM call with input tokens, output tokens, latency, and the tool calls it generated. Tagged with session ID, user ID, and feature context.</li>
+                                <li><strong>Tool call records:</strong> Tool name, input parameters (sanitized), response status, response latency, response size, and whether the agent used the result in its next turn.</li>
+                                <li><strong>MCP connection health:</strong> Connection age, reconnect events, queue depth per server, error rates by server.</li>
+                                <li><strong>Cost attribution:</strong> Token usage rolled up by user, team, feature, and agent type. Alert when cost per session exceeds budget thresholds.</li>
+                                <li><strong>Anomaly signals:</strong> Unusually long sessions, unusually high tool call counts, repeated identical tool calls (retry loops), sessions approaching context window limits.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>Real Example: Windsurf's Agent Tracing Approach</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <p>Windsurf (formerly Codeium) operates as an IDE agent product at scale. Their observability challenges are archetypal: tens of thousands of concurrent sessions, each running a multi-step agent that calls code search, file read, and terminal execution tools. Key patterns they use:</p>
+                            <ul>
+                                <li><strong>Correlation IDs:</strong> Every user interaction generates a trace ID that threads through every LLM call and tool execution in that session. Post-incident debugging starts by finding the trace, not searching logs.</li>
+                                <li><strong>Slow session detection:</strong> Sessions that exceed 2x the median tool call count for the same task type are flagged for review — early signal for agent inefficiency before users complain.</li>
+                                <li><strong>Cost dashboards by feature:</strong> Different IDE features (autocomplete vs agent chat vs code review) have separate cost attribution. This makes it trivial to identify which features are generating disproportionate API spend.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-example">
+                    <h4>Enterprise Multi-Tenant Agent Patterns</h4>
+                    <p>In enterprise deployments where multiple customers or teams share an agent infrastructure, additional isolation concerns arise. Each tenant needs separate token budgets, tool access control lists, cost attribution, and audit logs. The pattern that scales is treating the agent orchestration layer as a multi-tenant service: requests carry tenant context, the orchestrator applies tenant-specific policies before tool dispatch, and all observability data is tagged with tenant identifiers for isolation.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- OPERATIONAL SUMMARY -->
+        <section>
+            <h2>What Breaks First: Operational Priority Order</h2>
+            <p>When scaling agent systems from prototype to production, failures typically follow a predictable order. Prepare for each stage:</p>
+            <div class="takeaways-grid">
+                <div class="takeaway-card">
+                    <h4>Stage 1: First 100 Concurrent Agents</h4>
+                    <p>Rate limits and missing retry logic surface immediately. Implement token budgets, exponential backoff, and request queuing before anything else.</p>
+                </div>
+                <div class="takeaway-card">
+                    <h4>Stage 2: 100–1,000 Agents</h4>
+                    <p>MCP connection exhaustion and sequential tool latency become visible. Move to connection pooling and implement parallel tool calls.</p>
+                </div>
+                <div class="takeaway-card">
+                    <h4>Stage 3: 1,000–10,000 Agents</h4>
+                    <p>Context window management and cost attribution become critical. Implement rolling context, summarization, and per-tenant cost dashboards.</p>
+                </div>
+                <div class="takeaway-card">
+                    <h4>Stage 4: 10,000+ Agents</h4>
+                    <p>Observability infrastructure becomes the limiting factor. Standard logging is insufficient. Invest in structured tracing, anomaly detection, and automated alerting on agent behavioral patterns.</p>
+                </div>
+            </div>
+
+            <div class="card warning">
+                <h3>The Non-Obvious Scaling Lesson</h3>
+                <p>The hardest part of scaling agent systems is not the infrastructure — it is the behavior. At scale, rare LLM decision patterns that occur 0.1% of the time manifest hundreds of times per hour. Behavior that appears safe in testing becomes a reliability or cost incident in production. Build the observability to see what agents are actually doing before you need to debug a crisis in the middle of the night.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="section-footer">
+        <a href="tradeoffs.html" class="btn">Previous: Trade-offs Analysis</a>
+        <a href="landscape.html" class="btn">Next: Technology Landscape</a>
+    </footer>
+
+    <script src="../../js/components.js"></script>
+</body>
+</html>

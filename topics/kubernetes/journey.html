@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Journey - Learn Kubernetes</title>
+    <link rel="stylesheet" href="../../css/styles.css">
+    <link rel="stylesheet" href="theme.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <a href="index.html">← Back to Overview</a>
+        <span class="current-section">Learning Journey</span>
+    </nav>
+
+    <main>
+        <h1>The Learning Journey: From Beginner to Expert</h1>
+
+        <p class="intro">Your path from "I've heard of Kubernetes" to "I can architect and operate production K8s clusters." This journey spans four levels, each building on the previous one with real-world experience and production insights.</p>
+
+        <div class="progress-overview">
+            <div class="progress-step">
+                <div class="step-number">1</div>
+                <div class="step-label">Don't Break It</div>
+                <div class="step-time">0-6 months</div>
+            </div>
+            <div class="progress-step">
+                <div class="step-number">2</div>
+                <div class="step-label">Comfortable Practitioner</div>
+                <div class="step-time">6mo-2yr</div>
+            </div>
+            <div class="progress-step">
+                <div class="step-number">3</div>
+                <div class="step-label">Problem Solver</div>
+                <div class="step-time">2-5yr</div>
+            </div>
+            <div class="progress-step">
+                <div class="step-number">4</div>
+                <div class="step-label">Architect's Mind</div>
+                <div class="step-time">5-15+yr</div>
+            </div>
+        </div>
+
+        <!-- LEVEL 1 -->
+        <section class="level-section">
+            <div class="level-header level-1">
+                <h2>Level 1: The "Don't Break It" Stage</h2>
+                <div class="level-subtitle">Complete Beginner (0-6 months)</div>
+            </div>
+
+            <div class="level-content">
+                <h3>Mental Model: The Shipping Port Dashboard</h3>
+                <div class="card info">
+                    <p>At this level, think of Kubernetes as a <strong>control dashboard</strong> with buttons and displays. You don't need to understand the engine room — just which buttons to push and what the displays mean.</p>
+                    <div class="control-panel">
+                        <button class="docker-btn">kubectl apply</button>
+                        <span class="arrow">→</span>
+                        <button class="docker-btn">kubectl get pods</button>
+                        <span class="arrow">→</span>
+                        <button class="docker-btn">kubectl logs</button>
+                        <span class="arrow">→</span>
+                        <button class="docker-btn">kubectl delete</button>
+                    </div>
+                    <p><strong>The mantra:</strong> "I push these buttons in this order, and my app runs in the cluster."</p>
+                </div>
+
+                <h3>What Each Component Actually Does</h3>
+
+                <div class="component-explanation">
+                    <div class="component-item">
+                        <div class="component-name">kubectl</div>
+                        <div class="component-what">What it does:</div>
+                        <p>Your command-line interface to Kubernetes. Every interaction happens through kubectl (or API calls underneath).</p>
+                        <div class="component-analogy">🎛️ Analogy: Control panel at the shipping port operations center</div>
+                    </div>
+
+                    <div class="component-item">
+                        <div class="component-name">Pod</div>
+                        <div class="component-what">What it does:</div>
+                        <p>The smallest deployable unit. One or more containers that share storage/network. Always co-located and co-scheduled.</p>
+                        <div class="component-analogy">📦 Analogy: Shipping container(s) that travel together</div>
+                    </div>
+
+                    <div class="component-item">
+                        <div class="component-name">Node</div>
+                        <div class="component-what">What it does:</div>
+                        <p>A physical or virtual machine that runs pods. Each node has kubelet (agent), kube-proxy (network), and container runtime.</p>
+                        <div class="component-analogy">🏗️ Analogy: Crane/dock worker that moves containers</div>
+                    </div>
+
+                    <div class="component-item">
+                        <div class="component-name">Deployment</div>
+                        <div class="component-what">What it does:</div>
+                        <p>Manages replicated pods. Ensures specified number of pods are running. Handles rolling updates and rollbacks.</p>
+                        <div class="component-analogy">📋 Analogy: Order: "Keep 10 containers of this type running at all times"</div>
+                    </div>
+
+                    <div class="component-item">
+                        <div class="component-name">Service</div>
+                        <div class="component-what">What it does:</div>
+                        <p>Provides stable network endpoint (IP/DNS) for pods. Load balances traffic to pods. Pods come and go, Service stays the same.</p>
+                        <div class="component-analogy">📋 Analogy: Shipping office that directs trucks to available cranes</div>
+                    </div>
+
+                    <div class="component-item">
+                        <div class="component-name">Namespace</div>
+                        <div class="component-what">What it does:</div>
+                        <p>Isolates resources within a cluster. Like virtual clusters within the physical cluster.</p>
+                        <div class="component-analogy">🏢 Analogy: Different sections of the port for different companies</div>
+                    </div>
+                </div>
+
+                <h3>Safe Exploration Zones</h3>
+                <div class="safe-zones">
+                    <div class="zone-card">
+                        <div class="zone-icon">🧪</div>
+                        <h4>Local Development</h4>
+                        <p>Run K8s locally with minikube, kind, or Docker Desktop. Perfect for learning without breaking production.</p>
+                        <div class="zone-example">Run: <code>minikube start</code> to get a local cluster</div>
+                    </div>
+
+                    <div class="zone-card">
+                        <div class="zone-icon">📚</div>
+                        <h4>Read-Only Access</h4>
+                        <p>Ask for read-only access to production clusters. You can look but not break.</p>
+                        <div class="zone-example">Use: <code>kubectl get pods --namespace=production</code></div>
+                    </div>
+
+                    <div class="zone-card">
+                        <div class="zone-icon">🔧</div>
+                        <h4>Sandbox Namespaces</h4>
+                        <p>Create your own namespace for experimentation. Can't affect others' resources.</p>
+                        <div class="zone-example">Create: <code>kubectl create namespace my-sandbox</code></div>
+                    </div>
+                </div>
+
+                <h3>Common Mistakes to Avoid (with Real Production Stories)</h3>
+
+                <div class="mistakes-accordion">
+                    <div class="mistake-item">
+                        <div class="mistake-header">
+                            <h4>❌ "I'll run everything in the default namespace"</h4>
+                            <span class="severity medium">MEDIUM SEVERITY</span>
+                        </div>
+                        <div class="mistake-content">
+                            <p><strong>The mistake:</strong> Deploying all apps to the `default` namespace. Everything mixed together.</p>
+                            <p><strong>Real story:</strong> A new developer deployed their test app to default namespace, accidentally deleted what they thought was their pod, but it was someone else's critical service. Production outage for 2 hours.</p>
+                            <p><strong>✅ Right approach:</strong> Always use namespaces. Create one for your team, your app, your environment. <code>kubectl create namespace myapp</code></p>
+                        </div>
+                    </div>
+
+                    <div class="mistake-item">
+                        <div class="mistake-header">
+                            <h4>❌ "I'll put secrets in my deployment YAML"</h4>
+                            <span class="severity critical">CRITICAL SEVERITY</span>
+                        </div>
+                        <div class="mistake-content">
+                            <p><strong>The mistake:</strong> Adding database passwords and API keys directly in deployment manifests.</p>
+                            <p><strong>Real story:</strong> A startup committed their deployment YAML to GitHub with AWS credentials in it. Within hours, their AWS bill was $50,000 from crypto mining. The credentials were in the repo for 6 months.</p>
+                            <p><strong>✅ Right approach:</strong> Use Kubernetes Secrets. Create secrets with <code>kubectl create secret</code>, reference in deployments. Never commit secrets to git.</p>
+                        </div>
+                    </div>
+
+                    <div class="mistake-item">
+                        <div class="mistake-header">
+                            <h4>❌ "I don't need resource limits"</h4>
+                            <span class="severity high">HIGH SEVERITY</span>
+                        </div>
+                        <div class="mistake-content">
+                            <p><strong>The mistake:</strong> Deploying pods without CPU/memory limits. One pod can hog the entire node.</p>
+                            <p><strong>Real story:</strong> A data science job had a memory leak and consumed all node memory. The critical services running on that node (including monitoring) were OOMKilled. No one could see what was happening because monitoring died too.</p>
+                            <p><strong>✅ Right approach:</strong> Always set resources.requests and resources.limits. <code>resources: {requests: {memory: "128Mi"}, limits: {memory: "256Mi"}}</code></p>
+                        </div>
+                    </div>
+
+                    <div class="mistake-item">
+                        <div class="mistake-header">
+                            <h4>❌ "I'll use latest tag for all images"</h4>
+                            <span class="severity high">HIGH SEVERITY</span>
+                        </div>
+                        <div class="mistake-content">
+                            <p><strong>The mistake:</strong> Deploying with <code>image: myapp:latest</code>. You have no idea what version is actually running.</p>
+                            <p><strong>Real story:</strong> Team deployed with `:latest`. During incident, they couldn't roll back because they didn't know which version was previously deployed. Was it `latest` from today? Yesterday? Last week?</p>
+                            <p><strong>✅ Right approach:</strong> Use specific version tags. <code>image: myapp:v1.2.3</code>. You can always update to newer versions, but you know exactly what's running.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Basic Terminology with Analogies</h3>
+                <div class="terminology-grid">
+                    <div class="term-card">
+                        <div class="term">Cluster</div>
+                        <div class="analogy">🏢 Entire Port</div>
+                        <div class="definition">Collection of nodes (machines) running Kubernetes</div>
+                    </div>
+                    <div class="term-card">
+                        <div class="term">Control Plane</div>
+                        <div class="analogy">🎯 Control Tower</div>
+                        <div class="definition">Brain that makes decisions and coordinates the cluster</div>
+                    </div>
+                    <div class="term-card">
+                        <div class="term">etcd</div>
+                        <div class="analogy">📋 Logbook</div>
+                        <div class="definition">Key-value store that remembers the entire cluster state</div>
+                    </div>
+                    <div class="term-card">
+                        <div class="term">kubelet</div>
+                        <div class="analogy">👷 Crane Operator</div>
+                        <div class="definition">Agent on each node that runs pods and reports to control plane</div>
+                    </div>
+                    <div class="term-card">
+                        <div class="term">kube-proxy</div>
+                        <div class="analogy">🔀 Traffic Director</div>
+                        <div class="definition">Manages network rules on each node for Service communication</div>
+                    </div>
+                    <div class="term-card">
+                        <div class="term">Container Runtime</div>
+                        <div class="analogy">⚙️ Crane Mechanism</div>
+                        <div class="definition">Software that runs containers (containerd, CRI-O)</div>
+                    </div>
+                </div>
+
+                <h3>Survival Checklist for Your First Week</h3>
+                <div class="survival-checklist">
+                    <div class="checklist-item">
+                        <input type="checkbox" id="week1-1">
+                        <label for="week1-1">Install a local K8s: <code>minikube start</code> or <code>kind create cluster</code></label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="week1-2">
+                        <label for="week1-2">Deploy your first app: <code>kubectl create deployment nginx --image=nginx</code></label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="week1-3">
+                        <label for="week1-3">Expose it: <code>kubectl expose deployment nginx --port=80 --type=NodePort</code></label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="week1-4">
+                        <label for="week1-4">Check what's running: <code>kubectl get pods</code> and <code>kubectl get all</code></label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="week1-5">
+                        <label for="week1-5">View logs: <code>kubectl logs &lt;pod-name&gt;</code></label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="week1-6">
+                        <label for="week1-6">Get interactive: <code>kubectl exec -it &lt;pod-name&gt; -- sh</code></label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="week1-7">
+                        <label for="week1-7">Delete stuff: <code>kubectl delete deployment nginx</code></label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="week1-8">
+                        <label for="week1-8">Understand the difference between <code>kubectl apply</code> and <code>kubectl create</code></label>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEVEL 2 -->
+        <section class="level-section">
+            <div class="level-header level-2">
+                <h2>Level 2: The "Comfortable Practitioner"</h2>
+                <div class="level-subtitle">6 Months - 2 Years</div>
+            </div>
+
+            <div class="level-content">
+                <h3>Mental Model: Understanding the System</h3>
+                <div class="card info">
+                    <p>At this level, you move beyond "which buttons to push" to <strong>why things work the way they do</strong>. You understand Kubernetes' architecture and can troubleshoot issues.</p>
+                    <p><strong>The shift:</strong> From "I run this command" to "I understand what this command is doing under the hood."</p>
+                </div>
+
+                <h3>Understanding Kubernetes' Architecture</h3>
+                <div class="architecture-explanation">
+                    <p>Kubernetes consists of two parts: <strong>Control Plane</strong> (the brain) and <strong>Worker Nodes</strong> (the muscle).</p>
+
+                    <div class="architecture-diagram">
+                        <div class="arch-component">
+                            <div class="arch-title">Control Plane Components</div>
+                            <div class="arch-desc">
+                                <p><strong>API Server:</strong> Front door for all operations. Authenticates, validates, configures data.</p>
+                                <p><strong>etcd:</strong> Key-value store. The cluster's "memory" — remembers everything.</p>
+                                <p><strong>Scheduler:</strong> Decides which nodes run which pods.</p>
+                                <p><strong>Controller Manager:</strong> Runs controller loops. Notices desired vs actual state, drives to match.</p>
+                            </div>
+                        </div>
+
+                        <div class="arch-component">
+                            <div class="arch-title">Worker Node Components</div>
+                            <div class="arch-desc">
+                                <p><strong>kubelet:</strong> Primary node agent. Talks to API server, ensures pods are running.</p>
+                                <p><strong>kube-proxy:</strong> Network proxy. Maintains network rules on each node.</p>
+                                <p><strong>Container Runtime:</strong> Runs containers (containerd, CRI-O, etc.).</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p><strong>Key insight:</strong> When you run <code>kubectl apply</code>, you're talking to the API Server. The API Server stores your desired state in etcd. Controllers notice the change and make it happen. The Scheduler decides where pods run. Kubelet on each node actually runs them.</p>
+                </div>
+
+                <h3>Why Features Exist (Design Principles)</h3>
+
+                <div class="design-principle">
+                    <h4>🎯 Principle 1: Declarative API</h4>
+                    <p><strong>What it is:</strong> You tell Kubernetes <em>what you want</em>, not <em>how to do it</em>.</p>
+                    <p><strong>Why it exists:</strong> Imperative approaches ("run container on node 3") don't scale. Declarative ("run 3 replicas, I don't care where") enables self-healing and automation.</p>
+                    <p><strong>In practice:</strong></p>
+                    <div class="code-example">
+                        <strong>Imperative:</strong><br>
+                        "Run pod on node 3"<br>
+                        → What if node 3 fails? What if you need to scale? Manual work.<br>
+                        <br>
+                        <strong>Declarative:</strong><br>
+                        "I want 3 replicas of nginx"<br>
+                        → K8s figures out where, how to handle failures, auto-scales.
+                    </div>
+                </div>
+
+                <div class="design-principle">
+                    <h4>🎯 Principle 2: Controller Pattern</h4>
+                    <p><strong>What it is:</strong> Controllers continuously reconcile desired state (what you want) with actual state (what exists).</p>
+                    <p><strong>Why it exists:</strong> Distributed systems are constantly changing. Nodes fail, pods crash, networks glitch. Controllers ensure the system self-heals.</p>
+                    <p><strong>The loop:</strong></p>
+                    <div class="code-example">
+                        1. Observe actual state (current pods: 2)<br>
+                        2. Compare with desired state (deployment wants: 3)<br>
+                        3. Take action to reconcile (start 1 new pod)<br>
+                        4. Repeat forever
+                    </div>
+                    <p><strong>Production tip:</strong> This is why Kubernetes "just works" — controllers are constantly fixing problems.</p>
+                </div>
+
+                <div class="design-principle">
+                    <h4>🎯 Principle 3: Labels and Selectors</h4>
+                    <p><strong>What it is:</strong> Key-value pairs attached to objects. Selectors query for objects with specific labels.</p>
+                    <p><strong>Why it exists:</strong> Enables loose coupling. Services don't know which pods they target — they query by labels.</p>
+                    <p><strong>In practice:</strong></p>
+                    <div class="code-example">
+                        Pod has labels: <code>app=nginx, tier=frontend</code><br>
+                        Service selects: <code>tier=frontend</code><br>
+                        → Service finds all pods with that label, regardless of which pod they are
+                    </div>
+                    <p><strong>Production story:</strong> We added a new pod version with labels <code>app=nginx, version=v2</code>. Service selector <code>app=nginx</code> sent traffic to both v1 and v2. We tested v2, then removed v1 label. Zero downtime rollout.</p>
+                </div>
+
+                <div class="design-principle">
+                    <h4>🎯 Principle 4: Desired State and Reconciliation</h4>
+                    <p><strong>What it is:</strong> You declare desired state; K8s continuously drives actual state to match.</p>
+                    <p><strong>Why it exists:</strong> Manual operations don't scale. Automation requires clear goals and autonomous correction.</p>
+                    <p><strong>The reality:</strong> Kubernetes is not "set it and forget it" — it's "set it and it maintains itself". You still need to monitor, but much less manual intervention.</p>
+                </div>
+
+                <h3>Customizing Basics Confidently</h3>
+
+                <div class="customization-section">
+                    <h4>Writing Your Own Deployment Manifests</h4>
+
+                    <div class="customization-example">
+                        <h5>Basic Deployment YAML</h5>
+                        <p><strong>Why:</strong> Declarative configuration, version controlled, reviewable, reproducible.</p>
+                        <div class="code-example">
+                            <pre>
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.21
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"</pre>
+                        </div>
+                        <p><strong>Breakdown:</strong> apiVersion (which API), kind (what type), metadata (name/labels), spec (what you want). The template is what each pod should look like.</p>
+                    </div>
+
+                    <div class="customization-example">
+                        <h5>Service YAML</h5>
+                        <p><strong>Why:</strong> Stable network endpoint for your pods. Load balancing.</p>
+                        <div class="code-example">
+                            <pre>
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  selector:
+    app: nginx
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  type: LoadBalancer</pre>
+                        </div>
+                        <p><strong>Key concept:</strong> Selector matches pod labels. Port is what the service listens on. TargetPort is what pods expose.</p>
+                    </div>
+
+                    <div class="customization-example">
+                        <h5>ConfigMap for Configuration</h5>
+                        <p><strong>Why:</strong> Separate configuration from code. Don't rebuild images for config changes.</p>
+                        <div class="code-example">
+                            <pre>
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  database_url: "postgres://localhost:5432/mydb"
+  cache_enabled: "true"
+  log_level: "info"</pre>
+                        </div>
+                        <p><strong>Usage:</strong> Reference in deployment as environment variables or mounted as files.</p>
+                    </div>
+
+                    <div class="customization-example">
+                        <h5>Secret for Sensitive Data</h5>
+                        <p><strong>Why:</strong> Store passwords, API keys, certificates separately. Base64 encoded (not encrypted by default, use external secret management).</p>
+                        <div class="code-example">
+                            <pre>
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-secret
+type: Opaque
+data:
+  password: cGFzc3dvcmQxMjM=  # base64 encoded</pre>
+                        </div>
+                        <p><strong>Security note:</strong> Secrets are only base64 encoded. Use external secret management (Vault, AWS Secrets Manager) for production encryption.</p>
+                    </div>
+                </div>
+
+                <h3>Beginning Troubleshooting Methodology</h3>
+
+                <div class="troubleshooting-flow">
+                    <h4>When Pods Won't Start</h4>
+
+                    <div class="troubleshoot-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h5>Check pod status</h5>
+                            <code>kubectl get pods</code>
+                            <p>Look at STATUS column. Running? Pending? CrashLoopBackOff? ImagePullBackOff? Each means something different.</p>
+                        </div>
+                    </div>
+
+                    <div class="troubleshoot-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h5>Describe the pod</h5>
+                            <code>kubectl describe pod &lt;pod-name&gt;</code>
+                            <p>Shows events. This is your #1 debugging tool. Look for "Failed to pull image", "FailedScheduling", "OOMKilled".</p>
+                        </div>
+                    </div>
+
+                    <div class="troubleshoot-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h5>Check the logs</h5>
+                            <code>kubectl logs &lt;pod-name&gt;</code>
+                            <p>Shows what your application is logging. Container crashed? Logs will show why (often).</p>
+                        </div>
+                    </div>
+
+                    <div class="troubleshoot-step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h5>Get inside the pod</h5>
+                            <code>kubectl exec -it &lt;pod-name&gt; -- sh</code>
+                            <p>Interactive shell. See what's actually running. Check if files exist, network works, etc.</p>
+                        </div>
+                    </div>
+
+                    <div class="troubleshoot-step">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <h5>Check node resources</h5>
+                            <code>kubectl top nodes</code>
+                            <p>Out of memory or CPU? Pods won't schedule. Nodes at capacity?</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Efficiency Basics and Patterns</h3>
+
+                <div class="efficiency-tips">
+                    <div class="tip-card">
+                        <h4>📝 Use YAML, Not CLI</h4>
+                        <p>Imperative commands (<code>kubectl run</code>) are fine for learning. Declarative YAML is required for production. Version control, review, rollback.</p>
+                        <div class="code-example">
+                            <code>kubectl apply -f deployment.yaml</code> ← Do this<br>
+                            <code>kubectl run nginx --image=nginx</code> ← Learning only
+                        </div>
+                    </div>
+
+                    <div class="tip-card">
+                        <h4>🏷️ Label Everything</h4>
+                        <p>Labels make Kubernetes powerful. Query, group, select. Use consistent conventions: <code>app=&lt;name&gt;</code>, <code>tier=&lt;frontend/backend&gt;</code>, <code>env=&lt;dev/prod&gt;</code>.</p>
+                    </div>
+
+                    <div class="tip-card">
+                        <h4>📊 Set Resource Limits</h4>
+                        <p>Always set requests and limits. Prevents noisy neighbor problems. Enables scheduling decisions.</p>
+                        <div class="code-example">
+                            requests: <strong>minimum</strong> guaranteed (scheduling)<br>
+                            limits: <strong>maximum</strong> allowed (throttling/eviction)
+                        </div>
+                    </div>
+
+                    <div class="tip-card">
+                        <h4>🔄 Use Liveness and Readiness Probes</h4>
+                        <p>K8s needs to know if your pod is alive (restart if not) and ready (send traffic). Without probes, K8s can't self-heal properly.</p>
+                    </div>
+
+                    <div class="tip-card">
+                        <h4>🧹 Clean Up Old Resources</h4>
+                        <p>Namespaces fill up with old deployments, jobs, pods. Regular cleanup: <code>kubectl delete all --all</code> in dev namespaces.</p>
+                    </div>
+
+                    <div class="tip-card">
+                        <h4>📚 Use Namespaces</h4>
+                        <p>Organize by team, environment, project. Prevents accidental cross-team interference. Makes <code>kubectl get pods</code> manageable.</p>
+                    </div>
+                </div>
+
+                <h3>Reading Between the Lines: What Documentation Means vs Says</h3>
+
+                <div class="documentation-insights">
+                    <div class="insight-card">
+                        <h4>📖 Documentation says: "Kubernetes is self-healing"</h4>
+                        <p><strong>Reality:</strong> Kubernetes self-heals <em>if</em> you configure it correctly. No probes? No resource limits? Bad YAML? It won't heal.</p>
+                        <p><strong>Production lesson:</strong> Self-healing requires proper configuration: liveness/readiness probes, resource limits, replica sets, health checks. You get out what you put in.</p>
+                    </div>
+
+                    <div class="insight-card">
+                        <h4>📖 Documentation says: "Use Deployments for stateless workloads"</h4>
+                        <p><strong>Reality:</strong> Deployments work fine for many stateful workloads. But StatefulSets provide guarantees (stable network, persistent storage) that Deployments don't.</p>
+                        <p><strong>Production lesson:</strong> Understand the trade-offs. Use the right tool. Deployments for most apps, StatefulSets for databases, queues, etc.</p>
+                    </div>
+
+                    <div class="insight-card">
+                        <h4>📖 Documentation says: "kubectl is the CLI for Kubernetes"</h4>
+                        <p><strong>Reality:</strong> kubectl is just an API client. Everything kubectl does, you can do with API calls. Many teams build custom tools on top of the API.</p>
+                        <p><strong>Production lesson:</strong> Learn the API, not just kubectl. The API is the foundation. kubectl is just one interface.</p>
+                    </div>
+
+                    <div class="insight-card">
+                        <h4>📖 Documentation says: "Services provide load balancing"</h4>
+                        <p><strong>Reality:</strong> Services provide basic load balancing (random or round-robin). For advanced LB (session affinity, weighted routing), use Ingress or service mesh.</p>
+                        <p><strong>Production lesson:</strong> Kubernetes LB is IPVS or iptables-based. Good for basics. Production needs: external LB, ingress controller, or service mesh for advanced routing.</p>
+                    </div>
+                </div>
+
+                <h3>🎯 Level 2 Mastery Checklist</h3>
+                <div class="mastery-checklist">
+                    <div class="checklist-item">
+                        <input type="checkbox" id="level2-1">
+                        <label for="level2-1">I can write deployment and service YAML from scratch</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="level2-2">
+                        <label for="level2-2">I understand the control plane vs worker node architecture</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="level2-3">
+                        <label for="level2-3">I can troubleshoot pods that won't start using describe/logs/exec</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="level2-4">
+                        <label for="level2-4">I understand labels, selectors, and how Services find Pods</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="level2-5">
+                        <label for="level2-5">I use ConfigMaps and Secrets instead of hardcoded config</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="level2-6">
+                        <label for="level2-6">I set resource requests and limits on all my deployments</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="level2-7">
+                        <label for="level2-7">I can explain the controller reconciliation loop to a beginner</label>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEVEL 3 & 4 Summaries -->
+        <section class="levels-preview">
+            <h2>What's Coming Next</h2>
+            <div class="preview-cards">
+                <div class="preview-card">
+                    <div class="preview-level">Level 3</div>
+                    <div class="preview-title">Problem Solver (2-5 years)</div>
+                    <div class="preview-desc">Advanced troubleshooting, performance optimization, production patterns, debugging complex issues, network policies, RBAC, monitoring, logging.</div>
+                </div>
+                <div class="preview-card">
+                    <div class="preview-level">Level 4</div>
+                    <div class="preview-title">Architect's Mind (5-15+ years)</div>
+                    <div class="preview-desc">System design with K8s, migration strategies, build vs buy decisions, multi-cluster management, GitOps, service mesh, custom controllers, operator pattern.</div>
+                </div>
+            </div>
+
+            <div class="card info" style="margin-top: 2rem;">
+                <h3>📊 Full Content Available in Complete Journey</h3>
+                <p>Levels 3 and 4 contain extensive content including:</p>
+                <ul>
+                    <li>Advanced troubleshooting methodology</li>
+                    <li>Performance optimization at scale</li>
+                    <li>Security best practices (RBAC, network policies, secrets management)</li>
+                    <li>Monitoring, logging, and observability</li>
+                    <li>Multi-cluster and multi-region strategies</li>
+                    <li>Custom resources and operators</li>
+                    <li>GitOps and continuous delivery</li>
+                    <li>Service mesh integration</li>
+                </ul>
+                <p><strong>For the complete journey with all 4 levels, interview prep, and ecosystem coverage, continue to the next sections!</strong></p>
+            </div>
+        </section>
+
+        <section class="progress-summary">
+            <h2>Your Progress So Far</h2>
+            <div class="progress-overview">
+                <div class="progress-step completed">
+                    <div class="step-title">Level 1</div>
+                    <div class="step-status">Beginner basics</div>
+                </div>
+                <div class="progress-step completed">
+                    <div class="step-title">Level 2</div>
+                    <div class="step-status">Comfortable practitioner</div>
+                </div>
+                <div class="progress-step">
+                    <div class="step-title">Level 3</div>
+                    <div class="step-status">Problem solver</div>
+                </div>
+                <div class="progress-step">
+                    <div class="step-title">Level 4</div>
+                    <div class="step-status">Architect's mind</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="section-nav">
+        <a href="analogy.html" class="prev-btn">← Living Analogy</a>
+        <a href="conversations.html" class="next-btn">Interview Conversations →</a>
+    </footer>
+
+    <script src="../../js/components.js"></script>
+</body>
+</html>

@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trade-offs Analysis - RAG Learning Journey</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="theme-dark">
+    <div class="container">
+        <header class="section-header">
+            <div class="breadcrumbs">
+                <a href="index.html">Home</a>
+                <span>/</span>
+                <span>Section 8: Trade-offs Analysis</span>
+            </div>
+            <h1>Trade-offs Analysis</h1>
+            <p class="section-subtitle">Performance vs Complexity, Cost vs Capability, and Decision Frameworks</p>
+        </header>
+
+        <nav class="nav-buttons">
+            <a id="prevBtn" class="nav-btn" href="section7-patterns.html">
+                ← Previous
+            </a>
+            <button id="completeBtn" class="nav-btn" data-section="section8-tradeoffs">
+                ✓ Mark Complete
+            </button>
+            <a id="nextBtn" class="nav-btn" href="section9-scale.html">
+                Next: At Scale →
+            </a>
+        </nav>
+
+        <main>
+            <section class="content-section">
+                <h2>The Art of Trade-offs</h2>
+
+                <div class="highlight info">
+                    <h4>💡 There Are No Perfect Solutions</h4>
+                    <p><strong>Every technical decision involves trade-offs.</strong> Faster usually means less accurate. More accurate usually costs more. Simpler usually means less capable.</p>
+
+                    <p><strong>Great engineers understand these trade-offs and make intentional decisions.</strong> They don't chase "best" - they optimize for what matters most to their specific situation.</p>
+
+                    <p><strong>This section helps you think systematically about trade-offs so you can make informed decisions.</strong></p>
+                </div>
+            </section>
+
+            <!-- Performance vs Complexity -->
+            <section class="content-section">
+                <h2>Trade-off 1: Performance vs Complexity</h2>
+
+                <div class="highlight warning">
+                    <h4>The Fundamental Tension</h4>
+                    <p>More complex RAG systems can achieve better performance, but they're harder to build, maintain, and debug. Simpler systems are easier but may have limitations.</p>
+                </div>
+
+                <h3>Complexity Spectrum</h3>
+
+                <table class="matrix-table">
+                    <thead>
+                        <tr>
+                            <th>Approach</th>
+                            <th>Complexity</th>
+                            <th>Performance</th>
+                            <th>When to Choose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Naive RAG</strong></td>
+                            <td>Low (200 lines of code)</td>
+                            <td>Good for simple queries</td>
+                            <td>MVP, prototypes, simple Q&A</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Naive + Reranking</strong></td>
+                            <td>Medium</td>
+                            <td>Better precision</td>
+                            <td>Production, accuracy matters</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Hybrid Search + Reranking</strong></td>
+                            <td>Medium-High</td>
+                            <td>Good across query types</td>
+                            <td>General production use</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Adaptive RAG</strong></td>
+                            <td>High</td>
+                            <td>Optimized per query</td>
+                            <td>Cost-sensitive, mixed complexity</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Agentic RAG</strong></td>
+                            <td>Very High</td>
+                            <td>Best for complex queries</td>
+                            <td>Complex, multi-step questions</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Decision Framework</h3>
+                <div class="cards-grid">
+                    <div class="info-card">
+                        <h4>Choose Simple When</h4>
+                        <ul>
+                            <li>Early stage/MVP</li>
+                            <li>Team is small</li>
+                            <li>Queries are straightforward</li>
+                            <li>Speed to market matters</li>
+                            <li>Limited RAG expertise</li>
+                        </ul>
+                    </div>
+                    <div class="info-card">
+                        <h4>Choose Complex When</h4>
+                        <ul>
+                            <li>Production-scale</li>
+                            <li>Accuracy is critical</li>
+                            <li>Complex queries required</li>
+                            <li>Have engineering resources</li>
+                            <li>Proven need for advanced features</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>Real Trade-off Example</h3>
+                <div class="highlight success">
+                    <p><strong>Scenario:</strong> Startup building customer support RAG</p>
+                    <p><strong>Initial approach:</strong> Started with naive RAG (2 weeks to build)</p>
+                    <p><strong>Problem:</strong> 70% accuracy wasn't good enough</p>
+                    <p><strong>Decision point:</strong> Add reranking (1 week) or rebuild with Agentic RAG (6 weeks)?</p>
+                    <p><strong>Choice:</strong> Added reranking + hybrid search (2 weeks total)</p>
+                    <p><strong>Result:</strong> 85% accuracy, shipped on time, happy customers</p>
+                    <p><strong>Lesson:</strong> Incremental complexity beats starting with maximum complexity</p>
+                </div>
+            </section>
+
+            <!-- Cost vs Capability -->
+            <section class="content-section">
+                <h2>Trade-off 2: Cost vs Capability</h2>
+
+                <div class="highlight warning">
+                    <h4>The Budget Reality</h4>
+                    <p>Better models, more retrieval, and advanced features all cost more. You need to balance capability with budget constraints.</p>
+                </div>
+
+                <h3>Cost Comparison Matrix</h3>
+
+                <table class="matrix-table">
+                    <thead>
+                        <tr>
+                            <th>Component</th>
+                            <th>Budget Option</th>
+                            <th>Premium Option</th>
+                            <th>Cost Difference</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>LLM</strong></td>
+                            <td>GPT-3.5 / Llama 3</td>
+                            <td>GPT-4o / Claude 3.5</td>
+                            <td>5-10x more expensive</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Embeddings</strong></td>
+                            <td>Open-source (self-hosted)</td>
+                            <td>OpenAI/Cohere API</td>
+                            <td>Fixed monthly cost</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Vector DB</strong></td>
+                            <td>Self-hosted (Qdrant)</td>
+                            <td>Managed (Pinecone)</td>
+                            <td>$70-500/month difference</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Reranker</strong></td>
+                            <td>FlashRank (free, self-hosted)</td>
+                            <td>Cohere Rerank</td>
+                            <td>$2-4 per 1K searches</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Retrieval Amount</strong></td>
+                            <td>3 chunks</td>
+                            <td>10 chunks + reranking</td>
+                            <td>2-3x LLM cost</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Cost Optimization Strategies</h3>
+
+                <div class="accordion-group">
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Strategy 1: Adaptive Model Selection</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Concept:</strong> Use cheaper models for simple queries, expensive models for complex ones.</p>
+                            <p><strong>Implementation:</strong> Classify query complexity → Route to appropriate model</p>
+                            <p><strong>Savings:</strong> 40-60% reduction in LLM costs while maintaining 95% of quality</p>
+                            <p><strong>Trade-off:</strong> Adds complexity (classification layer)</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Strategy 2: Aggressive Caching</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Concept:</strong> Cache query results aggressively. Many queries are repeats or near-repeats.</p>
+                            <p><strong>Implementation:</strong> Redis or in-memory cache with appropriate TTL</p>
+                            <p><strong>Savings:</strong> 50-70% reduction in costs (60% cache hit rate typical)</p>
+                            <p><strong>Trade-off:</strong> Stale data risk, added infrastructure</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Strategy 3: Self-Hosting</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Concept:</strong> Self-host embeddings, LLMs, and vector DB instead of using APIs</p>
+                            <p><strong>Implementation:</strong> Deploy open-source models on your infrastructure</p>
+                            <p><strong>Savings:</strong> 80-95% reduction in variable costs (infrastructure cost only)</p>
+                            <p><strong>Trade-off:</strong> Engineering overhead, maintenance responsibility</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Strategy 4: Reduced Retrieval + Reranking</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Concept:</strong> Retrieve fewer documents but use reranking for precision</p>
+                            <p><strong>Implementation:</strong> Retrieve 5 instead of 10, add reranking step</p>
+                            <p><strong>Savings:</strong> 30-40% reduction in LLM costs (less context)</p>
+                            <p><strong>Trade-off:</strong> May miss relevant documents, added reranking cost</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Accuracy vs Latency -->
+            <section class="content-section">
+                <h2>Trade-off 3: Accuracy vs Latency</h2>
+
+                <div class="highlight warning">
+                    <h4>The Speed-Quality Tension</h4>
+                    <p>More accurate RAG systems usually take longer. Users want instant answers but also correct answers. Finding the right balance is crucial.</p>
+                </div>
+
+                <h3>Latency Breakdown</h3>
+
+                <table class="matrix-table">
+                    <thead>
+                        <tr>
+                            <th>Component</th>
+                            <th>Typical Latency</th>
+                            <th>Optimization Options</th>
+                            <th>Accuracy Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Query Processing</strong></td>
+                            <td>10-50ms</td>
+                            <td>Skip or simplify</td>
+                            <td>Minor (for simple queries)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Vector Search</strong></td>
+                            <td>50-200ms</td>
+                            <td>Smaller k, better indexing</td>
+                            <td>Medium (missed documents)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Reranking</strong></td>
+                            <td>50-100ms</td>
+                            <td>Skip or use faster model</td>
+                            <td>Medium (lower precision)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>LLM Generation</strong></td>
+                            <td>500-2000ms</td>
+                            <td>Smaller model, shorter context</td>
+                            <td>High (worse answers)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Latency Optimization Strategies</h3>
+
+                <div class="cards-grid">
+                    <div class="info-card">
+                        <h4>Strategy 1: Parallel Processing</h4>
+                        <p><strong>What:</strong> Run independent operations in parallel</p>
+                        <p><strong>Example:</strong> Vector search + keyword search simultaneously</p>
+                        <p><strong>Savings:</strong> 100-200ms for parallel operations</p>
+                        <p><strong>Cost:</strong> Added complexity</p>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>Strategy 2: Streaming Responses</h4>
+                        <p><strong>What:</strong> Start showing response as it's generated</p>
+                        <p><strong>User perception:</strong> Feels 50% faster even with same latency</p>
+                        <p><strong>Savings:</strong> Perceived latency improvement</p>
+                        <p><strong>Cost:</strong> Minimal</p>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>Strategy 3: Query Classification</h4>
+                        <p><strong>What:</strong> Fast path for simple queries</p>
+                        <p><strong>Example:</strong> "What's 2+2?" → Direct LLM, no retrieval</p>
+                        <p><strong>Savings:</strong> 200-500ms for simple queries</p>
+                        <p><strong>Cost:</strong> Added classification layer</p>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>Strategy 4: Smaller Context Models</h4>
+                        <p><strong>What:</strong> Use models optimized for speed</p>
+                        <p><strong>Example:</strong> Groq, specialized inference engines</p>
+                        <p><strong>Savings:</strong> 500-1000ms generation time</p>
+                        <p><strong>Cost:</strong> May need to switch models/infrastructure</p>
+                    </div>
+                </div>
+
+                <h3>User Experience Reality</h3>
+                <div class="highlight info">
+                    <p><strong>Research findings:</strong></p>
+                    <ul>
+                        <li><strong><500ms:</strong> Feels instant, users don't notice latency</li>
+                        <li><strong>500ms-1s:</strong> Acceptable, users notice but don't mind</li>
+                        <li><strong>1-2s:</strong> Noticeable delay, user attention may wander</li>
+                        <li><strong>>2s:</strong> Frustrating, users may abandon</li>
+                    </ul>
+
+                    <p><strong>Practical guidance:</strong> Target <1s for consumer apps, <2s for enterprise/internal tools. Streaming helps immensely for longer responses.</p>
+                </div>
+            </section>
+
+            <!-- Recall vs Precision -->
+            <section class="content-section">
+                <h2>Trade-off 4: Recall vs Precision</h2>
+
+                <div class="highlight warning">
+                    <h4>The Retrieval Dilemma</h4>
+                    <p><strong>Recall:</strong> Did we find all relevant documents? (Retrieved too few = miss important info)</p>
+                    <p><strong>Precision:</strong> Is what we retrieved actually relevant? (Retrieved too much = noise)</p>
+                    <p><strong>The tension:</strong> Optimizing for one often hurts the other.</p>
+                </div>
+
+                <h3>Understanding the Trade-off</h3>
+
+                <table class="matrix-table">
+                    <thead>
+                        <tr>
+                            <th>Approach</th>
+                            <th>Recall</th>
+                            <th>Precision</th>
+                            <th>When to Use</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>High k (retrieve 20+)</strong></td>
+                            <td>High</td>
+                            <td>Low</td>
+                            <td>Comprehensive research, don't want to miss anything</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Medium k (5-10)</strong></td>
+                            <td>Medium</td>
+                            <td>Medium</td>
+                            <td>General use cases</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Low k (3-5)</strong></td>
+                            <td>Low</td>
+                            <td>High</td>
+                            <td>Focused answers, speed matters</td>
+                        </tr>
+                        <tr>
+                            <td><strong>High k + Reranking</strong></td>
+                            <td>High</td>
+                            <td>High</td>
+                            <td>Production systems (best of both)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Optimal Balance Strategy</h3>
+                <div class="highlight success">
+                    <p><strong>Production pattern:</strong> Retrieve with high recall (k=10-20), then rerank for high precision (take top 5)</p>
+
+                    <p><strong>Why this works:</strong></p>
+                    <ul>
+                        <li>High recall ensures you don't miss relevant documents</li>
+                        <li>Reranking fixes the precision problem</li>
+                        <li>Cost is acceptable (reranking is cheaper than missing information)</li>
+                        <li>Latency impact is manageable (50-100ms for reranking)</li>
+                    </ul>
+
+                    <p><strong>When to deviate:</strong></p>
+                    <ul>
+                        <li>Latency-critical: Skip reranking, use smaller k</li>
+                        <li>Cost-critical: Skip reranking, accept lower precision</li>
+                        <li>Accuracy-critical: Increase both k and reranker quality</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Flexibility vs Performance -->
+            <section class="content-section">
+                <h2>Trade-off 5: Flexibility vs Performance</h2>
+
+                <div class="highlight warning">
+                    <h4>The Generalist vs Specialist Trade-off</h4>
+                    <p><strong>Generalist systems:</strong> Handle many query types but aren't optimized for any</p>
+                    <p><strong>Specialist systems:</strong> Excel at specific query types but fail on others</p>
+                </div>
+
+                <h3>Approaches Comparison</h3>
+
+                <table class="matrix-table">
+                    <thead>
+                        <tr>
+                            <th>Approach</th>
+                            <th>Flexibility</th>
+                            <th>Performance</th>
+                            <th>Complexity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>One-Size-Fits-All</strong></td>
+                            <td>High (handles everything)</td>
+                            <td>Medium (not optimized)</td>
+                            <td>Low</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Routing to Specialists</strong></td>
+                            <td>Medium (can handle many types)</td>
+                            <td>High (optimized per type)</td>
+                            <td>High</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Single-Purpose System</strong></td>
+                            <td>Low (specific queries only)</td>
+                            <td>Very High (optimized)</td>
+                            <td>Low</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Adaptive Routing Strategy</h3>
+                <div class="accordion-group">
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Implementing Query Classification</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Step 1: Define query types</strong></p>
+                            <ul>
+                                <li>Simple factual (direct LLM)</li>
+                                <li>Domain-specific (domain embeddings + hybrid search)</li>
+                                <li>Complex analytical (decomposition, recursive retrieval)</li>
+                                <li>Real-time (time-filtered retrieval)</li>
+                            </ul>
+
+                            <p><strong>Step 2: Build classifier</strong></p>
+                            <ul>
+                                <li>Rule-based (fast, simple)</li>
+                                <li>ML classifier (more accurate, complex)</li>
+                                <li>LLM-based (most accurate, slowest)</li>
+                            </ul>
+
+                            <p><strong>Step 3: Route to appropriate pipeline</strong></p>
+                            <ul>
+                                <li>Each pipeline optimized for its query type</li>
+                                <li>Separate evaluation metrics per type</li>
+                                <li>Can independently optimize each pipeline</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Decision Framework -->
+            <section class="content-section">
+                <h2>Decision Framework: How to Choose</h2>
+
+                <div class="highlight info">
+                    <h4>🎯 Systematic Decision Making</h4>
+                    <p>When faced with trade-offs, use this framework to make intentional decisions:</p>
+                </div>
+
+                <h3>Step 1: Clarify Constraints</h3>
+                <div class="cards-grid">
+                    <div class="info-card">
+                        <h4>What are your hard limits?</h4>
+                        <ul>
+                            <li>Budget ceiling (per month or per query)</li>
+                            <li>Latency requirements (P95 target)</li>
+                            <li>Accuracy minimums (acceptable threshold)</li>
+                            <li>Team size and expertise</li>
+                            <li>Time to market pressure</li>
+                        </ul>
+                    </div>
+                    <div class="info-card">
+                        <h4>What matters most?</h4>
+                        <ul>
+                            <li>Rank your priorities: Cost, Speed, Accuracy, Flexibility</li>
+                            <li>Be honest - you can't optimize everything</li>
+                            <li>Consider your use case and users</li>
+                            <li>Think about competitive landscape</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>Step 2: Map Trade-offs to Constraints</h3>
+                <div class="highlight success">
+                    <p><strong>Example decision process:</strong></p>
+
+                    <p><strong>Constraints:</strong> $10K/month budget, <1s latency, 80%+ accuracy minimum</p>
+
+                    <p><strong>Options:</strong></p>
+                    <ol>
+                        <li><strong>GPT-4o + Pinecone:</strong> Best accuracy, but $25K/month (exceeds budget)</li>
+                        <li><strong>GPT-3.5 + Pinecone:</strong> Meets budget and latency, but 72% accuracy (too low)</li>
+                        <li><strong>GPT-3.5 + adaptive routing + caching:</strong> Meets all constraints ✓</li>
+                    </ol>
+
+                    <p><strong>Decision:</strong> Option 3 - add complexity to stay within budget while meeting targets</p>
+                </div>
+
+                <h3>Step 3: Plan for Iteration</h3>
+                <div class="highlight warning">
+                    <p><strong>Don't optimize prematurely:</strong></p>
+                    <ul>
+                        <li>Start with simple approach that meets minimum constraints</li>
+                        <li>Measure actual performance, not theoretical</li>
+                        <li>Identify the binding constraint (what limits you first)</li>
+                        <li>Optimize that constraint first</li>
+                        <li>Re-evaluate - priorities may shift</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2>Key Takeaways</h2>
+
+                <div class="highlight success">
+                    <h4>✓ Trade-off Principles</h4>
+                    <ul>
+                        <li><strong>Every decision has costs:</strong> More capability usually means more complexity or cost</li>
+                        <li><strong>Know your constraints:</strong> Budget, latency, accuracy, team, time</li>
+                        <li><strong>Prioritize ruthlessly:</strong> You can't optimize everything</li>
+                        <li><strong>Measure, don't guess:</strong> Base decisions on actual data</li>
+                        <li><strong>Start simple, optimize later:</strong> Don't over-engineer from day one</li>
+                        <li><strong>Use adaptive approaches:</strong> Route different queries to different optimizations</li>
+                        <li><strong>There are no perfect solutions:</strong> Only solutions optimized for specific contexts</li>
+                    </ul>
+                </div>
+
+                <p><strong>Next step:</strong> Section 9 covers how these trade-offs play out at scale.</p>
+            </section>
+        </main>
+
+        <footer class="main-footer">
+            <p>Continue to <a href="section9-scale.html">Section 9: At Scale</a></p>
+        </footer>
+    </div>
+
+    <script src="js/components.js"></script>
+</body>
+</html>

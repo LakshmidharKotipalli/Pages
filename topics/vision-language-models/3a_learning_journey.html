@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Journey | VLM Learning Journey</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <a href="index.html" class="sidebar-title">VLMs & ECOSYSTEM</a>
+            <a href="index.html" class="nav-link ">Home / Hub</a>\n<a href="1_foundation.html" class="nav-link ">1. Foundation & Context</a>\n<a href="2_living_analogy.html" class="nav-link ">2. Living Analogy</a>\n<a href="3a_learning_journey.html" class="nav-link active">3A. Learning Journey</a>\n<a href="3b_interview_conversations.html" class="nav-link ">3B. Interview Conversations</a>\n<a href="4_system_design_integration.html" class="nav-link ">4. System Design Integration</a>\n<a href="5_ripple_effects_map.html" class="nav-link ">5. Ripple Effects Map</a>\n<a href="6_evolution_story.html" class="nav-link ">6. Evolution Story</a>\n<a href="7_patterns_anti_patterns.html" class="nav-link ">7. Patterns & Anti-Patterns</a>\n<a href="8_trade_offs_analysis.html" class="nav-link ">8. Trade-offs Analysis</a>\n<a href="9_at_scale.html" class="nav-link ">9. At Scale</a>\n<a href="10_technology_landscape.html" class="nav-link ">10. Technology Landscape</a>\n<a href="11_pitfalls_war_stories.html" class="nav-link ">11. Pitfalls & War Stories</a>\n<a href="12_debugging_process.html" class="nav-link ">12. Debugging Process</a>\n<a href="13_eloquent_conversation.html" class="nav-link ">13. Eloquent Conversation</a>\n<a href="14_practice_exercises.html" class="nav-link ">14. Practice Exercises</a>\n<a href="15_quick_reference.html" class="nav-link ">15. Quick Reference</a>\n<a href="16_whats_next.html" class="nav-link ">16. What's Next</a>\n
+        </aside>
+        <main class="main-content">
+            
+         <h1>03A. Learning Journey (4 Levels)</h1>
+         <div class="tabs-container">
+            <div class="tabs-header">
+                <button class="tab-btn active">L1: Don't Break It</button>
+                <button class="tab-btn">L2: Practitioner</button>
+                <button class="tab-btn">L3: Problem Solver</button>
+                <button class="tab-btn">L4: Architect</button>
+            </div>
+            <div class="tab-content active">
+                <h3>Level 1: Don't Break It (0-6 months)</h3>
+                <p><strong>Goal:</strong> Send an image via an API and get a response without crashing the system.</p>
+                <ul>
+                    <li>Base64 encoding images safely.</li>
+                    <li>Understanding payload limits (you can't send a 40MB raw 8K image).</li>
+                    <li>Prompting VLMs: "Look at this image and tell me X".</li>
+                </ul>
+            </div>
+            <div class="tab-content">
+                <h3>Level 2: Comfortable Practitioner (6mo-2yr)</h3>
+                <p><strong>Goal:</strong> Running local VLMs (vLLM, Ollama), handling chunking and basics of RAG.</p>
+                <ul>
+                    <li>Using multimodal-vLLM to host Qwen-VL or LLaVA.</li>
+                    <li>Understanding how number of image patches eats context window tokens (e.g., a 1024x1024 image = ~1024 tokens).</li>
+                    <li>Basic structured output (JSON generation) from receipts.</li>
+                </ul>
+            </div>
+            <div class="tab-content">
+                <h3>Level 3: Problem Solver (2-5yr)</h3>
+                <p><strong>Goal:</strong> Parameter Efficient Fine Tuning (LoRA) and layout parsing.</p>
+                <ul>
+                    <li>Freezing the vision encoder and LLM, only training the projector layer.</li>
+                    <li>Solving the "small text" problem via tiling/AnyRes processing.</li>
+                    <li>Managing GPU KV-cache explosion from images.</li>
+                </ul>
+            </div>
+            <div class="tab-content">
+                <h3>Level 4: Architect's Mind (5-15yr)</h3>
+                <p><strong>Goal:</strong> Ground-up pre-training strategies, latent space alignments.</p>
+                <ul>
+                    <li>Designing continuous vs discrete tokenization structures (VQ-VAE vs SigLIP grids).</li>
+                    <li>Architecting cross-attention layers that inject vision directly into deeper transformer layers (like Flamingo) rather than just prefixing visual tokens.</li>
+                    <li>Handling catastrophic forgetting during multimodal alignment.</li>
+                </ul>
+            </div>
+         </div>
+         
+        </main>
+    </div>
+    <script src="js/components.js"></script>
+</body>
+</html>

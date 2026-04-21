@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Docker & Ecosystem — Complete Learning Journey</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+.hero {
+  background: linear-gradient(135deg, #0f1117 0%, #1a2744 50%, #0f1117 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 4rem 3rem;
+  text-align: center;
+  position: relative; overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(36,150,237,0.15) 0%, transparent 70%);
+}
+.hero-logo { font-size: 5rem; margin-bottom: 1rem; position: relative; }
+.hero h1 {
+  font-size: 3rem; font-weight: 900;
+  background: linear-gradient(135deg, #2496ed, #7c3aed);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 1rem; position: relative;
+}
+.hero p { font-size: 1.15rem; color: var(--text2); max-width: 600px; margin: 0 auto 2rem; position: relative; }
+.hero-stats { display: flex; justify-content: center; gap: 3rem; position: relative; }
+.hero-stat { text-align: center; }
+.hero-stat .num { font-size: 2rem; font-weight: 800; color: var(--docker-blue); }
+.hero-stat .label { font-size: 0.78rem; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; }
+.sections-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; padding: 2rem 3rem 4rem; max-width: 1200px; margin: 0 auto; }
+.section-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.5rem;
+  text-decoration: none; transition: all 0.25s;
+  display: flex; flex-direction: column; gap: 0.5rem;
+}
+.section-card:hover { border-color: var(--docker-blue); transform: translateY(-3px); box-shadow: var(--shadow); }
+.section-num { font-size: 0.7rem; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; }
+.section-icon { font-size: 1.8rem; }
+.section-name { font-weight: 700; font-size: 1rem; color: var(--text); }
+.section-desc { font-size: 0.82rem; color: var(--text2); }
+.ecosystem-section { background: var(--bg2); border-top: 1px solid var(--border); padding: 2rem 3rem 3rem; }
+.ecosystem-section h2 { font-size: 1.5rem; margin-bottom: 1.5rem; }
+.eco-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.75rem; max-width: 1200px; }
+.eco-pill {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.75rem 1rem;
+  text-decoration: none; transition: all 0.2s;
+  display: flex; align-items: center; gap: 8px;
+}
+.eco-pill:hover { border-color: var(--docker-blue); color: var(--docker-blue); }
+.eco-pill-icon { font-size: 1.1rem; }
+.eco-pill-label { font-size: 0.82rem; font-weight: 600; color: var(--text2); }
+.eco-pill:hover .eco-pill-label { color: var(--docker-blue); }
+</style>
+</head>
+<body>
+<nav class="topnav">
+  <a class="topnav-brand" href="index.html">
+    <svg viewBox="0 0 100 76" fill="none"><rect x="0" y="32" width="18" height="14" rx="2" fill="#2496ed"/><rect x="21" y="32" width="18" height="14" rx="2" fill="#2496ed"/><rect x="42" y="32" width="18" height="14" rx="2" fill="#2496ed"/><rect x="21" y="16" width="18" height="14" rx="2" fill="#2496ed"/><rect x="42" y="16" width="18" height="14" rx="2" fill="#2496ed"/><rect x="42" y="0" width="18" height="14" rx="2" fill="#2496ed"/><rect x="63" y="32" width="18" height="14" rx="2" fill="#2496ed"/><path d="M95 42 Q100 30 88 25 Q88 12 76 14" stroke="#2496ed" stroke-width="2" fill="none"/><ellipse cx="10" cy="55" rx="8" ry="4" fill="#2496ed" opacity="0.5"/><ellipse cx="30" cy="58" rx="10" ry="5" fill="#2496ed" opacity="0.4"/></svg>
+    Docker & Ecosystem
+  </a>
+  <div class="topnav-links">
+    <a href="01-foundation.html">Foundation</a>
+    <a href="03b-interview.html">Interview</a>
+    <a href="07-patterns.html">Patterns</a>
+    <a href="08-tradeoffs.html">Trade-offs</a>
+    <a href="15-reference.html">Quick Ref</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-logo">🐳</div>
+  <h1>Docker & Its Ecosystem</h1>
+  <p>A complete production-grade learning journey — from first container to fleet orchestration. Interview-ready, war-story-rich, trade-offs-first.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="num">16</div><div class="label">Deep Sections</div></div>
+    <div class="hero-stat"><div class="num">50+</div><div class="label">Interview Q&As</div></div>
+    <div class="hero-stat"><div class="num">15yr</div><div class="label">Evolution Story</div></div>
+    <div class="hero-stat"><div class="num">8</div><div class="label">Ecosystem Tools</div></div>
+  </div>
+</div>
+
+<div class="sections-grid">
+  <a class="section-card" href="01-foundation.html">
+    <div class="section-num">Section 01</div>
+    <div class="section-icon">🏗️</div>
+    <div class="section-name">Foundation & Context</div>
+    <div class="section-desc">What Docker really is, why it exists, namespaces, cgroups, and the architecture that makes it tick.</div>
+  </a>
+  <a class="section-card" href="02-analogy.html">
+    <div class="section-num">Section 02</div>
+    <div class="section-icon">🚢</div>
+    <div class="section-name">Living Analogy</div>
+    <div class="section-desc">The shipping container revolution as a perfect mental model — applied throughout the entire journey.</div>
+  </a>
+  <a class="section-card" href="03a-journey.html">
+    <div class="section-num">Section 03A</div>
+    <div class="section-icon">🗺️</div>
+    <div class="section-name">Learning Journey</div>
+    <div class="section-desc">4 mastery levels — from "don't break prod" to architect-level thinking about container strategy.</div>
+  </a>
+  <a class="section-card" href="03b-interview.html">
+    <div class="section-num">Section 03B</div>
+    <div class="section-icon">🎯</div>
+    <div class="section-name">Interview Conversations</div>
+    <div class="section-desc">7 interview question trees with talking points, follow-ups, and production stories.</div>
+  </a>
+  <a class="section-card" href="04-system-design.html">
+    <div class="section-num">Section 04</div>
+    <div class="section-icon">⚙️</div>
+    <div class="section-name">System Design Integration</div>
+    <div class="section-desc">How Docker connects to reliability, latency, cost, security, and observability decisions.</div>
+  </a>
+  <a class="section-card" href="05-ripple.html">
+    <div class="section-num">Section 05</div>
+    <div class="section-icon">🌊</div>
+    <div class="section-name">Ripple Effects Map</div>
+    <div class="section-desc">Cascading consequences when you containerize everything — the good, the unexpected, the painful.</div>
+  </a>
+  <a class="section-card" href="06-evolution.html">
+    <div class="section-num">Section 06</div>
+    <div class="section-icon">📅</div>
+    <div class="section-name">Evolution Story</div>
+    <div class="section-desc">2013–2028: how Docker changed software delivery and what came next when Kubernetes took over.</div>
+  </a>
+  <a class="section-card" href="07-patterns.html">
+    <div class="section-num">Section 07</div>
+    <div class="section-icon">🧩</div>
+    <div class="section-name">Patterns & Anti-Patterns</div>
+    <div class="section-desc">6 proven patterns, 8 dangerous anti-patterns — with production impact ratings.</div>
+  </a>
+  <a class="section-card" href="08-tradeoffs.html">
+    <div class="section-num">Section 08</div>
+    <div class="section-icon">⚖️</div>
+    <div class="section-name">Trade-offs Analysis</div>
+    <div class="section-desc">VMs vs Containers, Docker vs Podman, Compose vs Swarm vs K8s — decision frameworks.</div>
+  </a>
+  <a class="section-card" href="09-at-scale.html">
+    <div class="section-num">Section 09</div>
+    <div class="section-icon">📈</div>
+    <div class="section-name">Docker at Scale</div>
+    <div class="section-desc">What breaks at 1000 containers, registry bottlenecks, image bloat, and how Netflix/Uber solved it.</div>
+  </a>
+  <a class="section-card" href="10-landscape.html">
+    <div class="section-num">Section 10</div>
+    <div class="section-icon">🗺️</div>
+    <div class="section-name">Technology Landscape</div>
+    <div class="section-desc">Podman, containerd, LXC, Kata, Firecracker — when to use what and industry trajectory.</div>
+  </a>
+  <a class="section-card" href="11-pitfalls.html">
+    <div class="section-num">Section 11</div>
+    <div class="section-icon">⚠️</div>
+    <div class="section-name">Pitfalls & War Stories</div>
+    <div class="section-desc">Real production disasters with root causes, impact, fixes, and the lessons that stick.</div>
+  </a>
+  <a class="section-card" href="12-debugging.html">
+    <div class="section-num">Section 12</div>
+    <div class="section-icon">🔍</div>
+    <div class="section-name">Debugging Playbook</div>
+    <div class="section-desc">Symptom → diagnosis flows for every common Docker failure mode. What to check first.</div>
+  </a>
+  <a class="section-card" href="13-conversation.html">
+    <div class="section-num">Section 13</div>
+    <div class="section-icon">💬</div>
+    <div class="section-name">Eloquent Conversation</div>
+    <div class="section-desc">How to talk Docker like a 15-year veteran. Soundbites, stances, debate frameworks.</div>
+  </a>
+  <a class="section-card" href="14-exercises.html">
+    <div class="section-num">Section 14</div>
+    <div class="section-icon">🏋️</div>
+    <div class="section-name">Practice Exercises</div>
+    <div class="section-desc">15 exercises from warm-up to expert — build real intuition, not just trivia knowledge.</div>
+  </a>
+  <a class="section-card" href="15-reference.html">
+    <div class="section-num">Section 15</div>
+    <div class="section-icon">📋</div>
+    <div class="section-name">Quick Reference</div>
+    <div class="section-desc">Commands, Dockerfile best practices, networking cheatsheet, security checklist.</div>
+  </a>
+  <a class="section-card" href="16-whats-next.html">
+    <div class="section-num">Section 16</div>
+    <div class="section-icon">🚀</div>
+    <div class="section-name">What's Next</div>
+    <div class="section-desc">Kubernetes, service mesh, eBPF, WebAssembly — the natural learning sequence from Docker.</div>
+  </a>
+</div>
+
+<div class="ecosystem-section">
+  <h2>🌐 The Docker Ecosystem</h2>
+  <div class="eco-grid">
+    <a class="eco-pill" href="16-whats-next.html#kubernetes"><span class="eco-pill-icon">☸️</span><span class="eco-pill-label">Kubernetes</span></a>
+    <a class="eco-pill" href="07-patterns.html#compose"><span class="eco-pill-icon">🐙</span><span class="eco-pill-label">Docker Compose</span></a>
+    <a class="eco-pill" href="10-landscape.html#containerd"><span class="eco-pill-icon">📦</span><span class="eco-pill-label">containerd</span></a>
+    <a class="eco-pill" href="10-landscape.html#podman"><span class="eco-pill-icon">🦭</span><span class="eco-pill-label">Podman</span></a>
+    <a class="eco-pill" href="16-whats-next.html#istio"><span class="eco-pill-icon">🕸️</span><span class="eco-pill-label">Service Mesh</span></a>
+    <a class="eco-pill" href="16-whats-next.html#registry"><span class="eco-pill-icon">🗄️</span><span class="eco-pill-label">Container Registry</span></a>
+    <a class="eco-pill" href="04-system-design.html#cicd"><span class="eco-pill-icon">🔄</span><span class="eco-pill-label">CI/CD Pipelines</span></a>
+    <a class="eco-pill" href="10-landscape.html#kata"><span class="eco-pill-icon">🔒</span><span class="eco-pill-label">Kata Containers</span></a>
+  </div>
+</div>
+
+<script src="js/components.js"></script>
+</body>
+</html>

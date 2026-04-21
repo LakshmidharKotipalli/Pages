@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>At Scale - Learn Claude Code Ecosystem</title>
+    <link rel="stylesheet" href="../../css/styles.css">
+    <link rel="stylesheet" href="theme.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <a href="index.html" class="nav-back">Back to Overview</a>
+        <span class="current-section">At Scale</span>
+        <div class="nav-links">
+            <a href="tradeoffs.html">Previous</a>
+            <a href="landscape.html">Next</a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <h1>At Scale</h1>
+            <p class="powerful-sentence">A solo developer with Claude Code is a novelist with a research assistant. A team of one hundred with Claude Code is a publishing house — and publishing houses need editorial standards, production pipelines, and governance boards, not just talented writers with good assistants.</p>
+            <p class="explanation">What works perfectly for five developers breaks silently at twenty and fails loudly at one hundred. This section maps the inflection points, the organizational patterns that survive each growth stage, and the things that break first when you skip the governance work.</p>
+        </section>
+
+        <section>
+            <h2>Three Stages of Scale</h2>
+            <p>Claude Code adoption inside an organization typically progresses through three recognizable stages, each with its own natural constraints and failure modes. Understanding which stage your organization is in — and what the next stage requires — is the most actionable piece of scaling knowledge available to a technical leader.</p>
+
+            <div class="diagram-container">
+                <svg class="architecture-diagram" viewBox="0 0 860 140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Three stages of Claude Code scale: startup, growth, enterprise">
+                    <!-- Stage 1 -->
+                    <rect x="20" y="20" width="240" height="100" rx="10" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+                    <text x="140" y="45" font-family="system-ui" font-size="13" font-weight="700" fill="#1e40af" text-anchor="middle">Stage 1: Startup</text>
+                    <text x="140" y="62" font-family="system-ui" font-size="10" fill="#374151" text-anchor="middle">Team of 2–5 developers</text>
+                    <text x="140" y="80" font-family="system-ui" font-size="10" fill="#374151" text-anchor="middle">Shared CLAUDE.md in git</text>
+                    <text x="140" y="98" font-family="system-ui" font-size="10" fill="#374151" text-anchor="middle">Informal context habits</text>
+                    <text x="140" y="116" font-family="system-ui" font-size="9" fill="#6b7280" text-anchor="middle">Film: indie crew, everyone wears hats</text>
+
+                    <!-- Arrow -->
+                    <text x="302" y="75" font-family="system-ui" font-size="20" fill="#9ca3af" text-anchor="middle">→</text>
+
+                    <!-- Stage 2 -->
+                    <rect x="320" y="20" width="220" height="100" rx="10" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
+                    <text x="430" y="45" font-family="system-ui" font-size="13" font-weight="700" fill="#065f46" text-anchor="middle">Stage 2: Growth</text>
+                    <text x="430" y="62" font-family="system-ui" font-size="10" fill="#374151" text-anchor="middle">Team of 15–25 developers</text>
+                    <text x="430" y="80" font-family="system-ui" font-size="10" fill="#374151" text-anchor="middle">Modular config + plugins</text>
+                    <text x="430" y="98" font-family="system-ui" font-size="10" fill="#374151" text-anchor="middle">First cost policies</text>
+                    <text x="430" y="116" font-family="system-ui" font-size="9" fill="#6b7280" text-anchor="middle">Film: TV series, shared style guide</text>
+
+                    <!-- Arrow -->
+                    <text x="562" y="75" font-family="system-ui" font-size="20" fill="#9ca3af" text-anchor="middle">→</text>
+
+                    <!-- Stage 3 -->
+                    <rect x="580" y="20" width="260" height="100" rx="10" fill="#ede9fe" stroke="#8b5cf6" stroke-width="2"/>
+                    <text x="710" y="45" font-family="system-ui" font-size="13" font-weight="700" fill="#4c1d95" text-anchor="middle">Stage 3: Enterprise</text>
+                    <text x="710" y="62" font-family="system-ui" font-size="10" fill="#374151" text-anchor="middle">Team of 100+ developers</text>
+                    <text x="710" y="80" font-family="system-ui" font-size="10" fill="#374151" text-anchor="middle">Governance + internal marketplace</text>
+                    <text x="710" y="98" font-family="system-ui" font-size="10" fill="#374151" text-anchor="middle">Compliance + model routing</text>
+                    <text x="710" y="116" font-family="system-ui" font-size="9" fill="#6b7280" text-anchor="middle">Film: major studio, shared universe rules</text>
+                </svg>
+            </div>
+        </section>
+
+        <section>
+            <h2>Stage 1: Team of 2–5 (The Startup)</h2>
+            <p>At the startup stage, Claude Code adoption is driven by individual enthusiasm. One developer discovers it, shares it with the team, everyone starts using it slightly differently. The shared CLAUDE.md in the git repository is the team's first coordination mechanism — and it works remarkably well at this scale because every developer has read every line of it and most of them wrote some of it.</p>
+
+            <div class="card info">
+                <h4>What Works at This Scale</h4>
+                <p>The startup setup is deliberately lean and that leanness is a virtue. A single CLAUDE.md under 150 lines covers the project's core conventions, architecture decisions, and the three things Claude must always know. Three to five shared skills cover the team's repetitive workflows: the commit convention skill, the migration generator skill, the PR description skill. One or two MCP servers handle the team's essential external connections — usually GitHub and the development database.</p>
+                <p>Context management is informal and effective because the team is small enough to share context about context. When someone discovers that <code>/compact focus on authentication</code> is dramatically better than <code>/clear</code> for mid-task summarization, they Slack the whole team and everyone knows within the hour. The knowledge flows freely because the organization is flat and the communication channels are short.</p>
+            </div>
+
+            <div class="card success">
+                <h4>What to Establish Now (Before You Grow)</h4>
+                <p>The patterns you establish at five developers become the load-bearing walls of your organizational architecture at twenty. The most critical habit to establish at the startup stage is CLAUDE.md discipline: a monthly review where every line earns its place or gets removed. Treat CLAUDE.md as a living document with an owner, not a shared notepad where anyone can append indefinitely.</p>
+                <p>Establishing a shared skill repository in git — even if it only has three skills — creates the muscle memory and infrastructure for skill governance before it becomes an emergency. The team that has a skills repo at five developers will handle skills at twenty developers with a process already in place. The team that waits until twenty developers to create the repo will spend two months sorting out conflicts between seventeen locally-evolved versions of the same skills.</p>
+            </div>
+
+            <div class="diagram-container">
+                <svg viewBox="0 0 760 180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Stage 1 startup tooling setup diagram">
+                    <text x="380" y="20" font-family="system-ui" font-size="12" font-weight="700" fill="#374151" text-anchor="middle">Startup Tooling Stack</text>
+                    <!-- CLAUDE.md -->
+                    <rect x="280" y="35" width="200" height="40" rx="6" fill="#ef4444" stroke="#dc2626" stroke-width="2"/>
+                    <text x="380" y="55" font-family="system-ui" font-size="11" font-weight="600" fill="white" text-anchor="middle">CLAUDE.md (single file)</text>
+                    <text x="380" y="69" font-family="system-ui" font-size="9" fill="#fee2e2" text-anchor="middle">Under 150 lines, in version control</text>
+                    <!-- Skills -->
+                    <rect x="60" y="105" width="175" height="40" rx="6" fill="#3b82f6" stroke="#1d4ed8" stroke-width="1.5"/>
+                    <text x="147" y="121" font-family="system-ui" font-size="10" font-weight="600" fill="white" text-anchor="middle">3–5 Shared Skills</text>
+                    <text x="147" y="136" font-family="system-ui" font-size="9" fill="#bfdbfe" text-anchor="middle">commit, migration, PR description</text>
+                    <!-- MCP -->
+                    <rect x="270" y="105" width="175" height="40" rx="6" fill="#10b981" stroke="#059669" stroke-width="1.5"/>
+                    <text x="357" y="121" font-family="system-ui" font-size="10" font-weight="600" fill="white" text-anchor="middle">1–2 MCP Servers</text>
+                    <text x="357" y="136" font-family="system-ui" font-size="9" fill="#d1fae5" text-anchor="middle">GitHub + dev database</text>
+                    <!-- Permission -->
+                    <rect x="480" y="105" width="175" height="40" rx="6" fill="#f59e0b" stroke="#d97706" stroke-width="1.5"/>
+                    <text x="567" y="121" font-family="system-ui" font-size="10" font-weight="600" fill="white" text-anchor="middle">Informal Permissions</text>
+                    <text x="567" y="136" font-family="system-ui" font-size="9" fill="#fef3c7" text-anchor="middle">developers choose own mode</text>
+                    <!-- Connecting lines -->
+                    <line x1="330" y1="75" x2="200" y2="105" stroke="#9ca3af" stroke-width="1" stroke-dasharray="3 2"/>
+                    <line x1="380" y1="75" x2="380" y2="105" stroke="#9ca3af" stroke-width="1" stroke-dasharray="3 2"/>
+                    <line x1="430" y1="75" x2="555" y2="105" stroke="#9ca3af" stroke-width="1" stroke-dasharray="3 2"/>
+                    <text x="380" y="168" font-family="system-ui" font-size="9" fill="#6b7280" text-anchor="middle">Simplicity is the correct strategy at this stage. Complexity is premature optimization.</text>
+                </svg>
+            </div>
+        </section>
+
+        <section>
+            <h2>Stage 2: Team of 15–25 (Growth Stage)</h2>
+            <p>The growth stage is where most teams get surprised. The startup setup that worked beautifully at five people begins showing stress fractures at fifteen. CLAUDE.md has grown to 400 lines. There are three different "deploy skill" files living on different developers' machines, none of which match the actual deployment process. The GitHub MCP server config has drifted — some developers have it pointed at the staging environment, others at production, and no one is sure which is which.</p>
+
+            <div class="card warning">
+                <h4>The Growth Stage Transition Triggers</h4>
+                <p>The signal that you have crossed from Stage 1 to Stage 2 is not team size alone — it is when you first experience Claude Code producing different results on the same task for two developers because their configurations have silently diverged. That moment of "why did Claude do X for you but Y for me" is the growth stage alarm bell. It means the informal coordination mechanisms that worked at five people have exceeded their capacity.</p>
+            </div>
+
+            <div class="card info">
+                <h4>The Growth Stage Architecture</h4>
+                <p>The growth stage requires deliberate structure where the startup stage had natural coordination. CLAUDE.md evolves into the hybrid model: a lean core file that references modular rule files in <code>.claude/rules/</code>. Frontend developers have a focused frontend rules file. Backend developers have their own. DevOps has theirs. Each team function can evolve its rules independently without creating conflicts in a shared monolith.</p>
+                <p>Plugin standardization becomes essential. The team plugin — a versioned bundle in a shared git repository containing the canonical skills, MCP configurations, and agent definitions for the whole team — becomes the single source of truth for Claude Code tooling. New developer onboards: they install the team plugin. Skill is updated: bump the plugin version and every developer gets the update on their next pull. The plugin turns ad hoc configuration into a managed dependency.</p>
+            </div>
+
+            <div class="card success">
+                <h4>Hooks for Quality Enforcement</h4>
+                <p>The growth stage is where hooks earn their place. Hooks are shell commands that execute at Claude Code session lifecycle events, and they are the mechanism for automating quality gates that would otherwise require manual developer discipline. A pre-session hook that runs linting and reports the current test coverage gives Claude crucial context about the codebase's health state at the start of every session — without requiring the developer to remember to run it.</p>
+                <p>A post-edit hook that checks for accidentally committed secrets, enforces import ordering, or verifies that modified files have corresponding test updates catches issues at the moment they are created rather than at PR review or — worse — production deployment. Growth-stage teams that invest in hooks consistently report fewer review cycles and higher confidence that Claude's output meets their standards.</p>
+            </div>
+
+            <div class="card warning">
+                <h4>First Context Management Policies</h4>
+                <p>At the growth stage, individual context habits are no longer sufficient. The team needs explicit, documented policies: when to use <code>/clear</code> versus <code>/compact</code>, which model to use for which task types, how to handle long-running sessions. Not because the decisions are complicated, but because without explicit policy the decisions are made differently by each developer, and inconsistency at this scale creates unpredictable outcomes and makes debugging difficult.</p>
+                <p>The growth stage is also the right time to introduce the first cost dashboards. Token usage is not a concern at five developers. At twenty developers, it is the difference between an AI tooling budget that stays predictable and one that surprises the CFO at quarter end. Basic visibility into who is using how much and for what classes of task is the foundation for intelligent optimization later.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Stage 3: Team of 100+ (Enterprise)</h2>
+            <p>Enterprise-scale Claude Code adoption is not just a bigger version of growth-stage adoption. It is qualitatively different. The problems are no longer primarily technical — any competent engineer can configure Claude Code correctly at this scale. The problems are organizational: how do you ensure that one hundred developers working across ten teams, three time zones, and two programming languages are all getting maximum value from the tool while maintaining compliance, controlling costs, and preventing catastrophic misuse?</p>
+
+            <div class="diagram-container">
+                <svg viewBox="0 0 860 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Enterprise Claude Code governance architecture">
+                    <!-- Title -->
+                    <text x="430" y="20" font-family="system-ui" font-size="12" font-weight="700" fill="#374151" text-anchor="middle">Enterprise Governance Architecture</text>
+                    <!-- CLAUDE.md Governance Board -->
+                    <rect x="280" y="35" width="300" height="45" rx="8" fill="#8b5cf6" stroke="#6d28d9" stroke-width="2"/>
+                    <text x="430" y="55" font-family="system-ui" font-size="11" font-weight="700" fill="white" text-anchor="middle">CLAUDE.md Governance Board</text>
+                    <text x="430" y="72" font-family="system-ui" font-size="9" fill="#ddd6fe" text-anchor="middle">Quarterly reviews. Approval required for changes.</text>
+
+                    <!-- Internal Marketplace -->
+                    <rect x="30" y="115" width="180" height="45" rx="6" fill="#3b82f6" stroke="#1d4ed8" stroke-width="1.5"/>
+                    <text x="120" y="133" font-family="system-ui" font-size="10" font-weight="600" fill="white" text-anchor="middle">Internal Skills</text>
+                    <text x="120" y="149" font-family="system-ui" font-size="9" fill="#bfdbfe" text-anchor="middle">Marketplace + approval workflow</text>
+
+                    <!-- MCP Registry -->
+                    <rect x="230" y="115" width="200" height="45" rx="6" fill="#10b981" stroke="#059669" stroke-width="1.5"/>
+                    <text x="330" y="133" font-family="system-ui" font-size="10" font-weight="600" fill="white" text-anchor="middle">MCP Server Registry</text>
+                    <text x="330" y="149" font-family="system-ui" font-size="9" fill="#d1fae5" text-anchor="middle">Vetted, versioned, all internal tools</text>
+
+                    <!-- Agent Teams -->
+                    <rect x="450" y="115" width="190" height="45" rx="6" fill="#f59e0b" stroke="#d97706" stroke-width="1.5"/>
+                    <text x="545" y="133" font-family="system-ui" font-size="10" font-weight="600" fill="white" text-anchor="middle">Agent Team Policies</text>
+                    <text x="545" y="149" font-family="system-ui" font-size="9" fill="#fef3c7" text-anchor="middle">Cross-team feature coordination</text>
+
+                    <!-- Compliance -->
+                    <rect x="660" y="115" width="170" height="45" rx="6" fill="#ef4444" stroke="#dc2626" stroke-width="1.5"/>
+                    <text x="745" y="133" font-family="system-ui" font-size="10" font-weight="600" fill="white" text-anchor="middle">Compliance Hooks</text>
+                    <text x="745" y="149" font-family="system-ui" font-size="9" fill="#fee2e2" text-anchor="middle">Audit log, secret detection</text>
+
+                    <!-- Monitoring layer -->
+                    <rect x="100" y="200" width="620" height="45" rx="8" fill="#f9fafb" stroke="#e5e7eb" stroke-width="2"/>
+                    <text x="410" y="218" font-family="system-ui" font-size="11" font-weight="700" fill="#374151" text-anchor="middle">Monitoring and Observability Layer</text>
+                    <text x="410" y="235" font-family="system-ui" font-size="9" fill="#6b7280" text-anchor="middle">Token usage dashboards | Skill analytics | Error rates by agent type | Model routing audit logs | Cost attribution by team</text>
+
+                    <!-- Connecting lines from governance to others -->
+                    <line x1="350" y1="80" x2="180" y2="115" stroke="#8b5cf6" stroke-width="1" stroke-dasharray="4 3"/>
+                    <line x1="390" y1="80" x2="340" y2="115" stroke="#8b5cf6" stroke-width="1" stroke-dasharray="4 3"/>
+                    <line x1="450" y1="80" x2="530" y2="115" stroke="#8b5cf6" stroke-width="1" stroke-dasharray="4 3"/>
+                    <line x1="490" y1="80" x2="720" y2="115" stroke="#8b5cf6" stroke-width="1" stroke-dasharray="4 3"/>
+                    <!-- Connect to monitoring -->
+                    <line x1="410" y1="160" x2="410" y2="200" stroke="#9ca3af" stroke-width="1" stroke-dasharray="3 2"/>
+                </svg>
+            </div>
+
+            <div class="card info">
+                <h4>CLAUDE.md Governance Board</h4>
+                <p>At one hundred developers, CLAUDE.md is no longer a developer convenience file — it is an organizational policy document. Changes to it affect how one hundred developers work, which means changes to it require a governance process: a review board, a change proposal process, and scheduled quarterly reviews where the file is audited for relevance. The film analogy is the studio's shared universe rules document — every franchise must comply, no single franchise owns it, and changes require executive sign-off because they affect every production in the pipeline.</p>
+            </div>
+
+            <div class="card success">
+                <h4>Internal Skills Marketplace</h4>
+                <p>At enterprise scale, the public skills marketplaces (20K+ skills as of early 2026) are a starting point, not a solution. The most valuable skills are the ones that encode your organization's specific workflows, your internal systems' conventions, and your compliance requirements. An internal marketplace — a curated repository of approved skills with quality review, version management, and documentation standards — is how enterprise organizations ensure that best practices are discoverable and that approved skills are distinguishable from experimental ones.</p>
+                <p>The marketplace requires a governance process for skill promotion: a developer creates a skill in their team's namespace, it goes through review, it gets promoted to the internal marketplace, it becomes available to all developers. This mirrors how libraries work in enterprise software development. Not every library makes it to the approved dependency list; the ones that do are reliable, documented, and supported.</p>
+            </div>
+
+            <div class="card warning">
+                <h4>Compliance Hooks</h4>
+                <p>Enterprise environments typically operate under regulatory constraints that individual developers cannot be expected to enforce manually. Compliance hooks — shell commands that execute at session events and check for policy violations — automate enforcement. A hook that scans all modified files for credential patterns and blocks the session from proceeding if any are found is not a nice-to-have in a SOC 2 environment; it is a requirement. A hook that logs every shell command Claude executes to an audit trail is how you answer "what exactly did the AI do in our production environment on that date" when the auditors ask.</p>
+            </div>
+
+            <div class="card info">
+                <h4>Model Routing Policies</h4>
+                <p>At enterprise scale, model selection cannot be left to individual developer preference. A simple heuristic — every developer uses Opus because "why compromise" — can cost a 100-person engineering organization tens of thousands of dollars monthly on tasks that Haiku handles perfectly. Enterprise model routing policies define which model class handles which task type: sub-agent research tasks route to Haiku, daily feature development routes to Sonnet, architectural analysis routes to Opus. These policies are enforced through configuration, not trust, and their impact on both cost and quality is measurable.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>What Breaks First — And Why</h2>
+            <p>Organizations scaling Claude Code without deliberate attention to governance reliably hit the same failure modes, in approximately the same order. Understanding this sequence lets you intervene before the breaking point rather than after.</p>
+
+            <div class="accordion" data-multiple-open="true">
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <span>1. CLAUDE.md Becomes a Committee Document</span>
+                        <span class="severity medium">Medium</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>The first thing that breaks is CLAUDE.md quality. Without a clear owner and a review process, CLAUDE.md becomes a document where everyone adds but no one removes. Every team adds their domain-specific rules to the shared file. Every incident produces a new "never do X" entry. Contradictory rules accumulate. The file grows past the 200-line priority threshold where Claude loads its content with degraded attention.</p>
+                        <p>The result is paradoxical: the more rules you add to CLAUDE.md, the less Claude Code follows any of them reliably, because the most important rules are now buried and the context overhead is high. Teams that recognize this pattern early invest in CLAUDE.md ownership — one person or small committee with authority to reject additions that do not earn their place.</p>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <span>2. Context Costs Spiral Without Visibility</span>
+                        <span class="severity high">High</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Token costs are invisible until they are a budget crisis. Teams without usage dashboards routinely discover at quarter end that their Claude Code spend is three times what was planned, driven by a handful of heavy users running Opus for every task without context management discipline. By the time this is discovered, the culture has formed around unconstrained usage and introducing cost policies feels like a takeaway rather than a standard practice.</p>
+                        <p>The fix is instrumentation early, before cost becomes a problem. Token usage dashboards, basic cost attribution by team or developer, and visibility into which tasks are consuming the most context are not complex to implement. The organizations that instrument early develop cost intuition while costs are low and establish norms before any individual has built habits around unconstrained usage.</p>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <span>3. Skills Proliferate Without Quality Control</span>
+                        <span class="severity medium">Medium</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Left unmanaged, skills grow like code dependencies: quickly, indiscriminately, and with no one responsible for quality. A team of twenty-five developers working for six months will independently create dozens of overlapping skills. The "deploy" skill, the "create PR" skill, the "generate migration" skill — each developer has their own version, each version has evolved independently, and no version matches the actual current process. Debugging a deployment issue becomes an exercise in first determining which version of the deploy skill was used.</p>
+                        <p>Preventing this requires the same practices used for code libraries: a canonical registry, a promotion process, and deprecation for outdated versions. Teams that apply software governance principles to skill governance avoid the proliferation problem entirely.</p>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <span>4. MCP Server Configs Drift Between Teams</span>
+                        <span class="severity medium">Medium</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>MCP configurations are point-in-time snapshots of external tool connectivity. As external tools evolve — API versions change, endpoints move, authentication methods update — MCP configurations require maintenance. Without a centralized registry and update process, different teams end up with different configurations of the same MCP server: different API versions, different authentication, different scopes. Two developers using "the GitHub MCP server" may actually be using incompatible configurations that produce subtly different behaviors.</p>
+                        <p>The governance pattern that works is treating MCP server configurations as infrastructure dependencies managed by the platform team — versioned, centrally distributed, and updated through a controlled process rather than individual developer preference.</p>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <span>5. Agent Team Experiments Block Real Work</span>
+                        <span class="severity high">High</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Agent teams (peer-to-peer multi-agent coordination) are experimentally powerful and organizationally dangerous if not isolated from production workflows. Teams that mix agent team experiments with their regular development workflow discover that when an experiment's shared task list gets corrupted or an agent team runs into a coordination deadlock, it can block real work in progress. The experiment overhead — higher coordination cost, experimental tooling — is manageable in isolation; it is destabilizing in a production workflow.</p>
+                        <p>The organizational pattern that works is clear separation: agent team experiments happen in dedicated environments, on dedicated branches, with explicit start and end criteria. Production workflows use the stable sub-agent model until agent teams are declared production-ready for specific use cases. The excitement about agent team capabilities should not override the need for reliable daily development workflows.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Monitoring: What to Measure and Why</h2>
+            <p>You cannot manage what you cannot measure. These are the five categories of instrumentation that matter most for Claude Code at scale, ordered by the value they provide relative to the cost of implementing them.</p>
+
+            <div class="efficiency-tips">
+                <div class="tip-card">
+                    <h4>Token Usage Dashboards</h4>
+                    <p>Track total token consumption by developer, by team, and by day. Trend lines reveal when a team's usage is growing faster than their output — a leading indicator of context waste. Per-developer anomalies often reveal a single heavy user who can be coached to more efficient patterns. Cost attribution by team enables meaningful budget conversations.</p>
+                </div>
+                <div class="tip-card">
+                    <h4>Skill Invocation Analytics</h4>
+                    <p>Which skills are used most frequently? Which are never used? High-frequency skills are candidates for quality investment — improving their prompt engineering, documentation, and edge case handling creates high-leverage value. Zero-usage skills should be deprecated to reduce cognitive clutter and context overhead from the skills registry.</p>
+                </div>
+                <div class="tip-card">
+                    <h4>Context Utilization Patterns</h4>
+                    <p>How full is the context window at the end of typical sessions? Sessions that consistently run to 90%+ utilization suggest that developers are not using <code>/compact</code> or <code>/clear</code> effectively. Sessions that rarely exceed 30% may indicate over-conservative context management that is limiting Claude's effectiveness. The data reveals the actual behavior behind the policy.</p>
+                </div>
+                <div class="tip-card">
+                    <h4>Error Rates by Sub-Agent Type</h4>
+                    <p>Track task failure and error rates broken down by which sub-agent type handled the task. High error rates from a specific sub-agent type indicate a configuration problem, a prompt quality issue, or a scope mismatch between the task type and the agent's design. This data makes sub-agent quality improvement systematic rather than anecdotal.</p>
+                </div>
+                <div class="tip-card">
+                    <h4>Time-to-Resolution Metrics</h4>
+                    <p>How long from task start to acceptable completion? Teams with strong Claude Code discipline — good CLAUDE.md, canonical skills, disciplined context management — consistently show lower time-to-resolution than teams without it, even controlling for task complexity. This metric makes the ROI of tooling investment visible and creates organizational motivation for the governance work that keeps the system healthy.</p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>The Universal Scaling Truth</h2>
+            <div class="card success">
+                <p class="powerful-sentence">At every stage of scale, the limiting factor is not the AI's capability — it is the organization's ability to define what they want the AI to do and to establish the shared context that makes consistent, high-quality output possible.</p>
+                <p>The major film studio does not make better movies than the indie crew because it has better cameras. It makes more movies, more reliably, to a consistent standard because it has invested in production infrastructure: shared universe rules, quality review pipelines, and department standards that let any two crew members from any franchise work together effectively. That infrastructure work is the unromantic but essential prerequisite for scale.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="section-footer">
+        <a href="tradeoffs.html" class="btn">Previous: Trade-offs Analysis</a>
+        <a href="landscape.html" class="btn">Next: Technology Landscape</a>
+    </footer>
+
+    <script src="../../js/components.js"></script>
+</body>
+</html>

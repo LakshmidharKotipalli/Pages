@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debugging - Learn AI Agents, Skills, Tools & MCP</title>
+    <link rel="stylesheet" href="../../css/styles.css">
+    <link rel="stylesheet" href="theme.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <a href="index.html" class="nav-back">Back to Overview</a>
+        <span class="current-section">Debugging</span>
+        <div class="nav-links">
+            <a href="pitfalls.html">Previous</a>
+            <a href="eloquent.html">Next</a>
+        </div>
+    </nav>
+
+    <main>
+        <h1>Debugging Agent Systems</h1>
+
+        <div class="hero">
+            <p class="powerful-sentence">Debugging an agent is differential diagnosis — you observe symptoms, form hypotheses, isolate variables, and test your fix without destabilizing the patient.</p>
+            <p class="explanation">In the hospital analogy, the attending physician doesn't panic when a patient presents with chest pain. They follow a structured protocol: rule out the life-threatening causes first, then work down to the mundane. Agent debugging is exactly the same discipline applied to software.</p>
+        </div>
+
+        <div class="card info">
+            <h2>The Debugging Mindset</h2>
+            <p>Most agent failures are not mysterious. They fall into a small number of repeating categories. The engineer who debugs fastest is not the one who knows the most — it's the one who has the most disciplined triage process. Before you read a single log line, ask: <strong>what category of failure is this?</strong></p>
+            <p>The six categories cover roughly 95% of all production agent issues: tool selection failures, tool execution failures, infinite loops, connectivity failures, incorrect results, and context degradation. Memorize the categories. The diagnostic path follows from the category.</p>
+        </div>
+
+        <!-- SVG Flowchart: Symptom → Category → Diagnosis → Fix -->
+        <div class="diagram-container">
+            <h2>Debugging Flowchart</h2>
+            <div class="architecture-diagram">
+                <svg viewBox="0 0 900 580" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+                    <!-- Title -->
+                    <text x="450" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="#1e293b">Agent Debugging Flow: Symptom → Category → Diagnosis → Fix</text>
+
+                    <!-- SYMPTOM node -->
+                    <rect x="360" y="50" width="180" height="50" rx="25" fill="#3b82f6" />
+                    <text x="450" y="80" text-anchor="middle" font-size="14" font-weight="bold" fill="white">SYMPTOM</text>
+
+                    <!-- Arrow down -->
+                    <line x1="450" y1="100" x2="450" y2="130" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+
+                    <!-- TRIAGE diamond -->
+                    <polygon points="450,130 530,165 450,200 370,165" fill="#f59e0b" />
+                    <text x="450" y="161" text-anchor="middle" font-size="12" font-weight="bold" fill="white">TRIAGE</text>
+                    <text x="450" y="177" text-anchor="middle" font-size="11" fill="white">Categorize</text>
+
+                    <!-- Six category branches -->
+                    <!-- Branch 1: No tools called -->
+                    <line x1="370" y1="165" x2="80" y2="240" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+                    <rect x="20" y="240" width="120" height="44" rx="6" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.5"/>
+                    <text x="80" y="257" text-anchor="middle" font-size="11" fill="#1e3a5f">No Tools</text>
+                    <text x="80" y="272" text-anchor="middle" font-size="11" fill="#1e3a5f">Called</text>
+
+                    <!-- Branch 2: Wrong tool called -->
+                    <line x1="390" y1="195" x2="200" y2="240" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+                    <rect x="140" y="240" width="120" height="44" rx="6" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.5"/>
+                    <text x="200" y="257" text-anchor="middle" font-size="11" fill="#1e3a5f">Wrong Tool</text>
+                    <text x="200" y="272" text-anchor="middle" font-size="11" fill="#1e3a5f">Selected</text>
+
+                    <!-- Branch 3: Tool call fails -->
+                    <line x1="420" y1="198" x2="340" y2="240" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+                    <rect x="280" y="240" width="120" height="44" rx="6" fill="#fee2e2" stroke="#ef4444" stroke-width="1.5"/>
+                    <text x="340" y="257" text-anchor="middle" font-size="11" fill="#7f1d1d">Tool Call</text>
+                    <text x="340" y="272" text-anchor="middle" font-size="11" fill="#7f1d1d">Fails</text>
+
+                    <!-- Branch 4: Agent loops -->
+                    <line x1="480" y1="198" x2="560" y2="240" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+                    <rect x="500" y="240" width="120" height="44" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+                    <text x="560" y="257" text-anchor="middle" font-size="11" fill="#78350f">Agent Loops</text>
+                    <text x="560" y="272" text-anchor="middle" font-size="11" fill="#78350f">Forever</text>
+
+                    <!-- Branch 5: MCP drops -->
+                    <line x1="510" y1="195" x2="700" y2="240" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+                    <rect x="640" y="240" width="120" height="44" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+                    <text x="700" y="257" text-anchor="middle" font-size="11" fill="#78350f">MCP Conn.</text>
+                    <text x="700" y="272" text-anchor="middle" font-size="11" fill="#78350f">Drops</text>
+
+                    <!-- Branch 6: Results wrong -->
+                    <line x1="530" y1="165" x2="830" y2="240" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+                    <rect x="770" y="240" width="110" height="44" rx="6" fill="#dcfce7" stroke="#22c55e" stroke-width="1.5"/>
+                    <text x="825" y="257" text-anchor="middle" font-size="11" fill="#14532d">Results</text>
+                    <text x="825" y="272" text-anchor="middle" font-size="11" fill="#14532d">Wrong</text>
+
+                    <!-- Diagnosis boxes row -->
+                    <rect x="20" y="340" width="120" height="60" rx="6" fill="#1e293b"/>
+                    <text x="80" y="360" text-anchor="middle" font-size="10" fill="#94a3b8">Check:</text>
+                    <text x="80" y="374" text-anchor="middle" font-size="10" fill="white">Tool desc.</text>
+                    <text x="80" y="388" text-anchor="middle" font-size="10" fill="white">System prompt</text>
+
+                    <rect x="140" y="340" width="120" height="60" rx="6" fill="#1e293b"/>
+                    <text x="200" y="360" text-anchor="middle" font-size="10" fill="#94a3b8">Check:</text>
+                    <text x="200" y="374" text-anchor="middle" font-size="10" fill="white">Naming clarity</text>
+                    <text x="200" y="388" text-anchor="middle" font-size="10" fill="white">Schema overlap</text>
+
+                    <rect x="280" y="340" width="120" height="60" rx="6" fill="#1e293b"/>
+                    <text x="340" y="360" text-anchor="middle" font-size="10" fill="#94a3b8">Check:</text>
+                    <text x="340" y="374" text-anchor="middle" font-size="10" fill="white">MCP server</text>
+                    <text x="340" y="388" text-anchor="middle" font-size="10" fill="white">Auth + params</text>
+
+                    <rect x="500" y="340" width="120" height="60" rx="6" fill="#1e293b"/>
+                    <text x="560" y="360" text-anchor="middle" font-size="10" fill="#94a3b8">Check:</text>
+                    <text x="560" y="374" text-anchor="middle" font-size="10" fill="white">Exit conditions</text>
+                    <text x="560" y="388" text-anchor="middle" font-size="10" fill="white">Max iterations</text>
+
+                    <rect x="640" y="340" width="120" height="60" rx="6" fill="#1e293b"/>
+                    <text x="700" y="360" text-anchor="middle" font-size="10" fill="#94a3b8">Check:</text>
+                    <text x="700" y="374" text-anchor="middle" font-size="10" fill="white">Transport layer</text>
+                    <text x="700" y="388" text-anchor="middle" font-size="10" fill="white">Timeout config</text>
+
+                    <rect x="770" y="340" width="110" height="60" rx="6" fill="#1e293b"/>
+                    <text x="825" y="360" text-anchor="middle" font-size="10" fill="#94a3b8">Check:</text>
+                    <text x="825" y="374" text-anchor="middle" font-size="10" fill="white">Implementation</text>
+                    <text x="825" y="388" text-anchor="middle" font-size="10" fill="white">Hallucination</text>
+
+                    <!-- Arrows to diagnosis boxes -->
+                    <line x1="80" y1="284" x2="80" y2="340" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+                    <line x1="200" y1="284" x2="200" y2="340" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+                    <line x1="340" y1="284" x2="340" y2="340" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+                    <line x1="560" y1="284" x2="560" y2="340" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+                    <line x1="700" y1="284" x2="700" y2="340" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+                    <line x1="825" y1="284" x2="825" y2="340" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+                    <!-- FIX box at bottom -->
+                    <rect x="320" y="460" width="260" height="50" rx="10" fill="#22c55e"/>
+                    <text x="450" y="480" text-anchor="middle" font-size="14" font-weight="bold" fill="white">APPLY FIX + VERIFY</text>
+                    <text x="450" y="498" text-anchor="middle" font-size="11" fill="white">Reproduce → Fix → Confirm → Monitor</text>
+
+                    <!-- Arrows from diagnosis to fix -->
+                    <line x1="80" y1="400" x2="330" y2="460" stroke="#64748b" stroke-width="1" stroke-dasharray="4,3"/>
+                    <line x1="200" y1="400" x2="360" y2="460" stroke="#64748b" stroke-width="1" stroke-dasharray="4,3"/>
+                    <line x1="340" y1="400" x2="400" y2="460" stroke="#64748b" stroke-width="1" stroke-dasharray="4,3"/>
+                    <line x1="560" y1="400" x2="500" y2="460" stroke="#64748b" stroke-width="1" stroke-dasharray="4,3"/>
+                    <line x1="700" y1="400" x2="540" y2="460" stroke="#64748b" stroke-width="1" stroke-dasharray="4,3"/>
+                    <line x1="825" y1="400" x2="570" y2="460" stroke="#64748b" stroke-width="1" stroke-dasharray="4,3"/>
+
+                    <!-- Arrow marker -->
+                    <defs>
+                        <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                            <path d="M0,0 L0,6 L8,3 z" fill="#64748b"/>
+                        </marker>
+                    </defs>
+                </svg>
+            </div>
+        </div>
+
+        <h2>The Six Symptom Categories</h2>
+        <div class="accordion" id="symptom-categories">
+
+            <div class="accordion-item">
+                <div class="accordion-header">Agent Isn't Calling Any Tools</div>
+                <div class="accordion-content">
+                    <p><strong>What you see:</strong> The agent responds with plain text when it should be using a tool. It may acknowledge the task but then attempt to answer from memory, or it may claim it "cannot" perform the action.</p>
+                    <p><strong>First check — Tool descriptions:</strong> The model decides whether to call a tool based entirely on the description. If the description is vague, incomplete, or uses jargon the model doesn't associate with the user's request, the tool is invisible to the agent's reasoning. Rewrite descriptions as if explaining to a competent junior developer: what does this tool do, when should you use it, what is the expected outcome?</p>
+                    <p><strong>Second check — System prompt:</strong> Does the system prompt explicitly tell the agent it has tools available and should use them? A common mistake is providing tools but not establishing in the system prompt that the agent is expected to be a "tool-using agent." The model will default to its base behavior — answering from knowledge — unless instructed otherwise.</p>
+                    <p><strong>Third check — Model capability:</strong> Not all models support tool/function calling. Verify the model you're using has tool-use capability enabled and that the API request is correctly formatted with the tools array. A malformed tools array is silently ignored by some APIs, resulting in a model that appears to have no tools.</p>
+                    <div class="card warning">
+                        <strong>Hospital analogy:</strong> The physician has a stethoscope but doesn't reach for it because nobody told them the patient has a cardiac complaint. Context determines whether instruments get used.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">Agent Calls the Wrong Tool</div>
+                <div class="accordion-content">
+                    <p><strong>What you see:</strong> The agent selects a tool that is semantically adjacent to the correct one. For example: calling "search_files" when it should call "read_file," or calling "get_user" when it should call "get_user_by_email."</p>
+                    <p><strong>First check — Tool naming:</strong> Tools with similar names create ambiguity. The model resolves ambiguity by matching the tool name to the intent. "search" and "find" and "query" all mean similar things. If you have both "search_database" and "query_database," the model will pick one semi-randomly. Rename for semantic clarity: "full_text_search" vs "exact_lookup."</p>
+                    <p><strong>Second check — Description clarity:</strong> Each tool description must include not just what it does but when to use it versus alternatives. If two tools can both "get information about a user," the descriptions must distinguish the use cases explicitly: "Use this when you have only an email address. For lookups by ID, use get_user_by_id."</p>
+                    <p><strong>Third check — Schema overlap:</strong> Two tools with identical or very similar parameter schemas look the same to the model. If both accept a "query" string parameter, the model may choose based on which tool appears first. Ensure parameter names and types meaningfully distinguish between tools.</p>
+                    <div class="card info">
+                        <strong>Diagnosis tip:</strong> Log every tool selection decision. Compare the user intent, the tool chosen, and the tools available. Patterns in wrong selections reveal the exact description or naming fix needed.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">Tool Call Fails (500 / Error Responses)</div>
+                <div class="accordion-content">
+                    <p><strong>What you see:</strong> The agent selects the correct tool, forms what appears to be a valid call, but receives an error. The agent may retry, spiral into error-handling behavior, or give up and report failure to the user.</p>
+                    <p><strong>First check — MCP server health:</strong> Is the MCP server process running? This sounds obvious but accounts for roughly 40% of "tool call fails" incidents in production. Check process health, memory usage, and restart logs. An MCP server that silently died will return connection refused or timeout errors that look identical to application-level errors.</p>
+                    <p><strong>Second check — Parameter validation:</strong> The model constructs tool parameters based on its interpretation of the schema. If the schema is ambiguous or the model slightly misinterprets a field type (e.g., sending a string where an integer is required), the server will reject the call. Enable strict schema validation and ensure error messages are descriptive enough for the model to self-correct on retry.</p>
+                    <p><strong>Third check — Auth tokens:</strong> MCP servers that call external APIs require credentials. Token expiration is a frequent production issue. Implement token refresh logic at the MCP server layer, not in the agent. The agent should never see or handle credentials — that complexity belongs in the server.</p>
+                    <div class="card error">
+                        <strong>Critical pattern:</strong> Implement structured error responses from every tool. Never return raw stack traces. Return: {error_code, human_readable_message, suggested_action}. This enables the agent to reason about the error and attempt recovery.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">Agent Loops Forever</div>
+                <div class="accordion-content">
+                    <p><strong>What you see:</strong> The agent keeps calling tools in a cycle — often the same tool repeatedly — without making progress. Token costs escalate. The task never completes. This is the most expensive failure mode.</p>
+                    <p><strong>First check — Exit conditions:</strong> Every agent loop must have a defined exit condition. "Continue until the task is complete" is not a sufficient exit condition. Define it precisely: "Exit when the final_answer tool is called, or when 20 iterations are reached, or when the same tool is called with identical parameters three times." Explicit exit conditions in the system prompt prevent most infinite loops.</p>
+                    <p><strong>Second check — Max iteration enforcement:</strong> Exit conditions in the system prompt are instructions, not hard limits. The model can violate them. Enforce max iterations in your agent orchestration code as a hard ceiling that cannot be overridden. When the ceiling is hit, surface the partial work to the user rather than silently failing.</p>
+                    <p><strong>Third check — Context window state:</strong> As the conversation grows, the model may lose track of what it has already tried. This is a context window degradation problem. After many tool calls, the relevant state is buried under thousands of tokens of history. Implement context summarization — periodically compress the tool call history into a summary that preserves the key findings without every raw response.</p>
+                    <div class="card warning">
+                        <strong>Hospital analogy:</strong> A physician who re-orders the same lab test three times without reading the results is not debugging — they're stuck in a protocol loop. Force them to read the results before ordering the next test.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">MCP Connection Drops</div>
+                <div class="accordion-content">
+                    <p><strong>What you see:</strong> Tool calls intermittently fail with connection errors. The agent works fine for a while, then hits a burst of failures. Restarting the agent or server temporarily resolves it.</p>
+                    <p><strong>First check — Transport layer:</strong> Different MCP transports have different reliability profiles. stdio transport is reliable but only works locally. HTTP+SSE transport is subject to network conditions, proxy timeouts, and load balancer idle connection timeouts. Streamable HTTP is more robust for long-running connections. If you're seeing drops on SSE, check whether your load balancer is closing idle connections before the MCP keepalive fires.</p>
+                    <p><strong>Second check — Server process:</strong> MCP servers written in Python or Node.js can crash on unhandled exceptions without visible symptoms on the client side. The connection appears live (the socket is still open) but requests time out. Implement health check endpoints and process monitors (systemd, PM2, supervisord) that automatically restart crashed server processes.</p>
+                    <p><strong>Third check — Timeout configuration:</strong> Default timeout values in MCP clients are often too aggressive for tools that call slow external APIs. A GitHub API call under load may take 8-12 seconds. If your MCP client has a 5-second timeout, every call to that tool will appear to fail. Tune timeouts per-tool based on observed p99 latencies, not a single global value.</p>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">Results Are Wrong</div>
+                <div class="accordion-content">
+                    <p><strong>What you see:</strong> The agent completes the task without errors, but the output is incorrect, subtly wrong, or inconsistent. This is the hardest category to debug because there's no error signal — everything looks healthy.</p>
+                    <p><strong>First check — Tool implementation:</strong> The tool itself may have a bug. This sounds obvious, but agents calling buggy tools will consistently produce wrong results in ways that look like model reasoning failures. Isolate the tool and test it directly with the exact parameters the agent is passing. Many "agent hallucination" complaints turn out to be tool bugs.</p>
+                    <p><strong>Second check — Response parsing:</strong> How your MCP server serializes tool responses matters enormously. If a tool returns a complex nested JSON object and your server converts it to a string representation, the model must parse that string — introducing transcription errors. Return structured data in a format that matches how the model is expected to reason about it. For tabular data, consider returning it as a markdown table rather than raw JSON.</p>
+                    <p><strong>Third check — Hallucination detection:</strong> When tool results are absent, incomplete, or ambiguous, the model will fill the gaps with plausible-sounding but fabricated content. Implement result validation — have the agent explicitly state what information it found versus what it inferred. Ask it to cite the specific tool call that produced each claim in its response.</p>
+                    <div class="card success">
+                        <strong>Prevention strategy:</strong> Add a "verification step" to your agent prompt: before producing the final answer, the agent must list each claim and the tool call that supports it. Claims without supporting tool calls are flagged as uncertain.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2>Priority-Ordered Debugging Checklist</h2>
+        <div class="card info">
+            <p>This is what a principal-level engineer checks, in order. The sequence matters — earlier checks eliminate whole categories of later ones.</p>
+        </div>
+
+        <div class="sections-grid">
+            <div class="section-card">
+                <h3>First: Establish Ground Truth</h3>
+                <ul>
+                    <li>Can I reproduce this in isolation? (Yes/No determines everything else)</li>
+                    <li>Is the MCP server process running and responding to health checks?</li>
+                    <li>Is the model being called with the correct tools array in the API request?</li>
+                    <li>What does the raw API response show — is a tool_use block present?</li>
+                </ul>
+            </div>
+            <div class="section-card">
+                <h3>Second: Isolate the Component</h3>
+                <ul>
+                    <li>Call the tool directly (bypassing the agent) — does it return correct results?</li>
+                    <li>Replay the exact tool call parameters from the failed run</li>
+                    <li>Check auth token validity and expiration</li>
+                    <li>Verify parameter schema matches what the server expects</li>
+                </ul>
+            </div>
+            <div class="section-card">
+                <h3>Third: Inspect the Reasoning Chain</h3>
+                <ul>
+                    <li>Review the full conversation history — what context did the model have?</li>
+                    <li>Did the model articulate its intent before the tool call?</li>
+                    <li>Is there a pattern in which tool calls succeed vs. fail?</li>
+                    <li>Has the context window grown large enough to cause degradation?</li>
+                </ul>
+            </div>
+            <div class="section-card">
+                <h3>Fourth: Check the System Prompt</h3>
+                <ul>
+                    <li>Does the system prompt clearly establish the agent's role?</li>
+                    <li>Are exit conditions explicit and unambiguous?</li>
+                    <li>Are conflicting instructions present that could confuse tool selection?</li>
+                    <li>Are tool usage guidelines consistent with the tool descriptions?</li>
+                </ul>
+            </div>
+            <div class="section-card">
+                <h3>Fifth: Verify at Scale</h3>
+                <ul>
+                    <li>Does the bug appear consistently or only under specific inputs?</li>
+                    <li>Is there a load-dependent pattern (fails at high concurrency)?</li>
+                    <li>Are there timeout or retry exhaustion patterns in the logs?</li>
+                    <li>Have any external API dependencies changed their response format?</li>
+                </ul>
+            </div>
+            <div class="section-card">
+                <h3>Sixth: Fix and Prevent Recurrence</h3>
+                <ul>
+                    <li>Add the failing case to your evaluation suite before fixing</li>
+                    <li>Fix the root cause — not the symptom</li>
+                    <li>Add a monitoring alert that would have caught this earlier</li>
+                    <li>Document the failure mode and its fix in your runbook</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card success">
+            <h2>The Hospital Principle</h2>
+            <p>In medicine, the discipline of differential diagnosis exists because symptoms are shared across many conditions. Chest pain could be cardiac, pulmonary, musculoskeletal, or anxiety. The attending physician who jumps to the most dramatic diagnosis (heart attack) without ruling out the common causes first wastes resources and may harm the patient.</p>
+            <p>Agent debugging works identically. The symptom "agent isn't working" could have a dozen causes. The engineer who jumps to "the LLM is hallucinating" or "the model isn't smart enough" — the dramatic diagnoses — usually misses the real cause: a missing tool description, an expired token, or a one-line bug in the tool implementation.</p>
+            <p><strong>Follow the protocol. Rule out the common causes first. Trust the checklist over your intuition.</strong></p>
+        </div>
+    </main>
+
+    <footer class="section-footer">
+        <a href="pitfalls.html" class="btn">Previous: Pitfalls</a>
+        <a href="eloquent.html" class="btn">Next: Eloquent Conversation</a>
+    </footer>
+
+    <script src="../../js/components.js"></script>
+</body>
+</html>

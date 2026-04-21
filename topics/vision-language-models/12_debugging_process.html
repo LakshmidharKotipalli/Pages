@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debugging Process | VLM Learning Journey</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <a href="index.html" class="sidebar-title">VLMs & ECOSYSTEM</a>
+            <a href="index.html" class="nav-link ">Home / Hub</a>\n<a href="1_foundation.html" class="nav-link ">1. Foundation & Context</a>\n<a href="2_living_analogy.html" class="nav-link ">2. Living Analogy</a>\n<a href="3a_learning_journey.html" class="nav-link ">3A. Learning Journey</a>\n<a href="3b_interview_conversations.html" class="nav-link ">3B. Interview Conversations</a>\n<a href="4_system_design_integration.html" class="nav-link ">4. System Design Integration</a>\n<a href="5_ripple_effects_map.html" class="nav-link ">5. Ripple Effects Map</a>\n<a href="6_evolution_story.html" class="nav-link ">6. Evolution Story</a>\n<a href="7_patterns_anti_patterns.html" class="nav-link ">7. Patterns & Anti-Patterns</a>\n<a href="8_trade_offs_analysis.html" class="nav-link ">8. Trade-offs Analysis</a>\n<a href="9_at_scale.html" class="nav-link ">9. At Scale</a>\n<a href="10_technology_landscape.html" class="nav-link ">10. Technology Landscape</a>\n<a href="11_pitfalls_war_stories.html" class="nav-link ">11. Pitfalls & War Stories</a>\n<a href="12_debugging_process.html" class="nav-link active">12. Debugging Process</a>\n<a href="13_eloquent_conversation.html" class="nav-link ">13. Eloquent Conversation</a>\n<a href="14_practice_exercises.html" class="nav-link ">14. Practice Exercises</a>\n<a href="15_quick_reference.html" class="nav-link ">15. Quick Reference</a>\n<a href="16_whats_next.html" class="nav-link ">16. What's Next</a>\n
+        </aside>
+        <main class="main-content">
+            
+        <h1>12. Debugging Process</h1>
+        <div class="card">
+            <h3>Symptom → Diagnosis Flow</h3>
+            <table style="width:100%; text-align:left;">
+                <tr style="color:var(--accent-1); font-family:'Clash Display', sans-serif;">
+                    <th>Symptom</th>
+                    <th>Diagnosis Focus</th>
+                    <th>Next Step</th>
+                </tr>
+                <tr>
+                    <td>Fails to read a small serial number.</td>
+                    <td>Resolution Compression. ViT squashed the patch.</td>
+                    <td>Crop the region before sending (Dynamic Tiling) or bump resolution.</td>
+                </tr>
+                <tr>
+                    <td>Hallucinates colors (e.g., says red car is blue).</td>
+                    <td>Pre-training bias. The base LLM overrode visual signal.</td>
+                    <td>Check prompt. Ask model to describe RGB values or use a stronger model.</td>
+                </tr>
+                <tr>
+                    <td>Ignores spatial relations ("the cat is UNDER the table").</td>
+                    <td>Linear flattening of ViT patches losing a 2D map.</td>
+                    <td>Provide grid line overlays on the image, or switch to a native multimodal architecture (GPT-4o).</td>
+                </tr>
+                <tr>
+                    <td>TTFT (Latency) is 5x higher than text alone.</td>
+                    <td>Vision encoder computation bottleneck or KV Cache miss.</td>
+                    <td>Profile the ViT forward pass vs LLM Prefill layer. Resize image down.</td>
+                </tr>
+            </table>
+        </div>
+        
+        </main>
+    </div>
+    <script src="js/components.js"></script>
+</body>
+</html>

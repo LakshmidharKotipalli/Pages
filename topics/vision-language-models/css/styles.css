@@ -1,0 +1,157 @@
+
+@import url('https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&f[]=satoshi@400,500,700&display=swap');
+
+:root {
+  --bg-color: #050505;
+  --text-color: #F2F2F2;
+  --text-muted: #888888;
+  --accent-1: #CCFF00; /* Neon Lime */
+  --accent-2: #FF0055; /* Hot Pink */
+  --border-color: #333333;
+  --surface: #111111;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Satoshi', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  line-height: 1.6;
+  font-size: 18px;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5 {
+  font-family: 'Clash Display', sans-serif;
+  text-transform: uppercase;
+  line-height: 1.1;
+  margin-bottom: 0.5em;
+}
+
+h1 { font-size: 4rem; letter-spacing: -1px; font-weight: 700; }
+h2 { font-size: 2.5rem; font-weight: 600; color: var(--accent-1); }
+h3 { font-size: 1.8rem; font-weight: 500; }
+
+a { color: var(--accent-1); text-decoration: none; border-bottom: 2px solid transparent; transition: border 0.3s ease; }
+a:hover { border-bottom: 2px solid var(--accent-1); }
+
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 320px;
+  background-color: var(--surface);
+  border-right: 1px solid var(--border-color);
+  padding: 2rem;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.sidebar-title {
+  font-size: 1.5rem;
+  font-family: 'Clash Display', sans-serif;
+  color: var(--accent-2);
+  margin-bottom: 1.5rem;
+  display: block;
+  text-decoration: none;
+  border: none;
+}
+
+.nav-link {
+  display: block;
+  padding: 0.8rem 0;
+  color: var(--text-muted);
+  font-family: 'Clash Display', sans-serif;
+  font-size: 1.1rem;
+  border-bottom: 1px solid var(--border-color);
+  transition: all 0.2s ease;
+}
+
+.nav-link:hover, .nav-link.active {
+  color: var(--accent-1);
+  padding-left: 10px;
+}
+
+.nav-link.active::after {
+  content: ' ←';
+  color: var(--accent-2);
+}
+
+.main-content {
+  flex: 1;
+  padding: 4rem 6rem;
+  max-width: 1200px;
+}
+
+/* Component Styles */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--accent-2);
+  padding: 2rem;
+  margin: 2rem 0;
+  box-shadow: 8px 8px 0 var(--accent-2);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translate(-4px, -4px);
+  box-shadow: 12px 12px 0 var(--accent-2);
+}
+
+.component-mindmap, .component-matrix, .component-timeline {
+  margin: 3rem 0;
+  padding: 2rem;
+  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.accordion-item {
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 1rem;
+}
+.accordion-header {
+  padding: 1rem 0;
+  cursor: pointer;
+  font-family: 'Clash Display', sans-serif;
+  font-size: 1.4rem;
+  color: var(--accent-1);
+  display: flex;
+  justify-content: space-between;
+}
+.accordion-content {
+  padding: 0 0 1rem 0;
+  display: none;
+  color: var(--text-muted);
+}
+.accordion-content.open { display: block; }
+
+.tabs-header { display: flex; gap: 1rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); }
+.tab-btn { background: none; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; padding: 0.5rem 1rem; font-family: 'Clash Display', sans-serif; }
+.tab-btn.active { color: var(--accent-2); border-bottom: 2px solid var(--accent-2); }
+.tab-content { display: none; padding: 1rem 0; }
+.tab-content.active { display: block; }
+
+/* Code & pre */
+pre, code {
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--surface);
+  color: var(--accent-1);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+}
+
+table { width: 100%; border-collapse: collapse; margin: 2rem 0; }
+th, td { border: 1px solid var(--border-color); padding: 1rem; text-align: left; }
+th { font-family: 'Clash Display', sans-serif; color: var(--accent-1); }
+
+@media (max-width: 900px) {
+  .layout { flex-direction: column; }
+  .sidebar { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid var(--border-color); }
+  .main-content { padding: 2rem; }
+  h1 { font-size: 2.5rem; }
+}

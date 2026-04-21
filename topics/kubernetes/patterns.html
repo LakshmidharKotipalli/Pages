@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patterns & Anti-Patterns - Learn Kubernetes</title>
+    <link rel="stylesheet" href="../../css/styles.css">
+    <link rel="stylesheet" href="theme.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <a href="index.html">← Back to Overview</a>
+        <span class="current-section">Patterns & Anti-Patterns</span>
+    </nav>
+
+    <main>
+        <h1>Kubernetes Patterns & Anti-Patterns</h1>
+        <p class="intro">Learn proven patterns that work in production and avoid common anti-patterns that have caused real incidents. These lessons come from 15+ years of production experience across hundreds of companies.</p>
+
+        <section class="intro-section">
+            <div class="card info">
+                <h3>How to Think About Patterns</h3>
+                <p><strong>Patterns aren't rules:</strong> They're starting points. Every situation is different. Use these patterns as a foundation, then adapt to your context.</p>
+                <p><strong>The shipping port analogy:</strong> Throughout this section, we'll reference the shipping port. Patterns are like "best practices for port operations"—proven methods that work most of the time.</p>
+                <p><strong>Key principle:</strong> Understand <em>why</em> a pattern works. Then you'll know when to use it, when to adapt it, and when to ignore it.</p>
+            </div>
+        </section>
+
+        <!-- PATTERNS SECTION -->
+        <section class="patterns-section">
+            <h2>Proven Production Patterns</h2>
+            <p class="section-intro">These patterns have been battle-tested in production at companies of all sizes. They solve real problems and introduce minimal new complexity.</p>
+
+            <!-- PATTERN 1 -->
+            <div class="pattern-item">
+                <div class="pattern-header">
+                    <h3>Pattern 1: The Sidecar Pattern</h3>
+                    <div class="pattern-tags">
+                        <span class="tag">pod-design</span>
+                        <span class="tag">common</span>
+                        <span class="severity low">Low Complexity</span>
+                    </div>
+                </div>
+
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>📖 What This Pattern Solves</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="pattern-problem">
+                                <p><strong>The problem:</strong> Your application needs functionality that isn't part of the core application logic. Examples:</p>
+                                <ul>
+                                    <li>Log collection (shipping logs to centralized logging)</li>
+                                    <li>Metrics collection (exposing metrics for Prometheus)</li>
+                                    <li>Secret synchronization (fetching secrets from Vault)</li>
+                                    <li>Proxy/ambassador (handling TLS, authentication)</li>
+                                </ul>
+                                <p><strong>Why not build it into the app?</strong></p>
+                                <ul>
+                                    <li>Mixes concerns (app logic + infrastructure)</li>
+                                    <li>Difficult to update (need to redeploy app to update logging agent)</li>
+                                    <li>Language/framework specific (each team builds their own)</li>
+                                </ul>
+                                <p><strong>Shipping port analogy:</strong> Like having a specialized worker on each crane who handles communication with the control tower. The crane operator (main container) focuses on moving cargo. The side worker (sidecar) handles reporting and coordination.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>🏗️ How It Works</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="pattern-implementation">
+                                <p><strong>Concept:</strong> Run multiple containers in the same Pod. They share:</p>
+                                <ul>
+                                    <li><strong>Network namespace:</strong> Same IP, can communicate via localhost</li>
+                                    <li><strong>Storage:</strong> Can share volumes (emptyDir, PVC)</li>
+                                    <li><strong>Lifecycle:</strong> Start together, stop together</li>
+                                </ul>
+
+                                <div class="pattern-diagram">
+                                    <h5>Pod Structure Example</h5>
+                                    <div class="diagram-visual">
+                                        <div class="pod-container">
+                                            <div class="pod-label">Pod (shared network & storage)</div>
+                                            <div class="main-container">
+                                                <div class="container-label">Main Container</div>
+                                                <p>Your application</p>
+                                                <p>Port: 8080</p>
+                                            </div>
+                                            <div class="sidecar-container">
+                                                <div class="container-label">Sidecar Container</div>
+                                                <p>Log agent / Proxy</p>
+                                                <p>Port: 9090</p>
+                                                <p>Communicates via localhost:8080</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <p><strong>Example: Fluentd Sidecar for Logging</strong></p>
+                                <p>Main container (app) writes logs to /var/log/app. Sidecar (Fluentd) mounts same directory, tails log files, ships to Elasticsearch.</p>
+
+                                <p><strong>Example: Envoy Sidecar for Service Mesh</strong></p>
+                                <p>Main container doesn't know about TLS, authentication, observability. Envoy sidecar handles all network traffic. App talks to Envoy (localhost). Envoy talks to other services.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>✅ When to Use This Pattern</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="pattern-use-cases">
+                                <ul>
+                                    <li><strong>Logging agents:</strong> Fluentd, Filebeat, Fluent Bit</li>
+                                    <li><strong>Metrics exporters:</strong> Prometheus exporters, statsd</li>
+                                    <li><strong>Service mesh proxies:</strong> Envoy, Linkerd proxy</li>
+                                    <li><strong>Secret rotation:</strong> Vault agent, AWS secret sync</li>
+                                    <li><strong>Background synchronization:</strong> Database replication, cache warming</li>
+                                    <li><strong>Debug adapters:</strong> Debug container for troubleshooting</li>
+                                </ul>
+                                <p><strong>Key indicator:</strong> If you're thinking "I wish there was a way to add this functionality without changing the app code," sidecars are often the answer.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>⚠️ Trade-offs & New Problems</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="pattern-tradeoffs">
+                                <p><strong>Benefits:</strong></p>
+                                <ul>
+                                    <li>Separation of concerns (app vs infrastructure)</li>
+                                    <li>Language/framework agnostic (same sidecar for all apps)</li>
+                                    <li>Independent updates (update sidecar without redeploying app)</li>
+                                    <li>Simplified app code (app doesn't handle infrastructure)</li>
+                                </ul>
+
+                                <p><strong>Drawbacks:</strong></p>
+                                <ul>
+                                    <li><strong>Resource overhead:</strong> Each sidecar uses memory/CPU. With 1000 pods, that's 1000 sidecars.</li>
+                                    <li><strong>Complexity:</strong> More containers to monitor, debug, and troubleshoot.</li>
+                                    <li><strong>Failure surface:</strong> Sidecar crash doesn't crash pod (by default), but functionality is lost.</li>
+                                    <li><strong>Resource contention:</strong> Sidecar and main container compete for resources on same node.</li>
+                                </ul>
+
+                                <p><strong>Production reality:</strong> At a company with 5,000 pods, adding Envoy sidecars (50MB each) consumed 250GB of cluster memory. That's 5 extra large nodes. Worth it for service mesh benefits, but not free.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>🏭 Production Examples</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="production-examples">
+                                <div class="example">
+                                    <div class="example-company">Google</div>
+                                    <p><strong>Pattern:</strong> Sidecar containers for logging, monitoring, debugging in Borg (K8s predecessor).</p>
+                                    <p><strong>Outcome:</strong> This pattern inspired Kubernetes' multi-container pod design. Google runs billions of containers with sidecars.</p>
+                                </div>
+
+                                <div class="example">
+                                    <div class="example-company">Istio / Linkerd (Service Mesh)</div>
+                                    <p><strong>Pattern:</strong> Envoy or Linkerd proxy as sidecar in every pod.</p>
+                                    <p><strong>Outcome:</strong> Automatic mTLS, observability, traffic management without app changes. Sidecar pattern makes this possible.</p>
+                                </div>
+
+                                <div class="example">
+                                    <div class="example-company">Shopify</div>
+                                    <p><strong>Pattern:</strong> Vault agent sidecar for secret rotation.</p>
+                                    <p><strong>Outcome:</strong> Secrets automatically rotated every 24 hours. Apps read from file (sidecar writes). No app code changes.</p>
+                                </div>
+
+                                <div class="example">
+                                    <div class="example-company">Airbnb</div>
+                                    <p><strong>Pattern:</strong> Service mesh sidecars for traffic management.</p>
+                                    <p><strong>Challenge:</strong> At 30,000 pods, sidecar overhead was significant.</p>
+                                    <p><strong>Solution:</strong> Optimized sidecar memory usage. Used selective meshing (not all pods need sidecars).</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PATTERN 2 -->
+            <div class="pattern-item">
+                <div class="pattern-header">
+                    <h3>Pattern 2: Init Containers</h3>
+                    <div class="pattern-tags">
+                        <span class="tag">pod-design</span>
+                        <span class="tag">intermediate</span>
+                        <span class="severity low">Low Complexity</span>
+                    </div>
+                </div>
+
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>📖 What This Pattern Solves</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="pattern-problem">
+                                <p><strong>The problem:</strong> Your main container needs setup before it can start. Examples:</p>
+                                <ul>
+                                    <li>Wait for database to be ready (don't crash on connection refused)</li>
+                                    <li>Generate configuration files from templates</li>
+                                    <li>Clone a git repository before running app</li>
+                                    <li>Migrate database schema before starting app server</li>
+                                </ul>
+
+                                <p><strong>Why not do it in the main container?</strong></p>
+                                <ul>
+                                    <li>Startup logic mixed with application logic</li>
+                                    <li>If setup fails, container restarts and tries again (loop)</li>
+                                    <li>No way to ensure setup completes before app starts</li>
+                                </ul>
+
+                                <p><strong>Shipping port analogy:</strong> Before a crane can start unloading containers, it needs setup: safety checks, equipment calibration, operator briefing. Init containers handle this setup phase. Only after setup completes does the main work begin.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>🏗️ How It Works</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="pattern-implementation">
+                                <p><strong>Concept:</strong> Special containers that run <em>before</em> main containers. They must complete successfully before main containers start.</p>
+
+                                <p><strong>Key characteristics:</strong></p>
+                                <ul>
+                                    <li>Run to completion (not long-running)</li>
+                                    <li>Run sequentially (init 1, then init 2, then main)</li>
+                                    <li>Share storage with main containers</li>
+                                    <li>If any init container fails, pod restarts</li>
+                                </ul>
+
+                                <p><strong>Example: Database Wait Init Container</strong></p>
+                                <p>Init container runs: <code>wait-for-it db:5432 --timeout=30</code></p>
+                                <p>Main container starts only after database is accepting connections.</p>
+
+                                <p><strong>Example: Config Generation Init Container</strong></p>
+                                <p>Init container runs: Template engine that generates nginx.conf from environment variables.</p>
+                                <p>Main container (nginx) starts with generated config.</p>
+
+                                <p><strong>Example: Git Clone Init Container</strong></p>
+                                <p>Init container runs: <code>git clone https://github.com/config/repo.git /config</code></p>
+                                <p>Main container mounts /config as volume, reads generated files.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>✅ When to Use This Pattern</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="pattern-use-cases">
+                                <ul>
+                                    <li><strong>Dependency waiting:</strong> Wait for database, cache, API to be ready</li>
+                                    <li><strong>Configuration generation:</strong> Templates, secrets transformation, file generation</li>
+                                    <li><strong>Setup tasks:</strong> Database migrations, cache warming, file downloads</li>
+                                    <li><strong>Security checks:</strong> Validate certificates, check permissions</li>
+                                </ul>
+
+                                <p><strong>Alternative: Readiness probes</strong></p>
+                                <p>Sometimes readiness probes are better than init containers:</p>
+                                <ul>
+                                    <li>Init: Run once at startup</li>
+                                    <li>Readiness probe: Run continuously (can handle database restarts)</li>
+                                </ul>
+                                <p><strong>Decision:</strong> Use init for one-time setup. Use readiness for ongoing health checks.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>🏭 Production Example</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="production-examples">
+                                <div class="example">
+                                    <div class="example-company">GitLab</div>
+                                    <p><strong>Challenge:</strong> GitLab needs database migrations before starting. Can't start app server if schema is old.</p>
+                                    <p><strong>Solution:</strong> Init container runs <code>db:migrate</code>. Main container starts only after migrations complete.</p>
+                                    <p><strong>Outcome:</strong> Zero-database-downtime upgrades. Migrations run before new version starts.</p>
+                                </div>
+
+                                <div class="example">
+                                    <div class="example-company">WordPress on K8s</div>
+                                    <p><strong>Challenge:</strong> WordPress needs wp-config.php before starting.</p>
+                                    <p><strong>Solution:</strong> Init container generates wp-config.php from environment variables (DB host, password, salts).</p>
+                                    <p><strong>Outcome:</strong> WordPress deploys to K8s without manual config. Fully automated.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PATTERN 3 -->
+            <div class="pattern-item">
+                <div class="pattern-header">
+                    <h3>Pattern 3: Controller Pattern</h3>
+                    <div class="pattern-tags">
+                        <span class="tag">advanced</span>
+                        <span class="tag">automation</span>
+                        <span class="severity medium">Medium Complexity</span>
+                    </div>
+                </div>
+
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>📖 What This Pattern Solves</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="pattern-problem">
+                                <p><strong>The problem:</strong> You need to automate complex operational tasks. Examples:</p>
+                                <ul>
+                                    <li>Create a database instance automatically when someone requests it</li>
+                                    <li>Backup databases every night, clean up old backups</li>
+                                    <li>Renew TLS certificates before they expire</li>
+                                    <li>Scale applications based on custom metrics (queue length)</li>
+                                </ul>
+
+                                <p><strong>Why not scripts / cron jobs?</strong></p>
+                                <ul>
+                                    <li>Scripts are one-off, hard to maintain</li>
+                                    <li>No feedback loop (scripts don't "watch" state)</li>
+                                    <li>Error handling is manual</li>
+                                    <li>Don't integrate with K8s API natively</li>
+                                </ul>
+
+                                <p><strong>Shipping port analogy:</strong> The control tower doesn't just give orders and hope. It continuously watches the port: Are cranes working? Are containers moving? If not, it sends new orders. Controllers are the automated loops that keep the system in desired state.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>🏗️ How It Works</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="pattern-implementation">
+                                <p><strong>The reconciliation loop:</strong></p>
+                                <ol>
+                                    <li>Observe actual state (what exists in K8s)</li>
+                                    <li>Compare with desired state (what you declared)</li>
+                                    <li>Take action to make them match</li>
+                                    <li>Repeat forever</li>
+                                </ol>
+
+                                <p><strong>Every K8s controller works this way:</strong></p>
+                                <ul>
+                                    <li><strong>Deployment controller:</strong> "I want 3 replicas" → Creates pods → Watches → If pod dies, creates new one</li>
+                                    <li><strong>Service controller:</strong> "I want a LoadBalancer" → Creates cloud LB → Watches → Updates if endpoints change</li>
+                                    <li><strong>Node controller:</strong> "I want all nodes healthy" → Watches node heartbeats → Marks unhealthy nodes as NotReady</li>
+                                </ul>
+
+                                <p><strong>Custom controllers (operators):</strong></p>
+                                <p>You write your own controller to automate your domain:</p>
+                                <ul>
+                                    <li>Database operator: "I want a Postgres database" → Operator creates StatefulSet, Service, PVC, ConfigMap</li>
+                                    <li>Cert-manager operator: "I want a TLS certificate" → Operator requests cert from Let's Encrypt, renews before expiry</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>✅ When to Use This Pattern</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="pattern-use-cases">
+                                <ul>
+                                    <li><strong>Application lifecycle automation:</strong> Database creation, upgrade, backup, restore</li>
+                                    <li><strong>Resource management:</strong> Automated scaling, cleanup, optimization</li>
+                                    <li><strong>Certificates and secrets:</strong> Automatic rotation, sync with external sources</li>
+                                    <li><strong>Multi-resource coordination:</strong> Deploy complex apps (frontend + backend + database + cache)</li>
+                                </ul>
+
+                                <p><strong>Signs you need a controller:</strong></p>
+                                <ul>
+                                    <li>You're writing scripts to manipulate K8s resources</li>
+                                    <li>You need to coordinate multiple resources</li>
+                                    <li>You want "declarative" behavior (say what you want, not how)</li>
+                                    <li>You need continuous reconciliation (react to changes)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>⚠️ Trade-offs</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="pattern-tradeoffs">
+                                <p><strong>Benefits:</strong></p>
+                                <ul>
+                                    <li>Declarative API (say what you want, not how)</li>
+                                    <li>Self-healing (continuously fixes drift)</li>
+                                    <li>Automation (no manual intervention)</li>
+                                    <li>Reusable (share controller across teams)</li>
+                                </ul>
+
+                                <p><strong>Drawbacks:</strong></p>
+                                <ul>
+                                    <li><strong>Complexity:</strong> Writing controllers requires understanding K8s API, informers, work queues</li>
+                                    <li><strong>Debugging:</strong> Controllers are distributed systems. Hard to trace bugs.</li>
+                                    <li><strong>Performance:</strong> Controllers poll API server constantly. Can overwhelm if not optimized.</li>
+                                    <li><strong>Maintenance:</strong> You're now maintaining a control plane component, not just apps.</li>
+                                </ul>
+
+                                <p><strong>Production reality:</strong> "I've seen companies build custom controllers that were more complex than the problems they solved. Start with existing operators (cert-manager, Prometheus operator, Postgres operator). Write custom controllers only when off-the-shelf doesn't work."</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>🏭 Production Examples</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="production-examples">
+                                <div class="example">
+                                    <div class="example-company">cert-manager</div>
+                                    <p><strong>What it does:</strong> Automatically provisions and renews TLS certificates from Let's Encrypt.</p>
+                                    <p><strong>Controller pattern:</strong> Watches Certificate resources → Requests from ACME → Stores as Secret → Renews before expiry.</p>
+                                    <p><strong>Outcome:</strong> Zero manual certificate management. Devs declare "I want a cert for example.com". Controller handles everything.</p>
+                                </div>
+
+                                <div class="example">
+                                    <div class="example-company">Prometheus Operator</div>
+                                    <p><strong>What it does:</strong> Automates Prometheus deployment and configuration.</p>
+                                    <p><strong>Controller pattern:</strong> Watch ServiceMonitor resources → Configure Prometheus to scrape services → Reload config.</p>
+                                    <p><strong>Outcome:</strong> Add new service to monitoring by creating ServiceMonitor. No manual Prometheus config changes.</p>
+                                </div>
+
+                                <div class="example">
+                                    <div class="example-company">TiDB Operator</div>
+                                    <p><strong>What it does:</strong> Manages distributed TiDB database on K8s.</p>
+                                    <p><strong>Controller pattern:</strong> Orchestrates PD, TiKV, TiDB components. Handles scaling, failover, backup, upgrade.</p>
+                                    <p><strong>Complexity:</strong> 50,000+ lines of code. Manages stateful distributed system. Shows controller pattern's power.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PATTERN 4 -->
+            <div class="pattern-item">
+                <div class="pattern-header">
+                    <h3>Pattern 4: Leader Election</h3>
+                    <div class="pattern-tags">
+                        <span class="tag">advanced</span>
+                        <span class="tag">coordination</span>
+                        <span class="severity high">High Complexity</span>
+                    </div>
+                </div>
+
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>📖 What This Pattern Solves</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="pattern-problem">
+                                <p><strong>The problem:</strong> You run multiple replicas of a service, but only one should do specific work. Examples:</p>
+                                <ul>
+                                    <li>Cron jobs (only one replica should run scheduled tasks)</li>
+                                    <li>Database migrations (don't run migrations from 5 pods simultaneously)</li>
+                                    <li>Expensive cleanup jobs (only one pod needed)</li>
+                                </ul>
+
+                                <p><strong>Why not just run 1 replica?</strong></p>
+                                <ul>
+                                    <li>You need high availability (if leader fails, another takes over)</li>
+                                    <li>Most work is parallelizable (HTTP requests handled by all replicas)</li>
+                                    <li>Only some tasks need single-leader semantics</li>
+                                </ul>
+
+                                <p><strong>Shipping port analogy:</strong> Multiple control towers can see the port, but only one is "active" giving orders. If the active tower fails, another takes over instantly. No two towers give conflicting orders.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>🏗️ How It Works</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="pattern-implementation">
+                                <p><strong>Concept:</strong> Use Kubernetes ConfigMap or Lease resource as a "lock". Pods race to acquire lock. Holder is "leader". Others are "standby".</p>
+
+                                <p><strong>Flow:</strong></p>
+                                <ol>
+                                    <li>All replicas start up</li>
+                                    <li>Each tries to create a ConfigMap with same name (the "lock")</li>
+                                    <li>First one succeeds → becomes leader</li>
+                                    <li>Others get "AlreadyExists" error → become standby</li>
+                                    <li>Leader renews lock periodically (heartbeat)</li>
+                                    <li>If leader dies, lock expires. Standby pods race again.</li>
+                                </ol>
+
+                                <p><strong>Implementation:</strong></p>
+                                <ul>
+                                    <li>Use <code>leader-election</code> library (Kubernetes client libraries include this)</li>
+                                    <li>Or use <code>Lease</code> resource (built for leader election)</li>
+                                    <li>Or use ConfigMap with annotations (older pattern)</li>
+                                </ul>
+
+                                <p><strong>Example code pattern:</strong></p>
+                                <pre>
+if (leaderElection.Acquire()) {
+    // I'm the leader
+    runCronJobs()
+    leaderElection.KeepAlive()  // Heartbeat
+}
+                                </pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>✅ When to Use This Pattern</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="pattern-use-cases">
+                                <ul>
+                                    <li><strong>Cron jobs:</strong> Only one replica should run scheduled tasks</li>
+                                    <li><strong>Batch processing:</strong> Only one pod should process queue</li>
+                                    <li><strong>Database migrations:</strong> Run schema updates from single pod</li>
+                                    <li><strong>Expensive tasks:</strong> Cache warming, report generation</li>
+                                </ul>
+
+                                <p><strong>Alternative:</strong></p>
+                                <ul>
+                                    <li><strong>CronJob controller:</strong> K8s native. Creates one pod per schedule. No leader election needed.</li>
+                                    <li><strong>Separate deployment:</strong> Deploy single replica for leader tasks, multi-replica for API.</li>
+                                </ul>
+
+                                <p><strong>When to use leader election:</strong> When you need one deployment to handle both API traffic (multi-instance) and background tasks (single instance).</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>⚠️ Trade-offs & Gotchas</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="pattern-tradeoffs">
+                                <p><strong>Benefits:</strong></p>
+                                <ul>
+                                    <li>High availability (automatic failover)</li>
+                                    <li>Simpler deployment (one deployment for all functionality)</li>
+                                </ul>
+
+                                <p><strong>Drawbacks:</strong></p>
+                                <ul>
+                                    <li><strong>Complexity:</strong> Leader election logic is subtle. Bugs cause split-brain (two leaders).</li>
+                                    <li><strong>Network partitions:</strong> If leader can't talk to API server, it thinks it's still leader. Standby can't acquire lock.</li>
+                                    <li><strong>Resource waste:</strong> N-1 pods are idle (just waiting for leader to fail).</li>
+                                </ul>
+
+                                <p><strong>Production war story:</strong> "We used leader election for cron jobs. During network blip, leader couldn't renew lock but also didn't crash. Lock expired. Standby became leader. Now we had 2 leaders running cron jobs. Database slammed by duplicate migrations. Lesson: Use proper fencing (leader ID check on every operation)."</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PATTERN 5 -->
+            <div class="pattern-item">
+                <div class="pattern-header">
+                    <h3>Pattern 5: Canary Deployment</h3>
+                    <div class="pattern-tags">
+                        <span class="tag">deployment</span>
+                        <span class="tag">progressive</span>
+                        <span class="severity medium">Medium Complexity</span>
+                    </div>
+                </div>
+
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>📖 What This Pattern Solves</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="pattern-problem">
+                                <p><strong>The problem:</strong> You want to deploy new versions with confidence. Rolling updates replace all pods, but what if the new version has a bug?</p>
+
+                                <p><strong>Why not just deploy and watch metrics?</strong></p>
+                                <ul>
+                                    <li>By the time you notice, all users are affected</li>
+                                    <li>Rollback takes time (rolling update in reverse)</li>
+                                    <li>Some bugs are subtle (10% error rate, not 100% failure)</li>
+                                </ul>
+
+                                <p><strong>Shipping port analogy:</strong> Before replacing all cranes with a new model, test one crane for a week. If it breaks, only one crane is affected. If it works great, then replace the rest gradually.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>🏗️ How It Works</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="pattern-implementation">
+                                <p><strong>Concept:</strong> Deploy new version to small subset of users. Monitor metrics. If good, gradually increase. If bad, rollback immediately.</p>
+
+                                <p><strong>Steps:</strong></p>
+                                <ol>
+                                    <li>Deploy v2.0 alongside v1.0 (10% pods v2, 90% v1)</li>
+                                    <li>Route 10% of traffic to v2</li>
+                                    <li>Monitor: error rate, latency, revenue impact</li>
+                                    <li>If metrics good → increase to 25% → 50% → 100%</li>
+                                    <li>If metrics bad → rollback to 0% v2 instantly</li>
+                                </ol>
+
+                                <p><strong>Implementation approaches:</strong></p>
+                                <ul>
+                                    <li><strong>Two Deployments:</strong> app-v1 and app-v2. Service selects both. Adjust replica counts.</li>
+                                    <li><strong>Service mesh:</strong> Istio/Linkerd traffic splitting (virtual services).</li>
+                                    <li><strong>Ingress:</strong> Nginx/Traefik canary annotations.</li>
+                                    <li><strong>Feature flags:</strong> Same deployment, feature toggles enable v2 logic.</li>
+                                </ul>
+
+                                <p><strong>Example: Flagger (GitOps progressive delivery)</strong></p>
+                                <p>Automated canary deployments. Metrics-driven. Auto-promotes or auto-rolls back based on SLOs.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>✅ When to Use This Pattern</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="pattern-use-cases">
+                                <ul>
+                                    <li><strong>High-traffic services:</strong> Even 1% errors affect many users</li>
+                                    <li><strong>Complex deployments:</strong> Database schema changes, API changes</li>
+                                    <li><strong>Frequent deployments:</strong> Multiple times per day, need automation</li>
+                                    <li><strong>Risk-averse environments:</strong> Production systems where downtime is expensive</li>
+                                </ul>
+
+                                <p><strong>When not to use:</strong></p>
+                                <ul>
+                                    <li>Low traffic (canary takes too long to get statistically significant data)</li>
+                                    <li>Simple apps (rollback is fast and safe)</li>
+                                    <li>Internal tools (users are engineers, can handle bugs)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>⚠️ Trade-offs</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="pattern-tradeoffs">
+                                <p><strong>Benefits:</strong></p>
+                                <ul>
+                                    <li>Risk reduction (only small percentage of users affected)</li>
+                                    <li>Fast rollback (instant traffic shift back)</li>
+                                    <li>Metrics-driven decisions (data, not gut feelings)</li>
+                                    <li>Confidence in deployments</li>
+                                </ul>
+
+                                <p><strong>Drawbacks:</strong></p>
+                                <ul>
+                                    <li><strong>Complexity:</strong> Need traffic splitting, metrics collection, automation</li>
+                                    <li><strong>Testing time:</strong> Canaries take hours/days to get confidence</li>
+                                    <li><strong>Database compatibility:</strong> v1 and v2 must both work with same database schema</li>
+                                    <li><strong>Monitoring requirements:</strong> Need detailed metrics (error rate, latency, business metrics)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>🏭 Production Examples</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="production-examples">
+                                <div class="example">
+                                    <div class="example-company">Facebook</div>
+                                    <p><strong>Approach:</strong> Deploy to one employee first. Then 1% of users. Then 5%, 10%, 50%, 100%.</p>
+                                    <p><strong>Automation:</strong> Automated rollback if metrics degrade.</p>
+                                    <p><strong>Outcome:</strong> Deploy multiple times per day with confidence.</p>
+                                </div>
+
+                                <div class="example">
+                                    <div class="example-company">Netflix</div>
+                                    <p><strong>Tool:</strong> Spinnaker (deployment platform). Automated canary analysis.</p>
+                                    <p><strong>Canary analysis:</strong> Compare canary vs baseline on latency, error rate, saturation.</p>
+                                    <p><strong>Outcome:</strong> Reduced deployment failures by 80%.</p>
+                                </div>
+
+                                <div class="example">
+                                    <div class="example-company">Weaveworks (Flagger)</div>
+                                    <p><strong>Tool:</strong> Flagger for Kubernetes. Automates canary deployments on service mesh.</p>
+                                    <p><strong>Process:</strong> Deploys canary, runs load tests, analyzes metrics, auto-promotes or auto-rolls back.</p>
+                                    <p><strong>Outcome:</strong> Progressive delivery without manual intervention.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ANTI-PATTERNS SECTION -->
+        <section class="anti-patterns-section">
+            <h2>Anti-Patterns: What to Avoid</h2>
+            <p class="section-intro">These patterns feel right but cause problems in production. Learn from others' mistakes so you don't repeat them.</p>
+
+            <!-- ANTI-PATTERN 1 -->
+            <div class="anti-pattern-item">
+                <div class="anti-pattern-header">
+                    <h3>Anti-Pattern 1: The "God Pod" Monolith</h3>
+                    <div class="pattern-tags">
+                        <span class="tag">architecture</span>
+                        <span class="severity critical">CRITICAL</span>
+                        <span class="frequency very-common">Very Common</span>
+                    </div>
+                </div>
+
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>🪤 The Trap (Why It Feels Right)</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="anti-pattern-trap">
+                                <p><strong>The thinking:</strong> "We'll run our entire application in one pod. It's simpler. Everything is on localhost. No network latency. Easy to debug."</p>
+
+                                <p><strong>Why teams do it:</strong></p>
+                                <ul>
+                                    <li>Lift-and-shift from VM: "Our app runs as one process, make it one container"</li>
+                                    <li>Fear of microservices overhead</li>
+                                    <li>"It's working, why change?"</li>
+                                    <li>Lack of microservices experience</li>
+                                </ul>
+
+                                <p><strong>Shipping port analogy:</strong> Instead of having specialized cranes for different cargo types, you build one mega-crane that tries to do everything. It can move containers, yes, but it's slow, hard to maintain, and if it breaks, everything stops.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>💥 Real Production Impact</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="anti-pattern-impact">
+                                <p><strong>What happens:</strong></p>
+                                <ul>
+                                    <li><strong>Single point of failure:</strong> Pod crashes → entire application down</li>
+                                    <li><strong>Scaling issues:</strong> Can't scale individual components (scale entire app or nothing)</li>
+                                    <li><strong>Resource waste:</strong> One component needs 4GB CPU, everything gets 4GB</li>
+                                    <li><strong>Slow deployments:</strong> Changing one line of code requires redeploying entire pod</li>
+                                    <li><strong>Team conflicts:</strong> Team A wants to deploy. Team B's code isn't ready. Deadlock.</li>
+                                    <li><strong>No isolation:</strong> Memory leak in one component crashes entire pod</li>
+                                </ul>
+
+                                <p><strong>Real incident:</strong></p>
+                                <p>Company ran monolithic app (web, API, worker, cron) in one pod. Memory leak in cron component caused OOMKilled. Entire app down. Had to fix leak in cron to restore web/API. No isolation meant no fault tolerance.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>✅ The Right Approach</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="anti-pattern-solution">
+                                <p><strong>Break into microservices:</strong></p>
+                                <ul>
+                                    <li>Web frontend (Deployment A)</li>
+                                    <li>API backend (Deployment B)</li>
+                                    <li>Background worker (Deployment C)</li>
+                                    <li>Cron scheduler (CronJob or separate Deployment)</li>
+                                </ul>
+
+                                <p><strong>Benefits:</strong></p>
+                                <ul>
+                                    <li>Independent scaling (scale API more, cron less)</li>
+                                    <li>Independent deployment (Team A deploys without waiting for Team B)</li>
+                                    <li>Isolation (cron crash doesn't affect API)</li>
+                                    <li>Technology diversity (API in Go, worker in Python)</li>
+                                </ul>
+
+                                <p><strong>Migration strategy:</strong></p>
+                                <ol>
+                                    <li>Start with monolith</li>
+                                    <li>Identify natural boundaries (API vs worker vs cron)</li>
+                                    <li>Extract one component at a time</li>
+                                    <li>Don't break microservices dogma (not everything needs to be separate)</li>
+                                </ol>
+
+                                <p><strong>When monolith is OK:</strong> Small team, simple app, low traffic. Don't over-engineer.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>📖 "I've Seen This Break When..."</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="war-stories">
+                                <div class="story">
+                                    <p>"Team ran Django + Celery + Nginx in one pod. 5GB memory limit. Celery job needed more memory, OOMKilled. Took down web server too. CEO's presentation failed because web was down."</p>
+                                    <p><strong>Lesson:</strong> Isolate failure domains. One component shouldn't crash others.</p>
+                                </div>
+                                <div class="story">
+                                    <p>"E-commerce site with search, recommendations, checkout in one pod. Search team deployed new version. Bug in search caused high CPU. Entire pod slow. Checkout timed out. Lost $50K in sales during sale event."</p>
+                                    <p><strong>Lesson:</strong> Independent scaling and deployment prevent cascading failures.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ANTI-PATTERN 2 -->
+            <div class="anti-pattern-item">
+                <div class="anti-pattern-header">
+                    <h3>Anti-Pattern 2: Latest Tag Hell</h3>
+                    <div class="pattern-tags">
+                        <span class="tag">deployment</span>
+                        <span class="severity high">HIGH</span>
+                        <span class="frequency very-common">Very Common</span>
+                    </div>
+                </div>
+
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>🪤 The Trap</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="anti-pattern-trap">
+                                <p><strong>The thinking:</strong> "We'll use `image: myapp:latest`. When we push new code, just `docker push myapp:latest`. K8s will pull it. Simple."</p>
+
+                                <p><strong>Why it feels right:</strong></p>
+                                <ul>
+                                    <li>No version management complexity</li>
+                                    <li>"Always get the latest code" feels good</li>
+                                    <li>Easy to explain to beginners</li>
+                                </ul>
+
+                                <p><strong>Shipping port analogy:</strong> Like shipping containers that all say "goods" with no label identifying what's inside or what version. When you need to find a specific item, impossible. When you need to revert to previous shipment, impossible.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>💥 Production Impact</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="anti-pattern-impact">
+                                <p><strong>What happens:</strong></p>
+                                <ul>
+                                    <li><strong>No rollback:</strong> Can't rollback because you don't know what version was running before</li>
+                                    <li><strong>Unexpected updates:</strong> Someone pushes `:latest`, you didn't know. Suddenly all pods update</li>
+                                    <li><strong>Reproducibility impossible:</strong> "Which version is running in prod?" → "I don't know"</li>
+                                    <li><strong>Debugging nightmares:</strong> Bug in production. Which version? Can't reproduce because `:latest` has moved on</li>
+                                </ul>
+
+                                <p><strong>Real incident:</strong></p>
+                                <p>Deployment used `:latest`. Bug found in production. Developer asked: "What version is running?" Ops: "We're using `:latest`." Dev: "But I pushed 3 times today. Which commit is this?" No one knew. Had to check container creation time, match to git commits. Took 2 hours to figure out. By then, `:latest` had been updated again. Total confusion.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>✅ The Right Approach</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="anti-pattern-solution">
+                                <p><strong>Use semantic versioning:</strong></p>
+                                <ul>
+                                    <li><code>image: myapp:v1.2.3</code></li>
+                                    <li><code>image: myapp:git-commit-hash</code></li>
+                                    <li><code>image: myapp:20240123-143022</code> (timestamp)</li>
+                                </ul>
+
+                                <p><strong>CI/CD workflow:</strong></p>
+                                <ol>
+                                    <li>Build: <code>docker build -t myapp:v1.2.3 .</code></li>
+                                    <li>Push: <code>docker push myapp:v1.2.3</code></li>
+                                    <li>Tag: <code>docker tag myapp:v1.2.3 myapp:latest</code></li>
+                                    <li>Push: <code>docker push myapp:latest</code></li>
+                                    <li>Deploy K8s with <code>v1.2.3</code> (not latest)</li>
+                                </ol>
+
+                                <p><strong>Benefits:</strong></p>
+                                <ul>
+                                    <li>Rollback: Change image from `v1.2.3` to `v1.2.2`</li>
+                                    <li>Reproducibility: Know exactly what code is running</li>
+                                    <li>Debugging: Can match version to git commit</li>
+                                    <li>Safe testing: Dev uses `:latest`, prod uses `v1.2.3`</li>
+                                </ul>
+
+                                <p><strong>Exception:</strong> `:latest` is OK for development/test environments. Never for production.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>📖 War Stories</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="war-stories">
+                                <div class="story">
+                                    <p>"Startup deployed with `:latest`. CEO asked: 'Can we demo version from last week?' Team: 'Uhh, we'd have to find the git commit, rebuild the image, tag it...' Demo delayed 3 hours. Never again."</p>
+                                </div>
+                                <div class="story">
+                                    <p>"New engineer deployed service X with `:latest`. Didn't know existing pods were on `:latest`. Their pull updated the image. Suddenly all service X pods restarted (K8s saw image digest changed). Unexpected outage at 2 AM. On-call engineer had no idea what changed."</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ANTI-PATTERN 3 -->
+            <div class="anti-pattern-item">
+                <div class="anti-pattern-header">
+                    <h3>Anti-Pattern 3: Ignoring Resource Limits</h3>
+                    <div class="pattern-tags">
+                        <span class="tag">resources</span>
+                        <span class="severity critical">CRITICAL</span>
+                        <span class="frequency common">Common</span>
+                    </div>
+                </div>
+
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>🪤 The Trap</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="anti-pattern-trap">
+                                <p><strong>The thinking:</strong> "We'll let pods use whatever they need. Why limit ourselves? If the node has resources, let the app use them."</p>
+
+                                <p><strong>Why it feels right:</strong></p>
+                                <ul>
+                                    <li>"Best performance" (no throttling)</li>
+                                    <li>Simple (no capacity planning)</li>
+                                    <li>"We'll scale when we need to"</li>
+                                </ul>
+
+                                <p><strong>Shipping port analogy:</strong> Like allowing any crane to use as much power as it wants. One crane draws 100% power, other cranes can't operate. Port efficiency drops. Everything slows down.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>💥 Production Impact</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="anti-pattern-impact">
+                                <p><strong>What happens:</strong></p>
+                                <ul>
+                                    <li><strong>Noisy neighbor:</strong> One pod hogs CPU, other pods starve</li>
+                                    <li><strong>OOMKilled cascade:</strong> One pod consumes all memory, kubelet kills ALL pods randomly to recover</li>
+                                    <li><strong>Unschedulable pods:</strong> Scheduler can't place new pods because existing pods have no limits (looks like they'll use all resources)</li>
+                                    <li><strong>Surprise bills:</strong> Cloud auto-scaling adds nodes unnecessarily</li>
+                                </ul>
+
+                                <p><strong>Real incident:</strong></p>
+                                <p>Data science team deployed ML training job without memory limits. Job had memory leak. Consumed all 64GB on node. Other pods on node (monitoring, logging, API gateway) OOMKilled. Monitoring died, so no one could see what was happening. Cluster blind for 4 hours.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>✅ The Right Approach</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="anti-pattern-solution">
+                                <p><strong>Always set requests and limits:</strong></p>
+                                <pre>
+resources:
+  requests:
+    memory: "128Mi"
+    cpu: "100m"
+  limits:
+    memory: "256Mi"
+    cpu: "200m"
+                                </pre>
+
+                                <p><strong>Understanding requests vs limits:</strong></p>
+                                <ul>
+                                    <li><strong>requests:</strong> Guaranteed minimum. Scheduler uses this for placement.</li>
+                                    <li><strong>limits:</strong> Maximum allowed. Pod throttled or killed if exceeded.</li>
+                                </ul>
+
+                                <p><strong>How to determine values:</strong></p>
+                                <ol>
+                                    <li>Run without limits in dev/test</li>
+                                    <li>Monitor actual usage (Prometheus, kubectl top)</li>
+                                    <li>Set request = average usage * 1.2 (buffer)</li>
+                                    <li>Set limit = max observed usage * 1.5 (headroom)</li>
+                                    <li>Adjust based on production metrics</li>
+                                </ol>
+
+                                <p><strong>Production best practice:</strong></p>
+                                <ul>
+                                    <li>Use LimitRange to enforce resource limits by namespace</li>
+                                    <li>Use ResourceQuota to limit total namespace resources</li>
+                                    <li>Use admission webhook to reject pods without limits</li>
+                                </ul>
+
+                                <p><strong>The 70% rule:</strong> Keep node utilization at 70%. Leave 30% for spikes and failover.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>📖 War Stories</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="war-stories">
+                                <div class="story">
+                                    <p>"Node had 64GB memory. 20 pods running without limits. One pod (Go app with goroutine leak) consumed 40GB. Kubelet started OOMKilling pods randomly. Killed the database pod. Database lost data (no persistent volume). Recovery took 6 hours."</p>
+                                </div>
+                                <div class="story">
+                                    <p>"Company spent $50K/month on K8s nodes. Added resource limits to all pods (based on actual usage). Cluster was 30% utilized. Consolidated to half the nodes. Monthly cost dropped to $30K. One day's work, $240K/year saved."</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ANTI-PATTERN 4 -->
+            <div class="anti-pattern-item">
+                <div class="anti-pattern-header">
+                    <h3>Anti-Pattern 4: Hardcoded Secrets in Images</h3>
+                    <div class="pattern-tags">
+                        <span class="tag">security</span>
+                        <span class="severity critical">CRITICAL</span>
+                        <span class="frequency occasional">Occasional</span>
+                    </div>
+                </div>
+
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>🪤 The Trap</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="anti-pattern-trap">
+                                <p><strong>The thinking:</strong> "We'll bake database passwords and API keys into the container image. It's easier than managing Secrets."</p>
+
+                                <p><strong>Why it feels right:</strong></p>
+                                <ul>
+                                    <li>"App just works" when deployed</li>
+                                    <li>No external dependency on Secrets</li>
+                                    <li>Quick development cycle</li>
+                                </ul>
+
+                                <p><strong>Shipping port analogy:</strong> Like writing the warehouse code on every container in permanent marker. Anyone who sees the container can access the warehouse. Once marked, can't change. Every container needs remarking when code changes.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>💥 Production Impact</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="anti-pattern-impact">
+                                <p><strong>What happens:</strong></p>
+                                <ul>
+                                    <li><strong>Security breach:</strong> Image registry compromised → All secrets exposed</li>
+                                    <li><strong>Git leaks:</strong> Dockerfile committed to git with secrets → Secrets in version history forever</li>
+                                    <li><strong>No rotation:</strong> To change password, must rebuild and redeploy all images</li>
+                                    <li><strong>Can't share images:</strong> Dev image can't be used in prod (different secrets)</li>
+                                </ul>
+
+                                <p><strong>Real incident:</strong></p>
+                                <p>Startup committed Dockerfile to GitHub with AWS credentials hardcoded. Image was public. Someone found credentials, used them to mine cryptocurrency. AWS bill: $80,000 in one weekend. Credentials in git history (still there even after deleting file from repo).</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>✅ The Right Approach</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="anti-pattern-solution">
+                                <p><strong>Use Kubernetes Secrets:</strong></p>
+                                <ol>
+                                    <li>Create Secret: <code>kubectl create secret generic db-creds --from-literal=password=xxx</code></li>
+                                    <li>Reference in Deployment: <code>valueFrom: secretKeyRef</code></li>
+                                    <li>App reads secret as environment variable or file</li>
+                                </ol>
+
+                                <p><strong>Even better: External secret management</strong></p>
+                                <ul>
+                                    <li><strong>AWS Secrets Manager:</strong> Secrets stored encrypted in AWS. App fetches at runtime.</li>
+                                    <li><strong>HashiCorp Vault:</strong> Centralized secret management with audit logs.</li>
+                                    <li><strong>External Secrets Operator:</strong> Syncs external secrets to K8s Secrets automatically.</li>
+                                </ul>
+
+                                <p><strong>Benefits:</strong></p>
+                                <ul>
+                                    <li>Rotation: Change secret in Vault, pods reload (no rebuild)</li>
+                                    <li>Audit: Log who accessed which secrets</li>
+                                    <li>Isolation: Dev, test, prod use same image, different secrets</li>
+                                    <li>Security: Secrets encrypted at rest, IAM controls access</li>
+                                </ul>
+
+                                <p><strong>Never, ever:</strong></p>
+                                <ul>
+                                    <li>Commit secrets to git (even in private repos)</li>
+                                    <li>Bake secrets into images</li>
+                                    <li>Store secrets in ConfigMaps (not encrypted)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>📖 War Stories</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="war-stories">
+                                <div class="story">
+                                    <p>"Dev hardcoded Stripe API key in Dockerfile. Pushed image. 6 months later, company discovered fraudulent charges. Key had been exposed in public registry. Attackers used it for months. Lost $200K."</p>
+                                </div>
+                                <div class="story">
+                                    <p>"Team built image with prod secrets. Used same image in dev environment. Devs accidentally ran transactions in prod database from dev cluster. Data corruption. Recovery took 2 days."</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ANTI-PATTERN 5 -->
+            <div class="anti-pattern-item">
+                <div class="anti-pattern-header">
+                    <h3>Anti-Pattern 5: Running as Root</h3>
+                    <div class="pattern-tags">
+                        <span class="tag">security</span>
+                        <span class="severity high">HIGH</span>
+                        <span class="frequency very-common">Very Common</span>
+                    </div>
+                </div>
+
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>🪤 The Trap</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="anti-pattern-trap">
+                                <p><strong>The thinking:</strong> "We'll run containers as root. It's easier. No permission issues. App works as-is."</p>
+
+                                <p><strong>Why it feels right:</strong></p>
+                                <ul>
+                                    <li>"Just works" without permission tuning</li>
+                                    <li>Legacy apps assume root access</li>
+                                    <li>"It's a container, isolated, what's the harm?"</li>
+                                </ul>
+
+                                <p><strong>Shipping port analogy:</strong> Like giving every crane operator master keys to the entire port. They can access any warehouse, any ship, any controls. If one operator is malicious or compromised, entire port is at risk.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>💥 Production Impact</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="anti-pattern-impact">
+                                <p><strong>What happens:</strong></p>
+                                <ul>
+                                    <li><strong>Container breakout:</strong> Vulnerability in container runtime gives attacker host access</li>
+                                    <li><strong>Privilege escalation:</strong> Attacker gains root on node</li>
+                                    <li><strong>Host access:</strong> Read host filesystem, access other containers' secrets</li>
+                                    <li><strong>Compliance failures:</strong> Security audits fail (PCI-DSS, SOC2 forbid running as root)</li>
+                                </ul>
+
+                                <p><strong>Real incident:</strong></p>
+                                <p>Kubernetes bug (CVE-2019-1002101) allowed attackers to escape containers and access host filesystem. If container ran as root, attacker had root access to node. If container ran as non-root, attacker had limited permissions. Running as root multiplied vulnerability impact.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>✅ The Right Approach</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="anti-pattern-solution">
+                                <p><strong>Always run as non-root:</strong></p>
+                                <pre>
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+                                </pre>
+
+                                <p><strong>Pod Security Standards:</strong></p>
+                                <ul>
+                                    <li>Use Pod Security Policy (deprecated) or Pod Security Admission (new)</li>
+                                    <li>Enforce non-root in namespaces (baseline policy)</li>
+                                    <li>Admission webhook rejects pods running as root</li>
+                                </ul>
+
+                                <p><strong>Build images correctly:</strong></p>
+                                <pre>
+FROM alpine:3.18
+RUN addgroup -g 1000 appgroup && \
+    adduser -D -u 1000 -G appgroup appuser
+USER appuser
+... (rest of Dockerfile)
+                                </pre>
+
+                                <p><strong>Benefits:</strong></p>
+                                <ul>
+                                    <li><strong>Least privilege:</strong> Container has minimal permissions</li>
+                                    <li><strong>Reduced attack surface:</strong> Container escape gives attacker limited access</li>
+                                    <li><strong>Compliance:</strong> Meets security standards</li>
+                                    <li><strong>Defense in depth:</strong> Even if container compromised, damage is limited</li>
+                                </ul>
+
+                                <p><strong>Debugging permission issues:</strong></p>
+                                <ul>
+                                    <li>Run container as root in dev to identify required permissions</li>
+                                    <li>Add capabilities (CAP_NET_BIND_SERVICE, etc.) instead of full root</li>
+                                    <li>Use securityContext to drop all capabilities, add only what's needed</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>📖 War Stories</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="war-stories">
+                                <div class="story">
+                                    <p>"Financial services company ran all containers as root. Security audit failed. Had to rebuild all images with non-root users. Took 3 months. Delayed product launch. Cost: $5M in lost revenue."</p>
+                                </div>
+                                <div class="story">
+                                    <p>"Container vulnerability in runc allowed attackers to escape. Company A ran as root → attackers owned the cluster. Company B ran as non-root → attackers had user-level access, contained. Difference: complete compromise vs minor incident."</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- KEY TAKEAWAYS -->
+        <section class="key-takeaways">
+            <h2>Key Takeaways: Patterns & Anti-Patterns</h2>
+
+            <div class="takeaways-grid">
+                <div class="takeaway-card">
+                    <h4>🎯 Patterns Are Starting Points</h4>
+                    <p>Not rules. Understand the problem, the pattern, and the trade-offs. Adapt to your context.</p>
+                </div>
+
+                <div class="takeaway-card">
+                    <h4>🏗️ Sidecars Separate Concerns</h4>
+                    <p>Infrastructure logic (logging, proxies) shouldn't be in app code. Use sidecars. But watch resource overhead.</p>
+                </div>
+
+                <div class="takeaway-card">
+                    <h4>🔄 Controllers Automate Operations</h4>
+                    <p>Write controllers for repetitive tasks. But they're complex. Start with existing operators before writing custom controllers.</p>
+                </div>
+
+                <div class="takeaway-card">
+                    <h4>⚠️ Anti-Patterns Have Warning Signs</h4>
+                    <p>"It's easier now" usually means "it'll hurt later." Hardcoding secrets, running as root, ignoring limits—all have short-term convenience, long-term pain.</p>
+                </div>
+
+                <div class="takeaway-card">
+                    <h4>🚦 Progressive Delivery Reduces Risk</h4>
+                    <p>Canary deployments, blue-green, feature flags. Deploy with confidence. Automate rollback when metrics degrade.</p>
+                </div>
+
+                <div class="takeaway-card">
+                    <h4>🏢 Production Experience Shows</h4>
+                    <p>Every pattern and anti-pattern here comes from real incidents. Learn from others' mistakes. Don't repeat them.</p>
+                </div>
+            </div>
+
+            <div class="card success">
+                <h3>🎓 The Shipping Port Analogy</h3>
+                <p>Throughout these patterns, the shipping port analogy helps us understand:</p>
+                <ul>
+                    <li><strong>Sidecars:</strong> Specialist workers alongside crane operators</li>
+                    <li><strong>Controllers:</strong> Operations center continuously monitoring and adjusting</li>
+                    <li><strong>Leader election:</strong> One active control tower, others on standby</li>
+                    <li><strong>Anti-patterns:</strong> One mega-crane, unlabeled containers, operators with master keys</li>
+                </ul>
+                <p>When in doubt, ask: "How would a well-run shipping port handle this?" The answer usually points to the right pattern.</p>
+            </div>
+        </section>
+
+        <!-- Next Steps -->
+        <section class="next-steps">
+            <h2>Continue Your Journey</h2>
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <h4>💬 Interview Conversations</h4>
+                    <p>Practice interview-style question trees with talking points and war stories.</p>
+                    <a href="conversations.html" class="btn">Interview Prep →</a>
+                </div>
+                <div class="tip-card">
+                    <h4>⚠️ Pitfalls & War Stories</h4>
+                    <p>Deep dive into common Kubernetes pitfalls with real production incidents.</p>
+                    <a href="pitfalls.html" class="btn">Explore Pitfalls →</a>
+                </div>
+                <div class="tip-card">
+                    <h4>⚖️ Trade-offs Analysis</h4>
+                    <p>Compare Kubernetes options and understand when to choose each approach.</p>
+                    <a href="tradeoffs.html" class="btn">View Trade-offs →</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="section-nav">
+        <a href="conversations.html" class="prev-btn">← Interview Conversations</a>
+        <a href="pitfalls.html" class="next-btn">Pitfalls & War Stories →</a>
+    </footer>
+
+    <script src="../../js/components.js"></script>
+</body>
+</html>

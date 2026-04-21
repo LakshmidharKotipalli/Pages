@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>At Scale - LangChain Learning Journey</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <span class="logo">LangChain Learning</span>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="breadcrumbs">
+            <a href="index.html">Home</a> <span class="separator">&rsaquo;</span> Section 9: At Scale
+        </div>
+
+        <h1>Section 9: At Scale</h1>
+
+        <div class="core-insight">
+            <h2>Production at Scale</h2>
+            <p class="emphasis">Scaling LangChain applications from prototype to production requires careful orchestration of caching, model routing, distributed processing, and observability &mdash; transforming a $50K/month bill into a $5K one while serving millions of users.</p>
+        </div>
+
+        <!-- Scenario 1 -->
+        <div class="section">
+            <h2>Scenario 1: 1M Queries/Day RAG Pipeline</h2>
+            <p><strong>Challenge:</strong> Enterprise knowledge base serving 1M daily queries across 500K documents with sub-second latency requirements.</p>
+
+            <div class="card-grid">
+                <div class="card info">
+                    <h3>Scale Metrics</h3>
+                    <ul>
+                        <li><strong>1M queries/day</strong> &mdash; ~12 QPS sustained, 50 QPS peak</li>
+                        <li><strong>500K documents</strong> &mdash; indexed across 20 vector store shards</li>
+                        <li><strong>&lt;800ms P95 latency</strong> &mdash; end-to-end response time</li>
+                        <li><strong>99.9% uptime SLA</strong> &mdash; 8.7 hours max downtime/year</li>
+                    </ul>
+                </div>
+                <div class="card success">
+                    <h3>Cost Optimization Journey</h3>
+                    <ul>
+                        <li><strong>Without optimization:</strong> $48,000/month (all GPT-4)</li>
+                        <li><strong>With smart routing:</strong> $14,400/month (70% cost reduction)</li>
+                        <li><strong>With caching layer:</strong> $8,640/month (40% cache hits)</li>
+                        <li><strong>Final optimized:</strong> $5,200/month (semantic cache + routing)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Multi-Tier Architecture</h3>
+            <div class="diagram-container">
+                <h4>Request Flow Through 4 Optimization Tiers</h4>
+                <svg viewBox="0 0 900 380" class="architecture-diagram">
+                    <defs>
+                        <marker id="arrow1" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#888"/></marker>
+                    </defs>
+
+                    <!-- User Query -->
+                    <rect x="30" y="160" width="110" height="50" rx="8" fill="#1a2035" stroke="#3b82f6" stroke-width="2"/>
+                    <text x="85" y="190" text-anchor="middle" fill="#e4e4e7" font-size="13" font-weight="bold">User Query</text>
+
+                    <!-- Tier 1: Semantic Cache -->
+                    <rect x="180" y="100" width="150" height="170" rx="10" fill="#0d1f17" stroke="#10b981" stroke-width="2"/>
+                    <text x="255" y="125" text-anchor="middle" fill="#10b981" font-size="12" font-weight="bold">TIER 1</text>
+                    <text x="255" y="145" text-anchor="middle" fill="#10b981" font-size="11">Semantic Cache</text>
+                    <text x="255" y="170" text-anchor="middle" fill="#a1a1aa" font-size="10">Redis + Embeddings</text>
+                    <text x="255" y="190" text-anchor="middle" fill="#a1a1aa" font-size="10">Similarity &gt; 0.95 = hit</text>
+                    <text x="255" y="215" text-anchor="middle" fill="#10b981" font-size="11" font-weight="bold">40% queries served</text>
+                    <text x="255" y="235" text-anchor="middle" fill="#10b981" font-size="11" font-weight="bold">~2ms response</text>
+                    <text x="255" y="260" text-anchor="middle" fill="#a1a1aa" font-size="10">Catches paraphrases</text>
+
+                    <!-- Tier 2: Model Router -->
+                    <rect x="370" y="100" width="150" height="170" rx="10" fill="#1a1530" stroke="#8b5cf6" stroke-width="2"/>
+                    <text x="445" y="125" text-anchor="middle" fill="#8b5cf6" font-size="12" font-weight="bold">TIER 2</text>
+                    <text x="445" y="145" text-anchor="middle" fill="#8b5cf6" font-size="11">Smart Model Router</text>
+                    <text x="445" y="175" text-anchor="middle" fill="#a1a1aa" font-size="10">Simple &rarr; GPT-3.5</text>
+                    <text x="445" y="195" text-anchor="middle" fill="#a1a1aa" font-size="10">Medium &rarr; GPT-4o-mini</text>
+                    <text x="445" y="215" text-anchor="middle" fill="#a1a1aa" font-size="10">Complex &rarr; GPT-4o</text>
+                    <text x="445" y="245" text-anchor="middle" fill="#8b5cf6" font-size="11" font-weight="bold">70% cost savings</text>
+                    <text x="445" y="260" text-anchor="middle" fill="#a1a1aa" font-size="10">Complexity classifier</text>
+
+                    <!-- Tier 3: Retrieval -->
+                    <rect x="560" y="100" width="150" height="170" rx="10" fill="#1f1a15" stroke="#f59e0b" stroke-width="2"/>
+                    <text x="635" y="125" text-anchor="middle" fill="#f59e0b" font-size="12" font-weight="bold">TIER 3</text>
+                    <text x="635" y="145" text-anchor="middle" fill="#f59e0b" font-size="11">Retrieval Optimizer</text>
+                    <text x="635" y="175" text-anchor="middle" fill="#a1a1aa" font-size="10">MMR search (diverse)</text>
+                    <text x="635" y="195" text-anchor="middle" fill="#a1a1aa" font-size="10">Top 5 from 20 candidates</text>
+                    <text x="635" y="215" text-anchor="middle" fill="#a1a1aa" font-size="10">Relevance vs diversity</text>
+                    <text x="635" y="245" text-anchor="middle" fill="#f59e0b" font-size="11" font-weight="bold">Higher precision</text>
+                    <text x="635" y="260" text-anchor="middle" fill="#a1a1aa" font-size="10">Balanced results</text>
+
+                    <!-- Tier 4: Reranking -->
+                    <rect x="750" y="100" width="130" height="170" rx="10" fill="#1f1520" stroke="#ec4899" stroke-width="2"/>
+                    <text x="815" y="125" text-anchor="middle" fill="#ec4899" font-size="12" font-weight="bold">TIER 4</text>
+                    <text x="815" y="145" text-anchor="middle" fill="#ec4899" font-size="11">Re-Ranking</text>
+                    <text x="815" y="175" text-anchor="middle" fill="#a1a1aa" font-size="10">Cross-encoder model</text>
+                    <text x="815" y="195" text-anchor="middle" fill="#a1a1aa" font-size="10">Reorder by relevance</text>
+                    <text x="815" y="215" text-anchor="middle" fill="#a1a1aa" font-size="10">Keep top 3 only</text>
+                    <text x="815" y="245" text-anchor="middle" fill="#ec4899" font-size="11" font-weight="bold">Best 3 docs</text>
+                    <text x="815" y="260" text-anchor="middle" fill="#a1a1aa" font-size="10">to LLM context</text>
+
+                    <!-- Arrows -->
+                    <line x1="140" y1="185" x2="178" y2="185" stroke="#888" stroke-width="2" marker-end="url(#arrow1)"/>
+                    <line x1="330" y1="185" x2="368" y2="185" stroke="#888" stroke-width="2" marker-end="url(#arrow1)"/>
+                    <line x1="520" y1="185" x2="558" y2="185" stroke="#888" stroke-width="2" marker-end="url(#arrow1)"/>
+                    <line x1="710" y1="185" x2="748" y2="185" stroke="#888" stroke-width="2" marker-end="url(#arrow1)"/>
+
+                    <!-- Cache hit arrow -->
+                    <path d="M255 270 L255 340 L85 340 L85 215" stroke="#10b981" stroke-width="1.5" fill="none" stroke-dasharray="5,5" marker-end="url(#arrow1)"/>
+                    <text x="170" y="355" text-anchor="middle" fill="#10b981" font-size="10">Cache Hit (instant return)</text>
+                </svg>
+            </div>
+
+            <h3>Infrastructure Layout</h3>
+            <div class="card-grid">
+                <div class="card">
+                    <h3>Load Balancing</h3>
+                    <ul>
+                        <li><strong>ALB/NLB:</strong> Distribute across 8 app servers</li>
+                        <li><strong>Auto-scaling:</strong> CPU &gt; 60% triggers scale-up</li>
+                        <li><strong>Health checks:</strong> /health endpoint every 10s</li>
+                        <li><strong>Connection draining:</strong> 30s graceful shutdown</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Vector Store Sharding</h3>
+                    <ul>
+                        <li><strong>20 Pinecone shards</strong> &mdash; 25K docs each</li>
+                        <li><strong>Namespace routing:</strong> by department/category</li>
+                        <li><strong>Replication:</strong> 3 replicas per shard</li>
+                        <li><strong>Index refresh:</strong> Incremental updates every 6 hours</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Cost Breakdown Table</h3>
+            <table>
+                <tr><th>Component</th><th>Monthly Cost</th><th>% of Total</th></tr>
+                <tr><td>LLM API calls (routed)</td><td>$3,200</td><td>61.5%</td></tr>
+                <tr><td>Vector store (Pinecone)</td><td>$800</td><td>15.4%</td></tr>
+                <tr><td>Redis cache cluster</td><td>$400</td><td>7.7%</td></tr>
+                <tr><td>Compute (8 servers)</td><td>$600</td><td>11.5%</td></tr>
+                <tr><td>Embedding generation</td><td>$150</td><td>2.9%</td></tr>
+                <tr><td>Monitoring (LangSmith)</td><td>$50</td><td>1.0%</td></tr>
+                <tr><td><strong>Total</strong></td><td><strong>$5,200</strong></td><td><strong>100%</strong></td></tr>
+            </table>
+        </div>
+
+        <!-- Scenario 2 -->
+        <div class="section">
+            <h2>Scenario 2: 10M Document Embedding Pipeline</h2>
+            <p><strong>Challenge:</strong> Embed and index 10M legal documents overnight during an 8-hour maintenance window.</p>
+
+            <div class="card-grid">
+                <div class="card info">
+                    <h3>Pipeline Dimensions</h3>
+                    <ul>
+                        <li><strong>10M documents</strong> &mdash; average 1,500 tokens each</li>
+                        <li><strong>8-hour window</strong> &mdash; maintenance window constraint</li>
+                        <li><strong>347 docs/second</strong> &mdash; minimum sustained throughput</li>
+                        <li><strong>15B total tokens</strong> &mdash; to be embedded</li>
+                    </ul>
+                </div>
+                <div class="card warning">
+                    <h3>Key Constraints</h3>
+                    <ul>
+                        <li><strong>API rate limits:</strong> OpenAI 10K RPM per org</li>
+                        <li><strong>Vector store write throughput:</strong> 1K upserts/second</li>
+                        <li><strong>Memory limits:</strong> Each worker needs 4GB RAM</li>
+                        <li><strong>Network bandwidth:</strong> 5Gbps sustained</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Distributed Processing Architecture</h3>
+            <div class="diagram-container">
+                <h4>50-Worker Parallel Embedding Fleet</h4>
+                <svg viewBox="0 0 900 300" class="architecture-diagram">
+                    <defs><marker id="arrow2" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#888"/></marker></defs>
+
+                    <!-- Source -->
+                    <rect x="20" y="100" width="120" height="80" rx="8" fill="#1a2035" stroke="#3b82f6" stroke-width="2"/>
+                    <text x="80" y="130" text-anchor="middle" fill="#3b82f6" font-size="12" font-weight="bold">S3 Bucket</text>
+                    <text x="80" y="150" text-anchor="middle" fill="#a1a1aa" font-size="10">10M Documents</text>
+                    <text x="80" y="165" text-anchor="middle" fill="#a1a1aa" font-size="10">200K per worker</text>
+
+                    <!-- SQS Queue -->
+                    <rect x="180" y="100" width="120" height="80" rx="8" fill="#1f1a15" stroke="#f59e0b" stroke-width="2"/>
+                    <text x="240" y="130" text-anchor="middle" fill="#f59e0b" font-size="12" font-weight="bold">SQS Queue</text>
+                    <text x="240" y="150" text-anchor="middle" fill="#a1a1aa" font-size="10">Job Distribution</text>
+                    <text x="240" y="165" text-anchor="middle" fill="#a1a1aa" font-size="10">Batch of 100 docs</text>
+
+                    <!-- Workers -->
+                    <rect x="340" y="40" width="200" height="200" rx="10" fill="#0d1f17" stroke="#10b981" stroke-width="2"/>
+                    <text x="440" y="65" text-anchor="middle" fill="#10b981" font-size="12" font-weight="bold">50 Worker Fleet</text>
+                    <text x="440" y="85" text-anchor="middle" fill="#a1a1aa" font-size="10">(g4dn.xlarge EC2 instances)</text>
+
+                    <rect x="360" y="100" width="70" height="35" rx="4" fill="#1a2530" stroke="#10b981" stroke-width="1"/>
+                    <text x="395" y="122" text-anchor="middle" fill="#a1a1aa" font-size="9">Split text</text>
+                    <rect x="450" y="100" width="70" height="35" rx="4" fill="#1a2530" stroke="#10b981" stroke-width="1"/>
+                    <text x="485" y="122" text-anchor="middle" fill="#a1a1aa" font-size="9">Embed</text>
+
+                    <text x="440" y="160" text-anchor="middle" fill="#10b981" font-size="11">17,350 docs/sec total</text>
+                    <text x="440" y="180" text-anchor="middle" fill="#a1a1aa" font-size="10">Checkpoint every 10K docs</text>
+                    <text x="440" y="200" text-anchor="middle" fill="#a1a1aa" font-size="10">Resume from last checkpoint</text>
+                    <text x="440" y="220" text-anchor="middle" fill="#a1a1aa" font-size="10">Dead-letter queue for failures</text>
+
+                    <!-- Pinecone -->
+                    <rect x="580" y="100" width="130" height="80" rx="8" fill="#1a1530" stroke="#8b5cf6" stroke-width="2"/>
+                    <text x="645" y="125" text-anchor="middle" fill="#8b5cf6" font-size="12" font-weight="bold">Pinecone</text>
+                    <text x="645" y="145" text-anchor="middle" fill="#a1a1aa" font-size="10">20+ shards</text>
+                    <text x="645" y="160" text-anchor="middle" fill="#a1a1aa" font-size="10">Batch upserts</text>
+
+                    <!-- Monitor -->
+                    <rect x="750" y="100" width="130" height="80" rx="8" fill="#1f1520" stroke="#ec4899" stroke-width="2"/>
+                    <text x="815" y="125" text-anchor="middle" fill="#ec4899" font-size="12" font-weight="bold">Grafana</text>
+                    <text x="815" y="145" text-anchor="middle" fill="#a1a1aa" font-size="10">Progress, ETA</text>
+                    <text x="815" y="160" text-anchor="middle" fill="#a1a1aa" font-size="10">Error rate alerts</text>
+
+                    <!-- Arrows -->
+                    <line x1="140" y1="140" x2="178" y2="140" stroke="#888" stroke-width="2" marker-end="url(#arrow2)"/>
+                    <line x1="300" y1="140" x2="338" y2="140" stroke="#888" stroke-width="2" marker-end="url(#arrow2)"/>
+                    <line x1="540" y1="140" x2="578" y2="140" stroke="#888" stroke-width="2" marker-end="url(#arrow2)"/>
+                    <line x1="710" y1="140" x2="748" y2="140" stroke="#888" stroke-width="2" marker-end="url(#arrow2)"/>
+
+                    <!-- Cost footer -->
+                    <text x="450" y="280" text-anchor="middle" fill="#10b981" font-size="13" font-weight="bold">Total Cost: $500 | Embedding: $300 | Compute: $200 | Time: ~9.6 hours</text>
+                </svg>
+            </div>
+
+            <h3>Failure Handling Strategy</h3>
+            <div class="card-grid">
+                <div class="card">
+                    <h3>Checkpointing</h3>
+                    <p>Every 10K docs, save progress to S3. On failure, restart from last checkpoint with full state recovery including doc IDs, chunk IDs, and upsert status.</p>
+                </div>
+                <div class="card">
+                    <h3>Dead Letter Queue</h3>
+                    <p>Failed documents go to SQS DLQ. Retry 3x with exponential backoff (1s, 5s, 25s). After 3 failures, moved to manual review queue with full error details.</p>
+                </div>
+                <div class="card">
+                    <h3>Circuit Breaker</h3>
+                    <p>On rate limit: switch to batch upsert mode. If error rate exceeds 5%, pause all workers and alert on-call engineer. Auto-resume when rate drops below 2%.</p>
+                </div>
+                <div class="card">
+                    <h3>Rollback Capability</h3>
+                    <p>Keep old index active until new index fully validated. Blue/green deployment for zero-downtime index swap. Validation includes random sample QA testing.</p>
+                </div>
+            </div>
+
+            <h3>Monitoring Dashboard Alerts</h3>
+            <table>
+                <tr><th>Metric</th><th>Alert Threshold</th><th>Action</th></tr>
+                <tr><td>Processing rate</td><td>&lt; 300 docs/s</td><td>Spin up 10 more workers</td></tr>
+                <tr><td>Error rate</td><td>&gt; 5%</td><td>Pause and investigate</td></tr>
+                <tr><td>ETA</td><td>&gt; 11 hours</td><td>Add workers immediately</td></tr>
+                <tr><td>Pinecone latency</td><td>&gt; 1s</td><td>Switch to batch mode</td></tr>
+                <tr><td>Memory per worker</td><td>&gt; 3.5GB</td><td>Reduce batch size</td></tr>
+            </table>
+        </div>
+
+        <!-- Scenario 3 -->
+        <div class="section">
+            <h2>Scenario 3: 100K Concurrent Chat Sessions</h2>
+            <p><strong>Challenge:</strong> Real-time customer support chatbot for enterprise platform with conversation memory and multi-turn reasoning.</p>
+
+            <div class="card-grid">
+                <div class="card info">
+                    <h3>Session Metrics</h3>
+                    <ul>
+                        <li><strong>100K active sessions</strong> &mdash; simultaneous conversations</li>
+                        <li><strong>&lt;500ms response time</strong> &mdash; streaming first token</li>
+                        <li><strong>24/7 availability</strong> &mdash; global multi-region</li>
+                        <li><strong>99.99% uptime SLA</strong> &mdash; 52 min max downtime/year</li>
+                    </ul>
+                </div>
+                <div class="card success">
+                    <h3>Architecture Highlights</h3>
+                    <ul>
+                        <li><strong>WebSocket:</strong> 25 servers (4K connections each)</li>
+                        <li><strong>Memory per session:</strong> ~50KB in Redis</li>
+                        <li><strong>Total Redis:</strong> 5GB per region</li>
+                        <li><strong>Failover:</strong> US &rarr; EU &rarr; APAC cascade</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Memory Hierarchy Architecture</h3>
+            <div class="diagram-container">
+                <h4>Three-Tier Session Memory</h4>
+                <svg viewBox="0 0 800 220" class="architecture-diagram">
+                    <defs><marker id="arrow3" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#888"/></marker></defs>
+
+                    <!-- Hot -->
+                    <rect x="30" y="40" width="220" height="140" rx="10" fill="#1f0d0d" stroke="#ef4444" stroke-width="2"/>
+                    <text x="140" y="70" text-anchor="middle" fill="#ef4444" font-size="14" font-weight="bold">HOT TIER</text>
+                    <text x="140" y="90" text-anchor="middle" fill="#ef4444" font-size="11">Redis Cluster</text>
+                    <text x="140" y="115" text-anchor="middle" fill="#a1a1aa" font-size="11">Last 10 messages</text>
+                    <text x="140" y="135" text-anchor="middle" fill="#a1a1aa" font-size="11">2ms access time</text>
+                    <text x="140" y="155" text-anchor="middle" fill="#a1a1aa" font-size="11">Cross-AZ replication</text>
+                    <text x="140" y="170" text-anchor="middle" fill="#ef4444" font-size="10">Auto-failover</text>
+
+                    <!-- Warm -->
+                    <rect x="290" y="40" width="220" height="140" rx="10" fill="#1f1a15" stroke="#f59e0b" stroke-width="2"/>
+                    <text x="400" y="70" text-anchor="middle" fill="#f59e0b" font-size="14" font-weight="bold">WARM TIER</text>
+                    <text x="400" y="90" text-anchor="middle" fill="#f59e0b" font-size="11">PostgreSQL</text>
+                    <text x="400" y="115" text-anchor="middle" fill="#a1a1aa" font-size="11">Full session history</text>
+                    <text x="400" y="135" text-anchor="middle" fill="#a1a1aa" font-size="11">50ms access time</text>
+                    <text x="400" y="155" text-anchor="middle" fill="#a1a1aa" font-size="11">Read replicas</text>
+                    <text x="400" y="170" text-anchor="middle" fill="#f59e0b" font-size="10">Auto-summarization</text>
+
+                    <!-- Cold -->
+                    <rect x="550" y="40" width="220" height="140" rx="10" fill="#0d1520" stroke="#3b82f6" stroke-width="2"/>
+                    <text x="660" y="70" text-anchor="middle" fill="#3b82f6" font-size="14" font-weight="bold">COLD TIER</text>
+                    <text x="660" y="90" text-anchor="middle" fill="#3b82f6" font-size="11">S3 Archive</text>
+                    <text x="660" y="115" text-anchor="middle" fill="#a1a1aa" font-size="11">Archived chats</text>
+                    <text x="660" y="135" text-anchor="middle" fill="#a1a1aa" font-size="11">200ms access time</text>
+                    <text x="660" y="155" text-anchor="middle" fill="#a1a1aa" font-size="11">Lowest cost storage</text>
+                    <text x="660" y="170" text-anchor="middle" fill="#3b82f6" font-size="10">7-day retention</text>
+
+                    <!-- Arrows -->
+                    <line x1="250" y1="110" x2="288" y2="110" stroke="#888" stroke-width="2" marker-end="url(#arrow3)"/>
+                    <line x1="510" y1="110" x2="548" y2="110" stroke="#888" stroke-width="2" marker-end="url(#arrow3)"/>
+                    <text x="270" y="100" text-anchor="middle" fill="#a1a1aa" font-size="9">30 min idle</text>
+                    <text x="530" y="100" text-anchor="middle" fill="#a1a1aa" font-size="9">session end</text>
+                </svg>
+            </div>
+
+            <h3>Session Management Best Practices</h3>
+            <ul>
+                <li><strong>Connection pooling:</strong> Reuse WebSocket connections across message bursts to reduce overhead</li>
+                <li><strong>Heartbeat monitoring:</strong> Detect stale connections every 30 seconds and reclaim resources</li>
+                <li><strong>Graceful reconnection:</strong> Clients auto-reconnect with session token, restoring full conversation state</li>
+                <li><strong>Message queue buffering:</strong> Buffer messages during brief disconnections (max 60s window)</li>
+                <li><strong>State synchronization:</strong> Sync conversation state across regions via Redis Streams in real-time</li>
+                <li><strong>Memory tiering:</strong> Automatically promote/demote messages between hot/warm/cold storage</li>
+                <li><strong>Summary memory:</strong> Long conversations are auto-summarized to keep context within token limits</li>
+            </ul>
+        </div>
+
+        <!-- Scale Readiness -->
+        <div class="key-takeaway">
+            <h3>Scale Readiness Checklist</h3>
+            <ul>
+                <li>Stateless application design (no session affinity required)</li>
+                <li>Horizontal auto-scaling configured (CPU-based triggers)</li>
+                <li>Database read replicas deployed (3 per region)</li>
+                <li>Vector store sharding implemented (20+ shards)</li>
+                <li>Multi-level caching (memory &rarr; Redis &rarr; CDN)</li>
+                <li>Circuit breakers on all external calls (OpenAI, Pinecone)</li>
+                <li>Monitoring dashboards (LangSmith + Grafana + Prometheus)</li>
+                <li>Runbook for common failures (documented procedures)</li>
+                <li>Load testing to 2x expected capacity</li>
+                <li>Disaster recovery tested quarterly (failover drills)</li>
+            </ul>
+        </div>
+
+        <!-- Key Learnings -->
+        <div class="section">
+            <h2>Key Learnings from Scale</h2>
+            <div class="card-grid">
+                <div class="card success">
+                    <h3>Caching is Everything</h3>
+                    <p>40% cache hit rate = 40% cost savings + 2x latency reduction. Semantic caching catches paraphrased questions that exact-match caching misses entirely.</p>
+                </div>
+                <div class="card info">
+                    <h3>Model Routing Pays Off</h3>
+                    <p>Smart routing saves 70% on LLM costs with minimal quality impact. A lightweight complexity classifier scores queries before routing to expensive models.</p>
+                </div>
+                <div class="card warning">
+                    <h3>Shard Early</h3>
+                    <p>Don't wait until you hit limits. Shard from day 1 of production. Retrofitting sharding on a live system is 10x harder than designing it upfront.</p>
+                </div>
+                <div class="card">
+                    <h3>Monitor Obsessively</h3>
+                    <p>Track token usage per chain, latency per component, error rates per model, and cost per user session. You can't optimize what you don't measure.</p>
+                </div>
+                <div class="card">
+                    <h3>Test Failures</h3>
+                    <p>Regular chaos engineering prevents real outages. Simulate API rate limits, vector store failures, and network partitions monthly.</p>
+                </div>
+                <div class="card success">
+                    <h3>Async by Default</h3>
+                    <p>Use async invocation and streaming everywhere. Synchronous calls block threads and kill throughput. Async allows 10x more concurrent requests per server.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <a href="08-tradeoffs.html" class="button secondary">&larr; Trade-offs</a>
+            <a href="10-landscape.html" class="button primary">Technology Landscape &rarr;</a>
+        </div>
+    </div>
+
+    <script src="js/components.js"></script>
+</body>
+</html>

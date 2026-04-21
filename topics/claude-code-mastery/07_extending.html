@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extending Claude Code — Claude Code Mastery</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Satoshi:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <nav class="nav-bar">
+        <a href="index.html" class="logo"><span>Claude Code</span> Mastery</a>
+        <div class="nav-links">
+            <a href="01_overview.html">Overview</a><a href="02_getting_started.html">Setup</a><a
+                href="03_golden_workflow.html">Workflow</a><a href="04_claude_md.html">CLAUDE.md</a><a
+                href="05_prompting.html">Prompting</a><a href="06_context.html">Context</a><a href="07_extending.html"
+                class="active">Extend</a><a href="08_automation.html">CI/CD</a><a
+                href="09_multi_agent.html">Multi-Agent</a><a href="10_commands.html">Commands</a><a
+                href="11_anti_patterns.html">Pitfalls</a><a href="12_community.html">Community</a>
+        </div>
+    </nav>
+    <div class="page-header">
+        <div class="breadcrumb"><a href="index.html">Home</a> / Chapter 07</div>
+        <h1>Extending <span class="gold">Claude Code</span></h1>
+        <p>Skills, Hooks, MCP Servers, Custom Subagents, and Plugins — unlock Claude's full potential with the
+            extensibility system.</p>
+    </div>
+
+    <section class="container reveal">
+        <div class="section-label">Extension System</div>
+        <h2 class="section-title">Five Ways to Extend</h2>
+
+        <div class="accordion">
+
+            <div class="acc-item open">
+                <div class="acc-header">🎯 Skills — Reusable Slash Commands</div>
+                <div class="acc-body">
+                    <div class="acc-inner">
+                        <p>Skills are <span class="code-inline">SKILL.md</span> files in <span
+                                class="code-inline">.claude/skills/</span> that define reusable workflows invoked via
+                            <span class="code-inline">/slash-commands</span>. They're the most accessible way to extend
+                            Claude Code.</p>
+
+                        <h4 style="margin-top:1rem;margin-bottom:.5rem">Example: Fix GitHub Issues</h4>
+                        <div class="code-block" data-label=".claude/skills/fix-issue/SKILL.md"><code>---
+name: fix-issue
+description: Fix a GitHub issue
+disable-model-invocation: true
+---
+Analyze and fix the GitHub issue: $ARGUMENTS.
+1. Use `gh issue view` to get the issue details
+2. Understand the problem described in the issue
+3. Search the codebase for relevant files
+4. Implement the necessary changes to fix the issue
+5. Write and run tests to verify the fix
+6. Ensure code passes linting and type checking
+7. Create a descriptive commit message
+8. Push and create a PR</code></div>
+                        <p>Usage: <span class="code-inline">/fix-issue 1234</span></p>
+
+                        <h4 style="margin-top:1.5rem;margin-bottom:.5rem">Example: API Conventions</h4>
+                        <div class="code-block" data-label=".claude/skills/api-conventions/SKILL.md"><code>---
+name: api-conventions
+description: REST API design conventions for our services
+---
+# API Conventions
+- Use kebab-case for URL paths
+- Use camelCase for JSON properties
+- Always include pagination for list endpoints
+- Version APIs in the URL path (/v1/, /v2/)</code></div>
+
+                        <div class="tip-box gold" style="margin-top:1rem">
+                            <div class="tip-label">Key Concepts</div>
+                            <p>• Skills are loaded on-demand to minimize token usage<br>
+                                • Use <span class="code-inline">$ARGUMENTS</span> to accept arguments from the slash
+                                command<br>
+                                • Set <span class="code-inline">disable-model-invocation: true</span> for deterministic
+                                scripts that don't need AI reasoning<br>
+                                • Can include scripts/, examples/, and resources/ subdirectories</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="acc-item">
+                <div class="acc-header">⚡ Hooks — Automated Event Triggers</div>
+                <div class="acc-body">
+                    <div class="acc-inner">
+                        <p>Shell scripts that run automatically when specific events occur during a session. Configure
+                            via <span class="code-inline">/hooks</span> command or directly in <span
+                                class="code-inline">.claude/settings.json</span>.</p>
+
+                        <h4 style="margin-top:1rem;margin-bottom:.5rem">Hook Events</h4>
+                        <table class="cmd-table">
+                            <thead>
+                                <tr>
+                                    <th>Event</th>
+                                    <th>When It Fires</th>
+                                    <th>Use Case</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>PreToolUse</td>
+                                    <td>Before Claude executes a tool</td>
+                                    <td>Validation, security blocks</td>
+                                </tr>
+                                <tr>
+                                    <td>PostToolUse</td>
+                                    <td>After tool execution completes</td>
+                                    <td>Auto-formatting, logging</td>
+                                </tr>
+                                <tr>
+                                    <td>UserPromptSubmit</td>
+                                    <td>Before Claude processes your prompt</td>
+                                    <td>Inject dynamic context</td>
+                                </tr>
+                                <tr>
+                                    <td>Notification</td>
+                                    <td>When Claude needs your input</td>
+                                    <td>Desktop alerts, sounds</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4 style="margin-top:1rem;margin-bottom:.5rem">Desktop Notification Hook (macOS)</h4>
+                        <div class="code-block">
+                            <code>osascript -e 'display notification "Claude Code needs your attention" with title "Claude Code"'</code>
+                        </div>
+
+                        <div class="tip-box blue" style="margin-top:1rem">
+                            <p><strong>Security:</strong> Hooks can block dangerous commands or modifications to
+                                sensitive files. They provide a deterministic control layer over Claude's behavior.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="acc-item">
+                <div class="acc-header">🔌 MCP Servers — External System Connections</div>
+                <div class="acc-body">
+                    <div class="acc-inner">
+                        <p>The Model Context Protocol connects Claude to external systems — databases, APIs, monitoring
+                            tools, issue trackers, documentation sites.</p>
+                        <div class="code-block" data-label="add MCP server"><code>claude mcp add</code></div>
+
+                        <h4 style="margin-top:1rem;margin-bottom:.5rem">What MCP Enables</h4>
+                        <ul>
+                            <li>Query your production database directly</li>
+                            <li>Fetch Sentry error details and stack traces</li>
+                            <li>Read and search Notion/Confluence documentation</li>
+                            <li>Interact with Jira/Linear issues</li>
+                            <li>Browse documentation sites</li>
+                            <li>Access any API through custom MCP servers</li>
+                        </ul>
+                        <p style="margin-top:.8rem">MCP is an open-source standard — any tool can expose an MCP
+                            interface for Claude to use.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="acc-item">
+                <div class="acc-header">🤖 Custom Subagents — Specialized AI Workers</div>
+                <div class="acc-body">
+                    <div class="acc-inner">
+                        <p>Create purpose-specific agents in <span class="code-inline">.claude/agents/</span>. Each
+                            subagent has its own system prompt, tool access, and can even use different models (e.g.,
+                            Opus for deep review).</p>
+
+                        <div class="code-block" data-label=".claude/agents/security-reviewer.md"><code>---
+name: security-reviewer
+description: Reviews code for security vulnerabilities
+tools: Read, Grep, Glob, Bash
+model: opus
+---
+You are a senior security engineer. Review code for:
+- Injection vulnerabilities (SQL, XSS, command injection)
+- Authentication and authorization flaws
+- Secrets or credentials in code
+- Insecure data handling
+Provide specific line references and suggested fixes.</code></div>
+
+                        <h4 style="margin-top:1rem;margin-bottom:.5rem">Key Benefits</h4>
+                        <ul>
+                            <li><strong>Isolated context:</strong> Subagent work doesn't pollute your main conversation
+                            </li>
+                            <li><strong>Specialized prompts:</strong> Each agent focuses on one expertise area</li>
+                            <li><strong>Tool restriction:</strong> Limit what each agent can access for safety</li>
+                            <li><strong>Model selection:</strong> Use Opus for deep analysis, Sonnet for speed</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="acc-item">
+                <div class="acc-header">🧩 Plugins — Community Extensions</div>
+                <div class="acc-body">
+                    <div class="acc-inner">
+                        <p>Install community-built plugins with <span class="code-inline">/plugin</span>. Plugins bundle
+                            skills, subagents, hooks, and resources into shareable packages.</p>
+                        <ul>
+                            <li><strong>Code Intelligence Plugin:</strong> Adds precise "go to definition" and "find
+                                references" navigation for your programming language</li>
+                            <li><strong>Frontend Design Plugin:</strong> Enhances UI/UX code generation with design
+                                system knowledge</li>
+                            <li>Browse and discover plugins from the community marketplace</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="container reveal">
+        <div class="section-label">Decision Guide</div>
+        <h2 class="section-title">Which Extension to Use?</h2>
+        <table class="cmd-table">
+            <thead>
+                <tr>
+                    <th>Need</th>
+                    <th>Use</th>
+                    <th>Why</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Reusable workflow</td>
+                    <td>Skill</td>
+                    <td>Slash command invocation, filesystem-based</td>
+                </tr>
+                <tr>
+                    <td>Auto-run on events</td>
+                    <td>Hook</td>
+                    <td>Deterministic, no AI reasoning needed</td>
+                </tr>
+                <tr>
+                    <td>External data access</td>
+                    <td>MCP Server</td>
+                    <td>Standard protocol for tool connection</td>
+                </tr>
+                <tr>
+                    <td>Specialized AI task</td>
+                    <td>Subagent</td>
+                    <td>Isolated context, custom system prompt</td>
+                </tr>
+                <tr>
+                    <td>Shareable package</td>
+                    <td>Plugin</td>
+                    <td>Bundles multiple extensions together</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="container">
+        <div class="page-nav">
+            <a href="06_context.html"><span class="nav-dir">← Previous</span><span class="nav-title">Context
+                    Management</span></a>
+            <a href="08_automation.html" class="next"><span class="nav-dir">Next →</span><span
+                    class="nav-title">Automation & CI/CD</span></a>
+        </div>
+    </section>
+    <footer>
+        <p>Claude Code Mastery Guide · <a href="https://docs.anthropic.com/en/docs/claude-code/best-practices"
+                target="_blank">Source: Anthropic Docs</a></p>
+    </footer>
+    <script src="js/components.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What's Next — Docker</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+.next-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1.25rem;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.next-card:hover { border-color: var(--docker-blue); transform: translateY(-2px); }
+.next-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem; }
+.next-title { font-weight: 700; font-size: 1.1rem; display: flex; align-items: center; gap: 10px; }
+.next-difficulty { font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 4px; }
+.diff-easy { background: rgba(16,185,129,0.15); color: var(--green); }
+.diff-med { background: rgba(245,158,11,0.15); color: var(--yellow); }
+.diff-hard { background: rgba(239,68,68,0.15); color: var(--red); }
+.next-meta { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; flex-wrap: wrap; }
+.prereq-block { background: rgba(36,150,237,0.06); border: 1px solid rgba(36,150,237,0.2); border-radius: 6px; padding: 0.75rem 1rem; margin-top: 0.75rem; }
+.prereq-title { font-size: 0.72rem; font-weight: 700; color: var(--docker-blue); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.35rem; }
+.learning-path {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.5rem; margin: 2rem 0;
+}
+.path-steps { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+.path-step { background: var(--bg3); border: 1px solid var(--border); border-radius: 20px; padding: 6px 14px; font-size: 0.82rem; font-weight: 600; color: var(--text2); }
+.path-arrow { color: var(--text3); }
+.path-step.current { background: rgba(36,150,237,0.15); color: var(--docker-blue); border-color: var(--docker-blue); }
+</style>
+</head>
+<body>
+<nav class="topnav">
+  <a class="topnav-brand" href="index.html">🐳 Docker & Ecosystem</a>
+  <div class="topnav-links">
+    <a href="01-foundation.html">Foundation</a>
+    <a href="03b-interview.html">Interview</a>
+    <a href="16-whats-next.html" class="active">What's Next</a>
+    <a href="15-reference.html">Quick Ref</a>
+  </div>
+</nav>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Core Sections</div>
+      <a href="index.html"><span class="num">00</span> Overview</a>
+      <a href="01-foundation.html"><span class="num">01</span> Foundation</a>
+      <a href="02-analogy.html"><span class="num">02</span> Analogy</a>
+      <a href="03a-journey.html"><span class="num">03A</span> Journey</a>
+      <a href="03b-interview.html"><span class="num">03B</span> Interview</a>
+      <a href="04-system-design.html"><span class="num">04</span> System Design</a>
+      <a href="05-ripple.html"><span class="num">05</span> Ripple Effects</a>
+      <a href="06-evolution.html"><span class="num">06</span> Evolution</a>
+      <a href="07-patterns.html"><span class="num">07</span> Patterns</a>
+      <a href="08-tradeoffs.html"><span class="num">08</span> Trade-offs</a>
+      <a href="09-at-scale.html"><span class="num">09</span> At Scale</a>
+      <a href="10-landscape.html"><span class="num">10</span> Landscape</a>
+      <a href="11-pitfalls.html"><span class="num">11</span> Pitfalls</a>
+      <a href="12-debugging.html"><span class="num">12</span> Debugging</a>
+      <a href="13-conversation.html"><span class="num">13</span> Conversation</a>
+      <a href="14-exercises.html"><span class="num">14</span> Exercises</a>
+      <a href="15-reference.html"><span class="num">15</span> Quick Ref</a>
+      <a href="16-whats-next.html" class="active"><span class="num">16</span> What's Next</a>
+    </div>
+  </aside>
+  <main class="main">
+    <div class="page-header">
+      <div class="badge">Section 16 · What's Next</div>
+      <h1>What's Next</h1>
+      <p class="subtitle">Docker is the gateway. Every major cloud-native technology connects to it. Here's the natural learning sequence — what to learn next, why it matters, and how it connects to what you already know.</p>
+    </div>
+
+    <div class="learning-path">
+      <h3 style="margin:0 0 1rem">Your Learning Sequence</h3>
+      <div class="path-steps">
+        <span class="path-step current">🐳 Docker</span>
+        <span class="path-arrow">→</span>
+        <span class="path-step">☸️ Kubernetes</span>
+        <span class="path-arrow">→</span>
+        <span class="path-step">🔄 CI/CD</span>
+        <span class="path-arrow">→</span>
+        <span class="path-step">🕸️ Service Mesh</span>
+        <span class="path-arrow">→</span>
+        <span class="path-step">🔍 Observability</span>
+        <span class="path-arrow">→</span>
+        <span class="path-step">🔒 Security (CNAPP)</span>
+      </div>
+    </div>
+
+    <!-- Kubernetes -->
+    <div class="next-card" id="kubernetes">
+      <div class="next-header">
+        <div class="next-title">☸️ Kubernetes</div>
+        <span class="next-difficulty diff-hard">Hard</span>
+      </div>
+      <div class="next-meta">
+        <span class="tag tag-blue">Direct Next Step</span>
+        <span class="tag tag-red">Steep Learning Curve</span>
+        <span class="tag tag-green">Industry Mandatory</span>
+      </div>
+      <p><strong>How it connects:</strong> Kubernetes is what you use to run Docker containers in production at scale. If Docker Compose is managing containers for one developer, Kubernetes is managing containers for the entire company across dozens of servers.</p>
+      <p><strong>What you'll learn:</strong> Pods, Deployments, Services, Ingress, ConfigMaps, Secrets, StatefulSets, PersistentVolumes, RBAC, namespaces, rolling updates, horizontal pod autoscaling, and the reconciliation loop that makes Kubernetes self-healing.</p>
+      <p><strong>Why it matters now:</strong> Kubernetes is the operating system of the cloud. Nearly every production container workload runs on Kubernetes. Understanding it is now a baseline expectation for senior engineers.</p>
+      <div class="prereq-block">
+        <div class="prereq-title">Where Docker knowledge transfers</div>
+        Images, Dockerfiles, container registries, environment variables, volumes, networking concepts — all transfer directly. Kubernetes builds on these primitives.
+      </div>
+    </div>
+
+    <!-- CI/CD -->
+    <div class="next-card" id="cicd">
+      <div class="next-header">
+        <div class="next-title">🔄 CI/CD Pipelines with Containers</div>
+        <span class="next-difficulty diff-med">Medium</span>
+      </div>
+      <div class="next-meta">
+        <span class="tag tag-blue">Natural Next Step</span>
+        <span class="tag tag-green">Practical Immediately</span>
+      </div>
+      <p><strong>How it connects:</strong> Docker containers are the unit of CI/CD. Your build pipeline produces Docker images; your deployment pipeline ships them. Understanding how to optimize builds, manage image lifecycle, and integrate scanning into pipelines is immediately practical.</p>
+      <p><strong>What you'll learn:</strong> GitHub Actions / GitLab CI / Jenkins / Tekton for container pipelines. BuildKit registry caching in CI. Image scanning integration (Trivy, Grype). GitOps with ArgoCD or Flux — declarative deployments driven by git state.</p>
+      <p><strong>Why it matters:</strong> CI/CD pipelines are where most Docker best practices are enforced. Vulnerability scanning, image signing, build caching, multi-architecture builds — all live in the CI/CD layer.</p>
+    </div>
+
+    <!-- Service Mesh -->
+    <div class="next-card" id="istio">
+      <div class="next-header">
+        <div class="next-title">🕸️ Service Mesh (Istio / Linkerd)</div>
+        <span class="next-difficulty diff-hard">Hard</span>
+      </div>
+      <div class="next-meta">
+        <span class="tag tag-yellow">After K8s</span>
+        <span class="tag tag-purple">Architectural Leap</span>
+      </div>
+      <p><strong>How it connects:</strong> When you containerize everything, inter-service communication becomes complex: how do you encrypt it? How do you control which services can talk to each other? How do you get distributed tracing? Service meshes inject Envoy sidecar containers into your pods to handle all of this transparently.</p>
+      <p><strong>What you'll learn:</strong> Mutual TLS (mTLS) between services, traffic management (canary deployments via traffic splitting, circuit breakers, retries), observability (Prometheus/Grafana integration, Kiali for topology), and authorization policies.</p>
+      <p><strong>Why it matters:</strong> Service meshes solve the "distributed systems tax" that microservices create. Once you have 50+ containerized services, managing their communication is its own infrastructure problem.</p>
+    </div>
+
+    <!-- Container Security -->
+    <div class="next-card" id="registry">
+      <div class="next-header">
+        <div class="next-title">🔒 Cloud-Native Security (CNAPP / Supply Chain)</div>
+        <span class="next-difficulty diff-hard">Hard</span>
+      </div>
+      <div class="next-meta">
+        <span class="tag tag-red">Critical for Production</span>
+        <span class="tag tag-blue">Growing Field</span>
+      </div>
+      <p><strong>How it connects:</strong> Everything you run in a container has a supply chain: base images with vulnerabilities, malicious packages, build-time secret leaks, insecure runtime configurations. Cloud-Native Application Protection Platforms (CNAPP) address the full lifecycle.</p>
+      <p><strong>What you'll learn:</strong> Sigstore/cosign for image signing. SBOMs (Software Bill of Materials) for compliance. OPA/Gatekeeper for admission control. Falco for runtime threat detection. Container escape techniques (so you can defend against them). SLSA framework for supply chain integrity.</p>
+      <p><strong>Why it matters:</strong> Container security is a growing specialization. Post-Log4Shell, supply chain security is a boardroom issue. Understanding container security end-to-end is increasingly valued.</p>
+    </div>
+
+    <!-- eBPF -->
+    <div class="next-card">
+      <div class="next-header">
+        <div class="next-title">⚡ eBPF (Cilium / Falco)</div>
+        <span class="next-difficulty diff-hard">Hard</span>
+      </div>
+      <div class="next-meta">
+        <span class="tag tag-cyan">Advanced</span>
+        <span class="tag tag-purple">Cutting Edge</span>
+      </div>
+      <p><strong>How it connects:</strong> eBPF (extended Berkeley Packet Filter) programs run in the kernel and are changing how container networking and observability work. Cilium uses eBPF to replace iptables for Kubernetes networking, providing 10x better performance. Falco uses eBPF for runtime security monitoring of container syscalls.</p>
+      <p><strong>What you'll learn:</strong> How eBPF programs hook into kernel events, how Cilium does L3/L4/L7 networking without iptables, how to use Hubble (Cilium's observability layer) for container network flow visualization, and Tetragon for container runtime security.</p>
+      <p><strong>Why it matters:</strong> eBPF is rewriting the infrastructure layer. Understanding it distinguishes platform engineers who can operate at depth from those who just use existing tools.</p>
+    </div>
+
+    <!-- WASM -->
+    <div class="next-card">
+      <div class="next-header">
+        <div class="next-title">🌐 WebAssembly (WASM) Containers</div>
+        <span class="next-difficulty diff-med">Medium</span>
+      </div>
+      <div class="next-meta">
+        <span class="tag tag-green">Emerging</span>
+        <span class="tag tag-yellow">2-3 Year Horizon</span>
+      </div>
+      <p><strong>How it connects:</strong> WASM is a portable binary format that Docker is starting to support as an alternative container runtime. WASM modules start in microseconds (vs milliseconds for containers), run securely sandboxed, and are architecture-agnostic.</p>
+      <p><strong>What you'll learn:</strong> WasmEdge and Spin runtimes, the WASI (WebAssembly System Interface) standard, when WASM containers make sense (serverless-style short-lived functions) vs Linux containers (long-lived services, stateful workloads), and how Docker's containerd integration for WASM works.</p>
+      <p><strong>Why it matters:</strong> WASM may not replace Linux containers, but it will likely become the preferred format for function-granularity workloads, edge deployments, and plugin systems — anywhere startup speed and security sandboxing are paramount.</p>
+    </div>
+
+    <div class="callout callout-success">
+      <div class="callout-title">🎉 You've Completed the Docker Learning Journey</div>
+      <p>You now have a production-grade mental model of Docker: its foundations, trade-offs, patterns, pitfalls, ecosystem, and the path forward. The next step is always building something real — no amount of reading replaces actually containerizing an application, hitting problems, and debugging them.</p>
+      <p>Return to <strong>Quick Reference</strong> during builds, the <strong>Interview Conversations</strong> before interviews, and the <strong>Debugging Playbook</strong> when things go wrong. Good luck.</p>
+    </div>
+
+    <div class="pagination">
+      <a href="15-reference.html" class="page-btn">← Quick Reference</a>
+      <a href="index.html" class="page-btn primary">↩ Back to Overview</a>
+    </div>
+  </main>
+</div>
+<script src="js/components.js"></script>
+</body>
+</html>

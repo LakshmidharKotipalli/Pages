@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Getting Started — Claude Code Mastery</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Satoshi:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <nav class="nav-bar">
+        <a href="index.html" class="logo"><span>Claude Code</span> Mastery</a>
+        <div class="nav-links">
+            <a href="01_overview.html">Overview</a><a href="02_getting_started.html" class="active">Setup</a><a
+                href="03_golden_workflow.html">Workflow</a><a href="04_claude_md.html">CLAUDE.md</a><a
+                href="05_prompting.html">Prompting</a><a href="06_context.html">Context</a><a
+                href="07_extending.html">Extend</a><a href="08_automation.html">CI/CD</a><a
+                href="09_multi_agent.html">Multi-Agent</a><a href="10_commands.html">Commands</a><a
+                href="11_anti_patterns.html">Pitfalls</a><a href="12_community.html">Community</a>
+        </div>
+    </nav>
+
+    <div class="page-header">
+        <div class="breadcrumb"><a href="index.html">Home</a> / Chapter 02</div>
+        <h1>Getting Started in <span class="gold">60 Seconds</span></h1>
+        <p>Install and start using Claude Code immediately on any platform.</p>
+    </div>
+
+    <section class="container reveal">
+        <div class="section-label">Installation</div>
+        <h2 class="section-title">Choose Your Platform</h2>
+
+        <div class="card-grid">
+            <div class="card">
+                <div class="card-icon">🍎</div>
+                <h3>macOS / Linux</h3>
+                <div class="code-block" data-label="terminal">
+                    <code>curl -fsSL https://claude.ai/install.sh | bash</code></div>
+                <p style="margin-top:.8rem">Or via Homebrew:</p>
+                <div class="code-block"><code>brew install --cask claude-code
+<span class="code-comment"># Upgrade later with:</span>
+brew upgrade claude-code</code></div>
+            </div>
+            <div class="card">
+                <div class="card-icon">🪟</div>
+                <h3>Windows</h3>
+                <div class="code-block" data-label="powershell"><code>irm https://claude.ai/install.ps1 | iex</code>
+                </div>
+                <p style="margin-top:.8rem">Or via WinGet:</p>
+                <div class="code-block"><code>winget install Anthropic.ClaudeCode
+<span class="code-comment"># Upgrade later with:</span>
+winget upgrade Anthropic.ClaudeCode</code></div>
+            </div>
+            <div class="card">
+                <div class="card-icon">💻</div>
+                <h3>VS Code / Cursor</h3>
+                <p>Open Extensions (<span class="code-inline">Cmd+Shift+X</span> / <span
+                        class="code-inline">Ctrl+Shift+X</span>)</p>
+                <p>Search for <span class="code-inline">anthropic.claude-code</span></p>
+                <p>Install and activate via <span class="code-inline">Cmd+Shift+P</span> / <span
+                        class="code-inline">Ctrl+Shift+P</span></p>
+            </div>
+            <div class="card">
+                <div class="card-icon">🖥️</div>
+                <h3>Desktop App</h3>
+                <p>Download from <a href="https://claude.ai/api/desktop/darwin/universal/dmg/latest/redirect"
+                        target="_blank">macOS (Intel & Apple Silicon)</a> or <a
+                        href="https://claude.ai/api/desktop/win32/x64/exe/latest/redirect" target="_blank">Windows
+                        (x64)</a>. Requires a paid Claude subscription.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">🌐</div>
+                <h3>Web</h3>
+                <p>Go to <a href="https://claude.ai/code" target="_blank">claude.ai/code</a> — run Claude Code on
+                    Anthropic's cloud infrastructure in isolated VMs. No local installation needed.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">🔧</div>
+                <h3>JetBrains</h3>
+                <p>Install the <a href="https://plugins.jetbrains.com/plugin/27310-claude-code-beta-"
+                        target="_blank">Claude Code plugin</a> from the JetBrains Marketplace. Works with IntelliJ,
+                    PyCharm, WebStorm, and all JetBrains IDEs.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="container reveal">
+        <div class="section-label">First Session</div>
+        <h2 class="section-title">Your First 5 Minutes</h2>
+
+        <div class="workflow">
+            <div class="step">
+                <div class="step-num"></div>
+                <div class="step-content">
+                    <h4>Navigate & Launch</h4>
+                    <div class="code-block"><code>cd your-project
+claude</code></div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num"></div>
+                <div class="step-content">
+                    <h4>Initialize Project Memory</h4>
+                    <p>Create a CLAUDE.md that gives Claude persistent memory of your project:</p>
+                    <div class="code-block"><code>> /init</code></div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num"></div>
+                <div class="step-content">
+                    <h4>Explore Your Codebase</h4>
+                    <div class="code-block"><code>> give me an overview of this codebase
+> explain the main architecture patterns used here
+> how is authentication handled?</code></div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num"></div>
+                <div class="step-content">
+                    <h4>Make Your First Change</h4>
+                    <div class="code-block"><code>> add input validation to the user registration endpoint. 
+  write tests and run them to verify.</code></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tip-box gold">
+            <div class="tip-label">💡 Pro Tip</div>
+            <p>Run <span class="code-inline">/init</span> in every new project. It's the single most impactful setup
+                step. Claude will analyze your project structure and generate a tailored CLAUDE.md with conventions,
+                commands, and patterns.</p>
+        </div>
+
+        <div class="tip-box blue">
+            <div class="tip-label">🔑 Authentication</div>
+            <p>You'll need a <a href="https://claude.com/pricing" target="_blank">Claude subscription</a> (Pro, Team, or
+                Enterprise) or an <a href="https://console.anthropic.com/" target="_blank">Anthropic Console</a> API
+                key. Third-party providers like AWS Bedrock and Google Vertex AI are also supported.</p>
+        </div>
+    </section>
+
+    <section class="container">
+        <div class="page-nav">
+            <a href="01_overview.html"><span class="nav-dir">← Previous</span><span class="nav-title">What Is Claude
+                    Code?</span></a>
+            <a href="03_golden_workflow.html" class="next"><span class="nav-dir">Next →</span><span
+                    class="nav-title">The Golden Workflow</span></a>
+        </div>
+    </section>
+    <footer>
+        <p>Claude Code Mastery Guide · <a href="https://docs.anthropic.com/en/docs/claude-code/overview"
+                target="_blank">Source: Anthropic Docs</a></p>
+    </footer>
+    <script src="js/components.js"></script>
+</body>
+
+</html>

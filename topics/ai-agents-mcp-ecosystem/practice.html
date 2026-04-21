@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practice Exercises - Learn AI Agents, Skills, Tools & MCP</title>
+    <link rel="stylesheet" href="../../css/styles.css">
+    <link rel="stylesheet" href="theme.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <a href="index.html" class="nav-back">Back to Overview</a>
+        <span class="current-section">Practice Exercises</span>
+        <div class="nav-links">
+            <a href="eloquent.html">Previous</a>
+            <a href="reference.html">Next</a>
+        </div>
+    </nav>
+
+    <main>
+        <h1>Practice Exercises</h1>
+
+        <div class="hero">
+            <p class="powerful-sentence">Reading about agents produces familiarity. Struggling with these questions produces understanding.</p>
+            <p class="explanation">These exercises are sequenced by difficulty. Don't skip to advanced questions until you can answer the warm-up questions without hesitation. The warm-up questions test vocabulary; the core questions test design thinking; the advanced questions test systems thinking; the expert questions test judgment under ambiguity.</p>
+        </div>
+
+        <div class="card info">
+            <p><strong>How to use these:</strong> Click a question to reveal a detailed model answer. Attempt your own answer first — write it down or say it out loud. Compare your answer to the model. Where did you miss nuance? Where did you add it? The gap is your learning.</p>
+        </div>
+
+        <!-- WARM-UP -->
+        <h2 style="margin-top: 2rem; color: #22c55e;">Warm-Up Questions <span style="font-weight:300; font-size:0.85rem; color:#64748b;">(Vocabulary &amp; Fundamentals)</span></h2>
+
+        <div class="accordion" id="warmup">
+
+            <div class="accordion-item">
+                <div class="accordion-header">Q1: What's the difference between a tool and a skill? Name an example of each.</div>
+                <div class="accordion-content">
+                    <div class="card success">
+                        <h3>Model Answer</h3>
+                        <p>A <strong>tool</strong> is a single, atomic capability — it does exactly one thing and returns a result. It has no internal decision logic; it just executes. Example: <em>read_file</em> — given a file path, returns the file contents. No reasoning, no branching, no side effects beyond the read.</p>
+                        <p>A <strong>skill</strong> is an orchestrated, multi-step workflow that chains tools together with decision logic to accomplish a meaningful goal. Example: <em>refactor_module</em> — this skill reads the target file, analyzes its structure, identifies refactoring opportunities, writes the improved version, runs the test suite, and commits if tests pass. It uses multiple tools and includes branching logic (what to do if tests fail).</p>
+                        <p>The hospital analogy: a scalpel is a tool. A laparoscopic appendectomy is a skill. Skills use tools, but skills are defined by their orchestration logic, not their individual steps.</p>
+                        <p><strong>Key distinction to remember:</strong> Tools are stateless and idempotent (calling them twice with the same input produces the same result). Skills are stateful workflows — their outcome depends on state accumulated across multiple steps.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">Q2: Explain what MCP does in one sentence that a non-technical PM would understand.</div>
+                <div class="accordion-content">
+                    <div class="card success">
+                        <h3>Model Answer</h3>
+                        <p>"MCP is a universal standard that lets any AI assistant connect to any external tool or service — so instead of building a custom connection for every AI-tool pair, you build it once and it works everywhere."</p>
+                        <p><strong>Why this works for a non-technical PM:</strong></p>
+                        <ul>
+                            <li>It maps to a concept they already understand (standards like USB, Bluetooth)</li>
+                            <li>It frames the value in terms of engineering efficiency (build once)</li>
+                            <li>It implies why it matters (reduces vendor lock-in, speeds up integration)</li>
+                        </ul>
+                        <p><strong>What to avoid:</strong> Don't use "JSON-RPC," "transport layer," "stdio," or "client-server architecture" with a PM. These terms signal you don't understand your audience. The MCP technical details are irrelevant to a product discussion; the economic and architectural benefits are everything.</p>
+                        <p><strong>Bonus follow-up if they ask "so what?":</strong> "It means our team can add a new data source to our AI assistant in an afternoon instead of a week, and it works with Claude, GPT-4, or whatever model we switch to next year."</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">Q3: Why can't you just use direct API calls instead of MCP?</div>
+                <div class="accordion-content">
+                    <div class="card success">
+                        <h3>Model Answer</h3>
+                        <p>You can, and for simple integrations, direct API calls are often the right choice. MCP adds value when you have these specific needs:</p>
+                        <p><strong>1. Multiple model support:</strong> If your application needs to work with Claude today and GPT-4 tomorrow, direct API calls require writing model-specific integration code twice. MCP abstracts the tool layer so the same server works with any MCP-compatible model.</p>
+                        <p><strong>2. Ecosystem reuse:</strong> A GitHub MCP server built by someone else can be dropped into your agent immediately. A direct API integration must be built from scratch. As the MCP ecosystem grows, the advantage of ecosystem reuse compounds.</p>
+                        <p><strong>3. Capability negotiation:</strong> MCP includes a handshake protocol where the client and server negotiate capabilities — what tools are available, what resource types are supported, what prompts are registered. Direct API calls have no equivalent mechanism; you have to hardcode what the API supports.</p>
+                        <p><strong>4. Standardized error handling and observability:</strong> Every MCP server speaks the same protocol, so your observability infrastructure can be generic. With direct API calls, each integration requires custom error handling and logging.</p>
+                        <p><strong>When to use direct API calls instead:</strong> When you have a single model, a single integration, and the overhead of running an MCP server is not justified. Premature abstraction is a real cost. Start simple; add MCP when you're integrating a third tool or a second model.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CORE -->
+        <h2 style="margin-top: 2.5rem; color: #3b82f6;">Core Questions <span style="font-weight:300; font-size:0.85rem; color:#64748b;">(Design Thinking)</span></h2>
+
+        <div class="accordion" id="core">
+
+            <div class="accordion-item">
+                <div class="accordion-header">Q1: Design the tool schema for a "web search" tool. What parameters? What response format?</div>
+                <div class="accordion-content">
+                    <div class="card success">
+                        <h3>Model Answer</h3>
+                        <p><strong>Parameters (what the agent sends to the tool):</strong></p>
+                        <ul>
+                            <li><strong>query</strong> (string, required): The search query. Keep this a free-form string — don't try to structure it. The model is good at writing search queries.</li>
+                            <li><strong>num_results</strong> (integer, optional, default: 5): How many results to return. Bounded between 1-20 to control token cost.</li>
+                            <li><strong>recency</strong> (enum, optional): "any" | "day" | "week" | "month" — filters by publication date when time-sensitivity matters.</li>
+                            <li><strong>safe_search</strong> (boolean, optional, default: true): Production agents should default to safe search on.</li>
+                        </ul>
+                        <p><strong>Response format (what the tool returns to the agent):</strong></p>
+                        <p>Return an array of result objects. Each result contains: title (string), url (string), snippet (string, 150-300 chars), published_date (ISO 8601 or null). Do NOT return the full page content — snippets are sufficient for the agent to decide which result to fetch with a separate read_url tool.</p>
+                        <p><strong>Error handling:</strong> If the search fails, return a structured error: {error: "RATE_LIMIT_EXCEEDED", retry_after_seconds: 30, suggestion: "Reduce query frequency or cache results"}. Never return an empty array on error — the agent cannot distinguish "no results found" from "search failed."</p>
+                        <p><strong>Tool description for the agent:</strong> "Search the web for current information on any topic. Use this when your training data may be outdated or when you need specific facts, recent news, or real-time data. Returns a list of results with titles and snippets — use the read_url tool to fetch the full content of any result."</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">Q2: You have an agent that searches code, reads files, and writes code. Sketch the tool call sequence for "fix this bug."</div>
+                <div class="accordion-content">
+                    <div class="card success">
+                        <h3>Model Answer</h3>
+                        <p>The tool call sequence for "fix this bug" follows a structured diagnosis-then-treatment pattern — exactly like medicine:</p>
+
+                        <div class="diagram-container">
+                            <div class="architecture-diagram">
+                                <svg viewBox="0 0 700 380" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+                                    <defs>
+                                        <marker id="arr2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                                            <path d="M0,0 L0,6 L8,3 z" fill="#64748b"/>
+                                        </marker>
+                                    </defs>
+
+                                    <!-- Step 1 -->
+                                    <rect x="30" y="20" width="200" height="60" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.5"/>
+                                    <text x="130" y="44" text-anchor="middle" font-weight="bold" font-size="12" fill="#1e3a5f">1. search_code</text>
+                                    <text x="130" y="60" text-anchor="middle" font-size="11" fill="#1e3a5f">Find the bug location</text>
+                                    <text x="130" y="74" text-anchor="middle" font-size="10" fill="#64748b">query: error message / stack trace</text>
+
+                                    <!-- Step 2 -->
+                                    <rect x="30" y="120" width="200" height="60" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.5"/>
+                                    <text x="130" y="144" text-anchor="middle" font-weight="bold" font-size="12" fill="#1e3a5f">2. read_file (x2-4)</text>
+                                    <text x="130" y="160" text-anchor="middle" font-size="11" fill="#1e3a5f">Understand the context</text>
+                                    <text x="130" y="174" text-anchor="middle" font-size="10" fill="#64748b">target file + related files</text>
+
+                                    <!-- Step 3 -->
+                                    <rect x="30" y="220" width="200" height="60" rx="8" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+                                    <text x="130" y="244" text-anchor="middle" font-weight="bold" font-size="12" fill="#78350f">3. search_code</text>
+                                    <text x="130" y="260" text-anchor="middle" font-size="11" fill="#78350f">Find related tests</text>
+                                    <text x="130" y="274" text-anchor="middle" font-size="10" fill="#64748b">locate test file for this module</text>
+
+                                    <!-- Step 4 -->
+                                    <rect x="30" y="320" width="200" height="50" rx="8" fill="#dcfce7" stroke="#22c55e" stroke-width="1.5"/>
+                                    <text x="130" y="344" text-anchor="middle" font-weight="bold" font-size="12" fill="#14532d">4. write_code</text>
+                                    <text x="130" y="360" text-anchor="middle" font-size="11" fill="#14532d">Apply the fix</text>
+
+                                    <!-- Right column -->
+                                    <rect x="460" y="120" width="210" height="60" rx="8" fill="#fee2e2" stroke="#ef4444" stroke-width="1.5"/>
+                                    <text x="565" y="144" text-anchor="middle" font-weight="bold" font-size="12" fill="#7f1d1d">Decision Gate</text>
+                                    <text x="565" y="160" text-anchor="middle" font-size="11" fill="#7f1d1d">Enough context?</text>
+                                    <text x="565" y="174" text-anchor="middle" font-size="10" fill="#64748b">No → more reads. Yes → proceed</text>
+
+                                    <rect x="460" y="220" width="210" height="60" rx="8" fill="#dcfce7" stroke="#22c55e" stroke-width="1.5"/>
+                                    <text x="565" y="244" text-anchor="middle" font-weight="bold" font-size="12" fill="#14532d">5. write_code</text>
+                                    <text x="565" y="260" text-anchor="middle" font-size="11" fill="#14532d">Add/update test case</text>
+                                    <text x="565" y="274" text-anchor="middle" font-size="10" fill="#64748b">prevent regression</text>
+
+                                    <rect x="460" y="320" width="210" height="50" rx="8" fill="#f3e8ff" stroke="#8b5cf6" stroke-width="1.5"/>
+                                    <text x="565" y="344" text-anchor="middle" font-weight="bold" font-size="12" fill="#4c1d95">6. run_tests</text>
+                                    <text x="565" y="360" text-anchor="middle" font-size="11" fill="#4c1d95">Verify fix works</text>
+
+                                    <!-- Arrows left column -->
+                                    <line x1="130" y1="80" x2="130" y2="120" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr2)"/>
+                                    <line x1="130" y1="180" x2="130" y2="220" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr2)"/>
+                                    <line x1="130" y1="280" x2="130" y2="320" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr2)"/>
+
+                                    <!-- Cross arrows -->
+                                    <line x1="230" y1="150" x2="460" y2="150" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr2)"/>
+                                    <line x1="230" y1="345" x2="460" y2="345" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr2)"/>
+                                    <line x1="565" y1="180" x2="565" y2="220" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr2)"/>
+                                    <line x1="565" y1="280" x2="565" y2="320" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr2)"/>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <p><strong>Key design insight:</strong> The agent should read before writing. The ratio of read_file calls to write_code calls in a well-designed code agent is typically 3:1 or higher. Agents that write immediately without reading context are guessing. They'll appear to fix the bug while introducing new ones.</p>
+                        <p><strong>The test step is non-negotiable.</strong> An agent that fixes code without verifying the fix is not a reliable tool — it's a liability. Include test execution in the tool definition and make it part of the skill's exit condition: "only declare success if tests pass."</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">Q3: Your MCP server is returning 500 errors intermittently. Walk through your debugging approach.</div>
+                <div class="accordion-content">
+                    <div class="card success">
+                        <h3>Model Answer</h3>
+                        <p><strong>Step 1 — Characterize "intermittent."</strong> Is it time-based (fails every N minutes), load-based (fails under concurrent requests), or input-based (fails on specific parameter patterns)? Pull logs for the last 24 hours and find the temporal pattern before touching any code.</p>
+                        <p><strong>Step 2 — Check the process health.</strong> Is the MCP server process consuming excessive memory and being killed by OOM? Is it leaving zombie connections that deplete a connection pool? Look at system metrics, not just application logs.</p>
+                        <p><strong>Step 3 — Isolate the failing tool.</strong> Are all tools returning 500s, or only specific ones? If only specific tools fail, the bug is in those tool implementations. If all tools fail, the bug is in shared infrastructure (auth middleware, connection pooling, request routing).</p>
+                        <p><strong>Step 4 — Replay failing requests.</strong> Extract the exact request payload from a failed call. Replay it in isolation, outside the agent loop. Can you reproduce the 500 on demand? A reproducible failure is a solvable failure. A non-reproducible failure in isolation is a race condition or concurrency bug.</p>
+                        <p><strong>Step 5 — Check external dependencies.</strong> If the tool calls an external API, check the rate limits, response time SLAs, and error rate of that dependency. A 500 from your MCP server is often a 503 from the upstream API that wasn't handled gracefully.</p>
+                        <p><strong>Step 6 — Add structured error handling.</strong> Before the next fix, add structured error logging at every boundary: request received, external call made, response received, response returned. The next intermittent failure will be much faster to diagnose with this in place.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">Q4: Compare building a custom Slack integration vs. using an MCP Slack server. Trade-offs?</div>
+                <div class="accordion-content">
+                    <div class="card success">
+                        <h3>Model Answer</h3>
+                        <p><strong>Custom Slack Integration (Direct API):</strong></p>
+                        <ul>
+                            <li><strong>Pro:</strong> Exactly the API surface you need, nothing more. If you only need to post messages, you build exactly that.</li>
+                            <li><strong>Pro:</strong> No additional process to run. The integration is just your agent code making HTTP calls.</li>
+                            <li><strong>Pro:</strong> You control the error handling, retry logic, and response format exactly as your agent expects it.</li>
+                            <li><strong>Con:</strong> Only works with the model you've integrated it with. Switching models means rewriting the integration.</li>
+                            <li><strong>Con:</strong> You own the maintenance burden entirely — Slack API changes, auth token rotation, deprecations.</li>
+                            <li><strong>Con:</strong> Cannot be shared across teams or projects without duplicating code.</li>
+                        </ul>
+                        <p><strong>MCP Slack Server:</strong></p>
+                        <ul>
+                            <li><strong>Pro:</strong> Works with any MCP-compatible model. Team switches from Claude to GPT-4? The Slack integration works unchanged.</li>
+                            <li><strong>Pro:</strong> If using a well-maintained open source server, you inherit improvements and bug fixes from the community.</li>
+                            <li><strong>Pro:</strong> Reusable across all agents in your organization. One deployment serves all.</li>
+                            <li><strong>Con:</strong> Additional operational overhead — another server process to deploy, monitor, and keep alive.</li>
+                            <li><strong>Con:</strong> The server's tool design may not match your agent's needs exactly, requiring adaptation work.</li>
+                            <li><strong>Con:</strong> Open source MCP servers vary enormously in quality — some are production-ready, others are demos.</li>
+                        </ul>
+                        <p><strong>Recommendation:</strong> For a prototype or single-agent system, direct API. For a multi-agent or multi-model organization, MCP. The cross-over point is typically when you have three or more agents that need the same integration.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">Q5: How would you prevent an agent from accidentally deleting production data through a database tool?</div>
+                <div class="accordion-content">
+                    <div class="card success">
+                        <h3>Model Answer</h3>
+                        <p><strong>Layer 1 — Tool design (most important):</strong> Do not give the agent a "delete" tool unless it absolutely requires one. Provide a "soft_delete" tool that sets a deleted_at timestamp and moves records to a trash table. Hard deletes require a second tool call to empty trash, which adds an explicit intent step the agent must choose to take.</p>
+                        <p><strong>Layer 2 — Environment separation at the connection level:</strong> The database tool's connection string should be injected at runtime based on context. Production agents connect to the production replica (read-only) by default; write access to production requires an explicit elevation that is logged. Staging agents connect to staging. This is enforced at the MCP server level, not the agent prompt level — the agent cannot override it.</p>
+                        <p><strong>Layer 3 — Dry-run mode:</strong> Every write operation should support a dry_run parameter. When dry_run is true, the tool returns what it would do without executing. The agent should be prompted to use dry_run first for any destructive operation and confirm the plan before executing.</p>
+                        <p><strong>Layer 4 — Human approval queue for high-blast-radius operations:</strong> Operations affecting more than N rows should route to a human approval queue rather than executing immediately. N depends on your data domain — for user records, N might be 10. For log records, N might be 1,000,000.</p>
+                        <p><strong>Layer 5 — Audit logging with rollback capability:</strong> Every database write operation must be logged with the full before-state, the agent's stated intent, and the after-state. For the first 30 days after deploying any agent with write access, maintain a point-in-time recovery capability. The ability to undo is the safety net that makes the other layers less catastrophic if they fail.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADVANCED -->
+        <h2 style="margin-top: 2.5rem; color: #f59e0b;">Advanced Questions <span style="font-weight:300; font-size:0.85rem; color:#64748b;">(Systems Thinking)</span></h2>
+
+        <div class="accordion" id="advanced">
+
+            <div class="accordion-item">
+                <div class="accordion-header">Q1: Design a multi-agent system for automated code review. What agents? What tools? How do they communicate?</div>
+                <div class="accordion-content">
+                    <div class="card success">
+                        <h3>Model Answer</h3>
+                        <p><strong>Agents in the system:</strong></p>
+                        <ul>
+                            <li><strong>Orchestrator Agent:</strong> Receives the PR, breaks down the review into specialized tasks, routes to specialist agents, aggregates results, produces the final review comment. Does not do any analysis itself — it coordinates.</li>
+                            <li><strong>Style Agent:</strong> Specializes in formatting, naming conventions, and style guide compliance. Operates entirely statically — no code execution required.</li>
+                            <li><strong>Logic Agent:</strong> Analyzes correctness, edge cases, and algorithmic issues. Has access to the code search tool to understand the codebase context for the changed code.</li>
+                            <li><strong>Security Agent:</strong> Specializes in security vulnerabilities, injection risks, auth issues, and data exposure. Has access to a vulnerability pattern database tool.</li>
+                            <li><strong>Test Coverage Agent:</strong> Analyzes whether the change is adequately tested. Can execute tests and report coverage deltas.</li>
+                        </ul>
+                        <p><strong>Communication pattern:</strong> Orchestrator creates a shared review context object (PR diff, file list, repository metadata) and passes it to each specialist agent in parallel. Each specialist returns a structured report: {severity, findings[], suggested_fixes[]}. Orchestrator aggregates, deduplicates overlapping findings, and formats the final review.</p>
+                        <p><strong>Key design choice:</strong> Specialists run in parallel, not in series. A 4-agent parallel review takes roughly the same time as a single-agent review. Running them in series would be 4x slower with no quality benefit.</p>
+                        <p><strong>The failure mode to design against:</strong> Conflicting recommendations from different specialists. Logic Agent recommends refactoring a method; Style Agent says the refactored version violates naming conventions. The Orchestrator needs to surface conflicts, not silently suppress them.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">Q2: Your agent system costs $50/user/day in API calls. How do you reduce it to $5 without losing capability?</div>
+                <div class="accordion-content">
+                    <div class="card success">
+                        <h3>Model Answer</h3>
+                        <p>A 10x cost reduction without capability loss requires finding where cost is concentrated and eliminating waste — not just prompting a cheaper model for everything.</p>
+                        <p><strong>Step 1 — Profile before optimizing:</strong> Break down costs by tool call type, model, and prompt length. You'll almost always find that 80% of the cost comes from 20% of the operations. The expensive operations are where you focus.</p>
+                        <p><strong>Step 2 — Cache aggressively:</strong> Tool results that are stable should be cached. A database schema lookup should be cached for hours. A search result can be cached for minutes. Semantic caching (embedding-based) can return cached results for queries that are semantically similar even if not lexically identical. Caching alone often achieves 40-60% cost reduction in knowledge-retrieval-heavy agents.</p>
+                        <p><strong>Step 3 — Route by complexity:</strong> Not every task requires the most capable (most expensive) model. Simple classification and routing decisions can be done with a smaller, cheaper model. Reserve the frontier model for complex reasoning steps. A hybrid routing approach — small model for triage, large model for execution — can cut costs by 30-50% with careful task decomposition.</p>
+                        <p><strong>Step 4 — Compress context aggressively:</strong> Every unnecessary token in the context window costs money. Summarize tool results instead of passing raw responses. After every 5-7 tool calls, compress the accumulated context into a summary. Strip whitespace and formatting from tool responses — they're for human readers, not models.</p>
+                        <p><strong>Step 5 — Batch and parallelize:</strong> Separate reads from writes. Batch multiple read operations into a single LLM call where possible. The overhead of multiple API round trips (latency + per-request fixed cost) adds up significantly at scale.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">Q3: Architect an MCP server that provides access to a company's internal knowledge base. Consider security, caching, and freshness.</div>
+                <div class="accordion-content">
+                    <div class="card success">
+                        <h3>Model Answer</h3>
+                        <p><strong>Security architecture (most critical layer):</strong></p>
+                        <ul>
+                            <li>The MCP server authenticates requests using the calling agent's identity token, not a shared service credential. This ensures every knowledge base query is attributable to a specific user/agent.</li>
+                            <li>The server enforces document-level permissions from the source system — if a user can't see a document in Confluence, they can't retrieve it through the MCP server either. Permission checks happen at query time, not at index time.</li>
+                            <li>All queries are logged with the requesting identity, query text, and documents returned. This creates an audit trail that satisfies compliance requirements and enables anomaly detection.</li>
+                        </ul>
+                        <p><strong>Caching architecture:</strong></p>
+                        <ul>
+                            <li>Three-tier cache: in-memory LRU cache for the last 1,000 query results (sub-millisecond), Redis distributed cache for the last 100,000 results (1-5ms), cold storage for everything older (10-50ms).</li>
+                            <li>Cache keys include the requesting user's permission hash — the same query from a user with different permissions returns different (permission-filtered) results. Do not share caches across permission boundaries.</li>
+                            <li>TTL varies by document type: volatile documents (Slack messages, Jira tickets) cache for 15 minutes; stable documents (engineering runbooks, architecture docs) cache for 4 hours.</li>
+                        </ul>
+                        <p><strong>Freshness architecture:</strong></p>
+                        <ul>
+                            <li>Webhook-based cache invalidation: when a document is updated in the source system, a webhook fires that invalidates the relevant cache entries immediately.</li>
+                            <li>Expose a freshness timestamp with every result. The agent's prompt should instruct it to mention when information may be stale if the retrieved timestamp is older than N hours relative to the task context.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">Q4: An agent is supposed to deploy code but sometimes deploys to the wrong environment. Design the safety architecture.</div>
+                <div class="accordion-content">
+                    <div class="card success">
+                        <h3>Model Answer</h3>
+                        <p><strong>Root cause first:</strong> "Sometimes deploys to wrong environment" is almost always an ambiguity problem in the agent's context, not a model intelligence problem. The agent doesn't know with certainty which environment to target — it infers from context. The fix is to eliminate the inference requirement.</p>
+                        <p><strong>Layer 1 — Explicit environment in every tool call:</strong> The deploy tool signature must require an explicit environment parameter: {environment: "staging" | "production"}. No default. If the agent doesn't specify, the tool returns an error. This forces the agent to make a conscious, observable choice rather than silently defaulting.</p>
+                        <p><strong>Layer 2 — Confirmation gate for production:</strong> When environment is "production," the tool returns a confirmation object rather than executing: {plan: "Deploy commit abc123 to production cluster us-east-1", estimated_downtime: "30s", rollback_procedure: "deploy-rollback --commit abc122", confirm: false}. The agent must make a second tool call with confirm: true to execute. This forces a two-step process that is visible in the conversation log.</p>
+                        <p><strong>Layer 3 — Environment as ambient context:</strong> The agent's system prompt should be dynamically populated with the current context: "You are operating in [ENVIRONMENT]. Deployments to environments other than [ENVIRONMENT] require explicit user approval." This leverages the model's instruction-following to catch mismatches before the tool call happens.</p>
+                        <p><strong>Layer 4 — Anomaly detection on tool call patterns:</strong> A deploy-to-production call that was not preceded by a deploy-to-staging call in the same session should trigger an alert and a human review hold. The expected pattern is staging → production. Pattern violations are early warning signals.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EXPERT -->
+        <h2 style="margin-top: 2.5rem; color: #ef4444;">Expert Questions <span style="font-weight:300; font-size:0.85rem; color:#64748b;">(Judgment Under Ambiguity)</span></h2>
+
+        <div class="accordion" id="expert">
+
+            <div class="accordion-item">
+                <div class="accordion-header">Q1: Design an agent-to-agent protocol for a system where specialized agents collaborate on a software release.</div>
+                <div class="accordion-content">
+                    <div class="card success">
+                        <h3>Model Answer</h3>
+                        <p>The key insight: agents do not coordinate by talking to each other directly in a chat interface. They coordinate through a shared state object and explicit handoff contracts. Think of it as a relay race, not a roundtable discussion.</p>
+                        <p><strong>The shared release state object:</strong> A structured document that every agent reads and writes to. Contains: {release_id, code_commit, environment, stage (enum: code|test|deploy|monitor), artifacts[], validations[], blockers[], audit_log[]}. Every agent reads the current state before acting and writes its results to the state after acting.</p>
+                        <p><strong>The handoff contract:</strong> Each agent has a defined trigger condition (when to start) and a defined completion condition (when to hand off). Code Agent: starts when a PR is merged, completes when it has written a changelog and tagged the commit. Test Agent: starts when code stage is COMPLETE, runs the test suite, fails fast if tests fail, marks test stage COMPLETE when green. Deploy Agent: starts when test stage is COMPLETE, runs the deployment, waits for health check, marks deploy stage COMPLETE. Monitor Agent: starts when deploy stage is COMPLETE, watches error rates and latency for 15 minutes, escalates if degradation detected.</p>
+                        <p><strong>The failure propagation contract:</strong> Any agent can write a blocker to the shared state. A blocker halts the pipeline and routes to the human approval queue. Agents must check for existing blockers before starting their stage. Blockers must include: {blocker_id, created_by_agent, severity, description, resolution_options[]}.</p>
+                        <p><strong>The philosophy:</strong> This is not an autonomous release pipeline — it's a human-supervised pipeline with agents doing the tedious work. The human remains in the loop at every blocker and at the final deploy-to-production confirmation. The agents handle the speed; the humans handle the judgment calls.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">Q2: How would you build an MCP server marketplace with trust, versioning, and discoverability?</div>
+                <div class="accordion-content">
+                    <div class="card success">
+                        <h3>Model Answer</h3>
+                        <p>This is fundamentally a package registry problem, not a novel AI problem. The lessons of npm, PyPI, and Docker Hub apply directly.</p>
+                        <p><strong>Trust model:</strong> Three tiers. Tier 1 (Verified): First-party servers published by the service owner (Stripe's official MCP server, GitHub's official MCP server). Cryptographically signed by the publisher. Tier 2 (Community): Third-party servers with a minimum usage threshold, automated security scanning, and manual review for the top 100 by usage. Tier 3 (Unverified): Any published server with no review — clearly labeled as such. The UI must make these trust levels unmissable, not buried in metadata.</p>
+                        <p><strong>Versioning:</strong> Semantic versioning (major.minor.patch) with the same semantics as software libraries: major version bumps signal breaking changes to the tool schema or authentication requirements. Clients specify minimum and maximum compatible versions in their configuration. The marketplace must host all published versions — allowing a patch to fix the current major without breaking clients pinned to the previous major.</p>
+                        <p><strong>Discoverability:</strong> Two search modes. Intent-based ("I need a server that can access GitHub pull requests") routes to an LLM-powered semantic search over the server tool descriptions. Identifier-based ("find me the official Jira server") routes to an exact name/organization search. Server pages must show: compatible client list, tool inventory with descriptions, auth requirements, rate limits, and a "try it" sandbox that lets developers test tool calls before installing.</p>
+                        <p><strong>The hard problem — quality drift:</strong> A server that was excellent at publication may become buggy as upstream APIs change. Implement automated canary testing: the marketplace periodically exercises a representative set of tool calls against each registered server. Servers that start failing are automatically downgraded in search ranking and flagged for review. This is the governance mechanism the npm registry still lacks and suffers for.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">Q3: Compare the agent architectures of Claude Code, Cursor, and GitHub Copilot. What trade-offs did each make?</div>
+                <div class="accordion-content">
+                    <div class="card success">
+                        <h3>Model Answer</h3>
+                        <p>These three products represent three distinct positions on the autonomy-safety spectrum, each making coherent trade-offs for their target user.</p>
+                        <p><strong>Claude Code (high autonomy, terminal-native):</strong> Designed for engineers who trust the agent to operate at a high level of autonomy in a terminal environment. The agent has broad file system access, can execute commands, run tests, and interact with git. The safety architecture relies on the engineer's ability to review changes in the terminal and use standard version control as the undo mechanism. Trade-off: high productivity ceiling, higher risk floor. Best for: senior engineers on tasks where speed matters more than oversight granularity.</p>
+                        <p><strong>Cursor (medium autonomy, IDE-integrated):</strong> Designed to extend the IDE experience rather than replace it. The agent operates within the context of what's visible in the editor. Change suggestions are presented as diffs before application — the human is always shown the change before it's made. The IDE integration provides rich context (open files, cursor position, selected text) that reduces hallucination rates. Trade-off: more guardrails reduce raw throughput but increase trust and reduce error rates. Best for: mixed teams where some members are skeptical of high-autonomy agents.</p>
+                        <p><strong>GitHub Copilot (low autonomy, inline suggestions):</strong> Originally designed around the inline completion paradigm — the agent suggests, the human accepts or rejects at every keystroke. The most conservative autonomy model of the three. Recent additions (Copilot Workspace) have moved toward higher autonomy, but the core product still optimizes for the human staying in control of every line. Trade-off: lowest productivity ceiling, lowest risk floor, widest market fit. Best for: organizations with compliance requirements, regulated industries, or teams early in their AI adoption journey.</p>
+                        <p><strong>The meta-observation:</strong> All three products are converging toward higher autonomy over time, but from different starting points and with different trust architectures. The winner in each market segment will be determined not by which product is "smarter" but by which product's trust model matches its users' risk tolerance and workflow integration depth.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="section-footer">
+        <a href="eloquent.html" class="btn">Previous: Eloquent Conversation</a>
+        <a href="reference.html" class="btn">Next: Quick Reference</a>
+    </footer>
+
+    <script src="../../js/components.js"></script>
+</body>
+</html>

@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debugging Process - RAG Learning Journey</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="theme-dark">
+    <div class="container">
+        <header class="section-header">
+            <div class="breadcrumbs">
+                <a href="index.html">Home</a>
+                <span>/</span>
+                <span>Section 12: Debugging Process</span>
+            </div>
+            <h1>Debugging RAG Systems</h1>
+            <p class="section-subtitle">Symptom Diagnosis, Common Error Patterns, and Systematic Troubleshooting</p>
+        </header>
+
+        <nav class="nav-buttons">
+            <a id="prevBtn" class="nav-btn" href="section11-pitfalls.html">
+                ← Previous
+            </a>
+            <button id="completeBtn" class="nav-btn" data-section="section12-debugging">
+                ✓ Mark Complete
+            </button>
+            <a id="nextBtn" class="nav-btn" href="section13-eloquent.html">
+                Next: Eloquent Conversation →
+            </a>
+        </nav>
+
+        <main>
+            <section class="content-section">
+                <h2>The Art of RAG Debugging</h2>
+
+                <div class="highlight info">
+                    <h4>🔍 Debugging RAG is Different</h4>
+                    <p><strong>Traditional debugging:</strong> Code throws an error → Find the line → Fix it</p>
+                    <p><strong>RAG debugging:</strong> System produces wrong answer → Figure out where in the 5-stage pipeline it failed → Fix the root cause</p>
+
+                    <p><strong>RAG debugging is about:</strong> Tracing a symptom through multiple components to find the root cause. It requires systematic thinking and good observability.</p>
+                </div>
+            </section>
+
+            <!-- Systematic Debugging Framework -->
+            <section class="content-section">
+                <h2>Systematic Debugging Framework</h2>
+
+                <div class="highlight warning">
+                    <h4>🎯 The 5-Step Debugging Process</h4>
+                    <p>When your RAG system produces a bad result, follow this systematic approach to identify and fix the problem.</p>
+                </div>
+
+                <h3>Step 1: Characterize the Symptom</h3>
+                <div class="cards-grid">
+                    <div class="info-card">
+                        <h4>What exactly is wrong?</h4>
+                        <ul>
+                            <li>Wrong answer (factually incorrect)</li>
+                            <li>No answer (says "I don't know")</li>
+                            <li>Irrelevant answer (doesn't address question)</li>
+                            <li>Hallucination (invents information)</li>
+                            <li>Slow response (latency issue)</li>
+                            <li>Error/timeout (technical failure)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>Step 2: Trace Through the Pipeline</h3>
+                <div class="accordion-group">
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Stage 1: Query Processing</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <h4>What to Check</h4>
+                            <ul>
+                                <li>Was the query transformed or rewritten?</li>
+                                <li>Was the query understood correctly?</li>
+                                <li>Were there any preprocessing errors?</li>
+                            </ul>
+
+                            <h4>Common Issues</h4>
+                            <ul>
+                                <li>Query expansion adds irrelevant terms</li>
+                                <li>HyDE generates hypothetical answer that's off-track</li>
+                                <li>Query rewriting loses key information</li>
+                            </ul>
+
+                            <h4>How to Debug</h4>
+                            <ul>
+                                <li>Log the query at each transformation step</li>
+                                <li>Compare original vs. processed queries</li>
+                                <li>Check if transformation helped or hurt</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Stage 2: Retrieval</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <h4>What to Check</h4>
+                            <ul>
+                                <li>What documents were retrieved?</li>
+                                <li>Are they actually relevant to the query?</li>
+                                <li>Were relevant documents missed?</li>
+                                <li>What were the similarity scores?</li>
+                            </ul>
+
+                            <h4>Common Issues</h4>
+                            <ul>
+                                <li>Retrieved documents are semantically similar but factually irrelevant</li>
+                                <li>Retrieved documents don't contain the answer</li>
+                                <li>Important documents weren't retrieved (low similarity)</li>
+                                <li>Metadata filters excluded relevant documents</li>
+                            </ul>
+
+                            <h4>How to Debug</h4>
+                            <ul>
+                                <li>Manually review retrieved documents</li>
+                                <li>Check similarity scores (are they too similar?)</li>
+                                <li>Try increasing k (retrieving more documents)</li>
+                                <li>Test with and without metadata filters</li>
+                                <li>Check if keyword search would find relevant docs</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Stage 3: Reranking</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <h4>What to Check</h4>
+                            <ul>
+                                <li>Did reranking improve the order?</li>
+                                <li>Are the top-k after reranking more relevant?</li>
+                                <li>Did reranking drop relevant documents?</li>
+                            </ul>
+
+                            <h4>Common Issues</h4>
+                            <ul>
+                                <li>Reranker doesn't understand domain-specific terminology</li>
+                                <li>Reranker is too conservative (same as input order)</li>
+                                <li>Reranker is too aggressive (loses relevant docs)</li>
+                            </ul>
+
+                            <h4>How to Debug</h4>
+                            <ul>
+                                <li>Compare order before and after reranking</li>
+                                <li>Check reranker scores</li>
+                                <li>Try different rerankers or parameters</li>
+                                <li>Consider skipping reranking for this query type</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Stage 4: Prompt Assembly</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <h4>What to Check</h4>
+                            <ul>
+                                <li>Is the context within the model's context window?</li>
+                                <li>Is the prompt well-structured?</li>
+                                <li>Are instructions clear?</li>
+                                <li>Are citations required?</li>
+                            </ul>
+
+                            <h4>Common Issues</h4>
+                            <ul>
+                                <li>Context window overflow (truncation)</li>
+                                <li>Poor prompt structure (confusing instructions)</li>
+                                <li>Missing emphasis on using retrieved context</li>
+                                <li>No citation requirements (leads to hallucination)</li>
+                            </ul>
+
+                            <h4>How to Debug</h4>
+                            <ul>
+                                <li>Count tokens in the assembled prompt</li>
+                                <li>Review the full prompt (system + context + query)</li>
+                                <li>Test different prompt structures</li>
+                                <li>Add explicit citation requirements</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Stage 5: Generation</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <h4>What to Check</h4>
+                            <ul>
+                                <li>Did the LLM use the retrieved context?</li>
+                                <li>Is the answer grounded in the context?</li>
+                                <li>Are there citations?</li>
+                                <li>Is the answer relevant to the question?</li>
+                            </ul>
+
+                            <h4>Common Issues</h4>
+                            <ul>
+                                <li>LLM ignores retrieved context (hallucinates)</li>
+                                <li>LLM doesn't understand domain-specific content</li>
+                                <li>Temperature too high (creative, not faithful)</li>
+                                <li>Model doesn't follow instructions</li>
+                            </ul>
+
+                            <h4>How to Debug</h4>
+                            <ul>
+                                <li>Lower temperature (0-0.3 for factual)</li>
+                                <li>Try different models (some are better at RAG)</li>
+                                <li>Strengthen prompt instructions ("use ONLY the following context")</li>
+                                <li>Add faithfulness checks</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Symptom-Based Debugging -->
+            <section class="content-section">
+                <h2>Symptom-Based Debugging Guide</h2>
+
+                <div class="highlight info">
+                    <h4>🎯 Start from the Symptom</h4>
+                    <p>When you see a specific symptom, use this guide to identify likely causes and solutions.</p>
+                </div>
+
+                <div class="accordion-group">
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Symptom: "The answer is factually wrong"</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <h4>Likely Causes (in order)</h4>
+                            <ol>
+                                <li><strong>Retrieved wrong documents:</strong> Check retrieval quality</li>
+                                <li><strong>Retrieved documents don't contain answer:</strong> Check if relevant docs exist in corpus</li>
+                                <li><strong>LLM hallucinated despite good context:</strong> Check prompt and temperature</li>
+                                <li><strong>Context window overflow:</strong> Check token count</li>
+                            </ol>
+
+                            <h4>Debugging Steps</h4>
+                            <ol>
+                                <li>Review retrieved documents - are they relevant?</li>
+                                <li>Check if answer exists in retrieved documents</li>
+                                <li>Lower temperature to 0-0.2</li>
+                                <li>Strengthen prompt: "Use ONLY the following context"</li>
+                                <li>Try different LLM</li>
+                            </ol>
+
+                            <h4>Quick Fixes</h4>
+                            <ul>
+                                <li>Improve retrieval (add reranking, hybrid search)</li>
+                                <li>Add citations (makes errors traceable)</li>
+                                <li>Add "I don't know" option for low confidence</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Symptom: "The system says 'I don't know' too often"</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <h4>Likely Causes</h4>
+                            <ol>
+                                <li><strong>Retrieval is failing to find relevant documents</strong></li>
+                                <li><strong>Context doesn't actually contain the answer</strong></li>
+                                <li><strong>System is too conservative (afraid to hallucinate)</strong></li>
+                            </ol>
+
+                            <h4>Debugging Steps</h4>
+                            <ol>
+                                <li>Check if the answer exists in your corpus at all</li>
+                                <li>Manually search for similar queries - do they work?</li>
+                                <li>Review retrieved documents - why aren't they relevant?</li>
+                                <li>Check if query preprocessing is hurting rather than helping</li>
+                            </ol>
+
+                            <h4>Quick Fixes</h4>
+                            <ul>
+                                <li>Improve retrieval (better embeddings, hybrid search)</li>
+                                <li>Increase retrieval k (get more documents)</li>
+                                <li>Add query expansion (catch more variations)</li>
+                                <li>Adjust confidence threshold for "I don't know"</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Symptom: "The response is too slow"</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <h4>Likely Causes</h4>
+                            <ol>
+                                <li><strong>No caching (every query is processed fresh)</strong></li>
+                                <li><strong>Retrieving too many documents</strong></li>
+                                <li><strong>Using slow model (GPT-4 vs GPT-3.5)</strong></li>
+                                <li><strong>Vector database queries are slow</strong></li>
+                                <li><strong>Network latency</strong></li>
+                            </ol>
+
+                            <h4>Debugging Steps</h4>
+                            <ol>
+                                <li>Profile the pipeline - where is time spent?</li>
+                                <li>Check cache hit rate</li>
+                                <li>Measure vector DB query time</li>
+                                <li>Check LLM generation time</li>
+                            </ol>
+
+                            <h4>Quick Fixes</h4>
+                            <ul>
+                                <li>Implement caching (60% hit rate typical)</li>
+                                <li>Reduce retrieval k</li>
+                                <li>Use faster LLM for simple queries</li>
+                                <li>Skip reranking for speed-critical queries</li>
+                                <li>Parallelize independent operations</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Symptom: "The response is generic/unhelpful"</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <h4>Likely Causes</h4>
+                            <ol>
+                                <li><strong>Retrieved documents are too general</strong></li>
+                                <li><strong>Query is too vague</strong></li>
+                                <li><strong>Not enough specific context</strong></li>
+                                <li><strong>LLM being too cautious</strong></li>
+                            </ol>
+
+                            <h4>Debugging Steps</h4>
+                            <ol>
+                                <li>Review retrieved documents - are they specific enough?</li>
+                                <li>Could the query be more specific?</li>
+                                <li>Is there more specific content in the corpus that wasn't retrieved?</li>
+                            </ol>
+
+                            <h4>Quick Fixes</h4>
+                            <ul>
+                                <li>Improve query (ask user to clarify)</li>
+                                <li>Increase retrieval k (get more context)</li>
+                                <li>Add query expansion (catch relevant specifics)</li>
+                                <li>Use semantic chunking (more specific chunks)</li>
+                                <li>Adjust prompt to encourage specificity</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Symptom: "The system works for some queries but not others"</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <h4>Likely Causes</h4>
+                            <ol>
+                                <li><strong>Different query types need different handling</strong></li>
+                                <li><strong>Some topics are well-represented in corpus, others aren't</strong></li>
+                                <li><strong>Keyword vs semantic search issues</strong></li>
+                            </ol>
+
+                            <h4>Debugging Steps</h4>
+                            <ol>
+                                <li>Categorize failing queries - what do they have in common?</li>
+                                <li>Compare working vs failing queries</li>
+                                <li>Check if failing queries are domain-specific</li>
+                            </ol>
+
+                            <h4>Quick Fixes</h4>
+                            <ul>
+                                <li>Implement adaptive routing (different pipelines for different query types)</li>
+                                <li>Add hybrid search (catches keyword and semantic)</li>
+                                <li>Add domain-specific embeddings for specialized topics</li>
+                                <li>Improve corpus coverage for weak topics</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Debugging Tools -->
+            <section class="content-section">
+                <h2>Debugging Tools and Techniques</h2>
+
+                <div class="cards-grid">
+                    <div class="info-card">
+                        <h4>🔍 Manual Inspection</h4>
+                        <p><strong>What:</strong> Manually review each stage for sample queries</p>
+                        <p><strong>How:</strong> Log everything, trace through pipeline</p>
+                        <p><strong>Best for:</strong> Understanding failures, early debugging</p>
+                        <p><strong>Limitations:</strong> Doesn't scale, time-consuming</p>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>📊 Visualization Tools</h4>
+                        <p><strong>What:</strong> TruLens, Arize Phoenix, LangSmith</p>
+                        <p><strong>How:</strong> Trace requests visually, see each component</p>
+                        <p><strong>Best for:</strong> Understanding system behavior</p>
+                        <p><strong>Limitations:</strong> Can be overwhelming with lots of data</p>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>🤖 Automated Evaluation</h4>
+                        <p><strong>What:</strong> RAGAS, DeepEval, TruLens</p>
+                        <p><strong>How:</strong> Run evaluation on test queries regularly</p>
+                        <p><strong>Best for:</strong> Regression testing, CI/CD</p>
+                        <p><strong>Limitations:</strong> Requires test set, not real-time</p>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>📈 Metrics and Monitoring</h4>
+                        <p><strong>What:</strong> Prometheus, Grafana, Datadog</p>
+                        <p><strong>How:</strong> Track metrics at each stage</p>
+                        <p><strong>Best for:</strong> Spotting trends, catching regressions</p>
+                        <p><strong>Limitations:</strong> Doesn't explain why, just that</p>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>🔬 A/B Testing</h4>
+                        <p><strong>What:</strong> Test different approaches side-by-side</p>
+                        <p><strong>How:</strong> Split traffic, compare metrics</p>
+                        <p><strong>Best for:</strong> Validating improvements</p>
+                        <p><strong>Limitations:</strong> Requires traffic, takes time</p>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>📝 Error Analysis Sessions</h4>
+                        <p><strong>What:</strong> Regular review of failures with team</p>
+                        <p><strong>How:</strong> Sample errors, discuss root causes</p>
+                        <p><strong>Best for:</strong> Learning, team alignment</p>
+                        <p><strong>Limitations:</strong> Subjective, time-consuming</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Debugging Checklist -->
+            <section class="content-section">
+                <h2>Quick Debugging Checklist</h2>
+
+                <div class="highlight warning">
+                    <h4>🎯 When Something Breaks, Check These First</h4>
+                </div>
+
+                <h3>Immediate Checks (5 minutes)</h3>
+                <ul>
+                    <li>☐ Is the service up? (Check health endpoints)</li>
+                    <li>☐ Are there errors in logs? (Check for exceptions)</li>
+                    <li>☐ Did anything change recently? (Deployments, data updates)</li>
+                    <li>☐ Is it just this query or all queries? (Test with known-good query)</li>
+                </ul>
+
+                <h3>Retrieval Checks (10 minutes)</h3>
+                <ul>
+                    <li>☐ What documents were retrieved? Are they relevant?</li>
+                    <li>☐ What were the similarity scores? (Too high/too low?)</li>
+                    <li>☐ Would keyword search find relevant docs?</li>
+                    <li>☐ Are metadata filters working correctly?</li>
+                </ul>
+
+                <h3>Generation Checks (10 minutes)</h3>
+                <ul>
+                    <li>☐ Is the context within the window? (Count tokens)</li>
+                    <li>☐ Is the LLM using the context? (Check response vs context)</li>
+                    <li>☐ What's the temperature? (Lower for factual)</li>
+                    <li>☐ Try a different LLM - same result?</li>
+                </ul>
+
+                <h3>System Checks (15 minutes)</h3>
+                <ul>
+                    <li>☐ Run evaluation metrics - any degradation?</li>
+                    <li>☐ Check recent deployments - any changes?</li>
+                    <li>☐ Review recent data updates - any issues?</li>
+                    <li>☐ Compare with baseline - when did it work?</li>
+                </ul>
+            </section>
+
+            <section class="content-section">
+                <h2>Key Takeaways</h2>
+
+                <div class="highlight success">
+                    <h4>✓ Debugging Principles</h4>
+                    <ul>
+                        <li><strong>Start with the symptom:</strong> Characterize what's wrong before diving in</li>
+                        <li><strong>Trace through the pipeline:</strong> Check each stage systematically</li>
+                        <li><strong>Everything is logged:</strong> You can't debug what you can't see</li>
+                        <li><strong>Compare working vs failing:</strong> What's different?</li>
+                        <li><strong>Isolate variables:</strong> Change one thing at a time</li>
+                        <li><strong>Use tools appropriately:</strong> Manual for understanding, automated for scale</li>
+                        <li><strong>Document findings:</strong> Build knowledge over time</li>
+                        <li><strong>Fix root causes:</strong> Don't just patch symptoms</li>
+                    </ul>
+                </div>
+
+                <p><strong>Next step:</strong> Section 13 covers how to talk about RAG like an expert.</p>
+            </section>
+        </main>
+
+        <footer class="main-footer">
+            <p>Continue to <a href="section13-eloquent.html">Section 13: Eloquent Conversation</a></p>
+        </footer>
+    </div>
+
+    <script src="js/components.js"></script>
+</body>
+</html>

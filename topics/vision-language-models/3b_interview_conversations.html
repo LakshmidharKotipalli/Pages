@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Conversations | VLM Learning Journey</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <a href="index.html" class="sidebar-title">VLMs & ECOSYSTEM</a>
+            <a href="index.html" class="nav-link ">Home / Hub</a>\n<a href="1_foundation.html" class="nav-link ">1. Foundation & Context</a>\n<a href="2_living_analogy.html" class="nav-link ">2. Living Analogy</a>\n<a href="3a_learning_journey.html" class="nav-link ">3A. Learning Journey</a>\n<a href="3b_interview_conversations.html" class="nav-link active">3B. Interview Conversations</a>\n<a href="4_system_design_integration.html" class="nav-link ">4. System Design Integration</a>\n<a href="5_ripple_effects_map.html" class="nav-link ">5. Ripple Effects Map</a>\n<a href="6_evolution_story.html" class="nav-link ">6. Evolution Story</a>\n<a href="7_patterns_anti_patterns.html" class="nav-link ">7. Patterns & Anti-Patterns</a>\n<a href="8_trade_offs_analysis.html" class="nav-link ">8. Trade-offs Analysis</a>\n<a href="9_at_scale.html" class="nav-link ">9. At Scale</a>\n<a href="10_technology_landscape.html" class="nav-link ">10. Technology Landscape</a>\n<a href="11_pitfalls_war_stories.html" class="nav-link ">11. Pitfalls & War Stories</a>\n<a href="12_debugging_process.html" class="nav-link ">12. Debugging Process</a>\n<a href="13_eloquent_conversation.html" class="nav-link ">13. Eloquent Conversation</a>\n<a href="14_practice_exercises.html" class="nav-link ">14. Practice Exercises</a>\n<a href="15_quick_reference.html" class="nav-link ">15. Quick Reference</a>\n<a href="16_whats_next.html" class="nav-link ">16. What's Next</a>\n
+        </aside>
+        <main class="main-content">
+            
+        <h1>03B. Interview Conversations</h1>
+        <div class="card">
+            <h3>Interview Question 1: The Context Window Squeeze</h3>
+            <p><strong>Interviewer:</strong> "We pass 4 photos of a car to our VLM and suddenly our context size hits 12,000 tokens causing latency. How do you solve this?"</p>
+            <p><strong>Candidate:</strong> "Every image patch maps to a token. 4 high-res photos mapped linearly result in thousands of tokens. To solve this: 1) Downsample non-informative backgrounds using a saliency map before tokenization. 2) Use a model with an active vision mechanism like Qwen-VL that dynamically compresses redundant visual tokens. 3) Cache the visual token KV tensors entirely if these 4 images are static and we're just asking multiple questions about them (System Prompt Caching)."</p>
+            
+            <h3>Interview Question 2: Layout & Bounding Boxes</h3>
+            <p><strong>Interviewer:</strong> "The model easily reads text off a receipt, but if I ask 'what is the price next to the milk', it hallucinates or grabs the wrong number. Why?"</p>
+            <p><strong>Candidate:</strong> "Standard VLMs encode spatial information poorly because they flatten patches linearly (1D sequence). The model loses the 2D Cartesian coordinate relationship. To fix this, we need bounding box coordinate grounding. E.g., we provide specialized `<box> <x1 y1 x2 y2> </box>` tokens during fine-tuning (like Qwen-VL or Kosmos-2) so the spatial intelligence is rigidly tied to semantic text output. Alternatively, we prepend 2D absolute position embeddings directly to the vision patches."</p>
+
+            <h3>Interview Question 3: Why not pure OCR?</h3>
+            <p><strong>Interviewer:</strong> "Why use a huge VLM over a fast, cheap OCR pipeline + standard LLM?"</p>
+            <p><strong>Candidate:</strong> "OCR strips visual context. A user's scribble, a bolded warning text, a faded receipt, or a meme format carries meaning outside the raw string. VLM processes the visual semantics concurrently with text semantics. The font size might dictate hierarchy; pure OCR flattens it all. However, if latency/cost are strict constraints, OCR + LLM is still the baseline to beat."</p>
+        </div>
+        
+        </main>
+    </div>
+    <script src="js/components.js"></script>
+</body>
+</html>

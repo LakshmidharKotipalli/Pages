@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Practice Exercises — Large Language Models Learning Journey">
+    <title>Practice Exercises | LLM Learning Journey</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <a href="index.html" class="sidebar-brand">Large Language Models</a>
+            <span class="sidebar-subtitle">A Complete Learning Journey</span>
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="1_foundation.html" class="nav-link"><span class="nav-num">01</span> Foundation & Context</a>
+            <a href="2_living_analogy.html" class="nav-link"><span class="nav-num">02</span> Living Analogy</a>
+            <a href="3a_learning_journey.html" class="nav-link"><span class="nav-num">3a</span> Learning Journey</a>
+            <a href="3b_interview_conversations.html" class="nav-link"><span class="nav-num">3b</span> Interview Conversations</a>
+            <a href="4_system_design.html" class="nav-link"><span class="nav-num">04</span> System Design Integration</a>
+            <a href="5_ripple_effects.html" class="nav-link"><span class="nav-num">05</span> Ripple Effects Map</a>
+            <a href="6_evolution.html" class="nav-link"><span class="nav-num">06</span> Evolution Story</a>
+            <a href="7_patterns.html" class="nav-link"><span class="nav-num">07</span> Patterns & Anti-Patterns</a>
+            <a href="8_tradeoffs.html" class="nav-link"><span class="nav-num">08</span> Trade-offs Analysis</a>
+            <a href="9_at_scale.html" class="nav-link"><span class="nav-num">09</span> At Scale</a>
+            <a href="10_landscape.html" class="nav-link"><span class="nav-num">10</span> Technology Landscape</a>
+            <a href="11_pitfalls.html" class="nav-link"><span class="nav-num">11</span> Pitfalls & War Stories</a>
+            <a href="12_debugging.html" class="nav-link"><span class="nav-num">12</span> Debugging Process</a>
+            <a href="13_eloquent.html" class="nav-link"><span class="nav-num">13</span> Eloquent Conversation</a>
+            <a href="14_exercises.html" class="nav-link active"><span class="nav-num">14</span> Practice Exercises</a>
+            <a href="15_quick_ref.html" class="nav-link"><span class="nav-num">15</span> Quick Reference</a>
+            <a href="16_whats_next.html" class="nav-link"><span class="nav-num">16</span> What's Next</a>
+
+        </aside>
+        <main class="main-content">
+
+            <h4>Section Fourteen</h4>
+            <h1>Practice Exercises</h1>
+            <p class="page-intro">Hands-on challenges that build real engineering intuition.</p>
+
+            <div class="card card--accent">
+                <span class="card-label">Warm-Up (30 min each)</span>
+                <h3>Getting Your Hands Dirty</h3>
+                <ol>
+                    <li><strong>Token Arithmetic:</strong> Use the tiktoken library to tokenize 5 different sentences. Calculate the token-to-word ratio for English, code (Python), and a non-Latin language (Japanese/Arabic). Explain why the ratios differ.</li>
+                    <li><strong>Temperature Experiment:</strong> Send the same prompt ("Write a haiku about programming") 10 times at temperature 0, 0.5, and 1.0. Measure the uniqueness of responses at each level. At what temperature do you start seeing genuinely novel outputs?</li>
+                    <li><strong>Prompt Engineering Basics:</strong> Write a prompt that reliably extracts structured JSON from unstructured product reviews. Test it on 20 reviews. Measure accuracy. Iterate until you hit 95%+ accuracy without fine-tuning.</li>
+                </ol>
+            </div>
+
+            <div class="card card--sage">
+                <span class="card-label">Core Engineering (1-3 hours each)</span>
+                <h3>Building Real Systems</h3>
+                <ol start="4">
+                    <li><strong>RAG Pipeline:</strong> Build a complete RAG system: embed 50 documents using an embedding model, store in a vector DB (Chroma or Qdrant), build a retrieval pipeline that fetches the top 3 relevant chunks, and inject them into an LLM prompt. Measure answer quality with and without RAG.</li>
+                    <li><strong>Semantic Cache:</strong> Implement a semantic cache layer in front of an LLM API. Embed incoming queries, search for similar past queries (cosine similarity > 0.95), and return cached responses. Measure cache hit rate and cost savings over 100 representative queries.</li>
+                    <li><strong>Prompt Chain:</strong> Build a 3-step prompt chain for email triage: Step 1 — classify intent (complaint, question, feedback, spam). Step 2 — extract entities (customer name, product, issue). Step 3 — draft a response. Evaluate each step independently.</li>
+                    <li><strong>Local Inference:</strong> Deploy Llama 3.1 8B using vLLM or Ollama on your machine. Measure TTFT and TPS at different quantization levels (FP16, INT8, INT4). Plot the quality-speed-memory trade-off curve.</li>
+                </ol>
+            </div>
+
+            <div class="card card--danger">
+                <span class="card-label">Advanced Architecture (4-8 hours each)</span>
+                <h3>Production-Grade Challenges</h3>
+                <ol start="8">
+                    <li><strong>Model Router:</strong> Build a classifier that routes incoming queries to either a 1B model (simple classification), an 8B model (structured extraction), or a 70B API (complex reasoning). Measure end-to-end cost savings vs. routing everything to the 70B.</li>
+                    <li><strong>Fine-Tuning Pipeline:</strong> Fine-tune a 7B model on a custom dataset using QLoRA (4-bit quantization + LoRA adapters). Measure quality improvement on your specific task vs. the base model + careful prompting. Calculate the break-even point where fine-tuning cost is recovered through reduced prompt engineering effort.</li>
+                    <li><strong>Evaluation Framework:</strong> Build an automated evaluation pipeline that uses LLM-as-judge to grade model outputs on 5 criteria (accuracy, relevance, completeness, safety, format adherence). Calibrate against 50 human judgments. Deploy as a nightly regression test.</li>
+                    <li><strong>Guardrails System:</strong> Implement a prompt injection defense layer. Create 50 adversarial prompts. Build a classifier that detects injection attempts with >95% recall and <5% false positive rate. Test against real user traffic (anonymized).</li>
+                </ol>
+            </div>
+
+            <div class="card">
+                <span class="card-label">Expert (Multi-day)</span>
+                <h3>System-Level Thinking</h3>
+                <ol start="12">
+                    <li><strong>Disaggregated Inference:</strong> Set up a split prefill/decode serving architecture using two separate vLLM instances. Measure throughput improvement vs. a single instance. Profile the KV cache transfer overhead.</li>
+                    <li><strong>Speculative Decoding:</strong> Implement speculative decoding using a 1B draft model and a 70B target model. Measure the acceptance rate and overall speedup. Tune the number of speculative tokens for your specific workload distribution.</li>
+                    <li><strong>End-to-End System Design:</strong> Design and document (architecture diagram, capacity planning, cost estimate) a production LLM system that serves 100K daily active users for a customer support chat product. Include model selection, caching strategy, safety guardrails, monitoring, fallback logic, and cost projections.</li>
+                </ol>
+            </div>
+
+        </main>
+    </div>
+    <script src="js/components.js"></script>
+</body>
+</html>

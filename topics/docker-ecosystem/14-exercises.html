@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Practice Exercises — Docker</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+.exercise-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); margin-bottom: 1.25rem; overflow: hidden;
+}
+.ex-header {
+  padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: flex-start;
+  cursor: pointer; transition: background 0.2s; flex-wrap: wrap; gap: 0.5rem;
+}
+.ex-header:hover { background: var(--bg3); }
+.ex-title { font-weight: 700; font-size: 0.95rem; }
+.ex-num { font-size: 0.72rem; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.2rem; }
+.ex-body { display: none; padding: 1.5rem; border-top: 1px solid var(--border); }
+.ex-body.open { display: block; }
+.ex-section { margin-bottom: 1rem; }
+.ex-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text3); margin-bottom: 0.3rem; }
+.difficulty-warm { background: rgba(16,185,129,0.15); color: var(--green); }
+.difficulty-core { background: rgba(36,150,237,0.15); color: var(--docker-blue); }
+.difficulty-advanced { background: rgba(245,158,11,0.15); color: var(--yellow); }
+.difficulty-expert { background: rgba(239,68,68,0.15); color: var(--red); }
+</style>
+</head>
+<body>
+<nav class="topnav">
+  <a class="topnav-brand" href="index.html">🐳 Docker & Ecosystem</a>
+  <div class="topnav-links">
+    <a href="01-foundation.html">Foundation</a>
+    <a href="03b-interview.html">Interview</a>
+    <a href="14-exercises.html" class="active">Exercises</a>
+    <a href="08-tradeoffs.html">Trade-offs</a>
+    <a href="15-reference.html">Quick Ref</a>
+  </div>
+</nav>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Core Sections</div>
+      <a href="index.html"><span class="num">00</span> Overview</a>
+      <a href="01-foundation.html"><span class="num">01</span> Foundation</a>
+      <a href="02-analogy.html"><span class="num">02</span> Analogy</a>
+      <a href="03a-journey.html"><span class="num">03A</span> Journey</a>
+      <a href="03b-interview.html"><span class="num">03B</span> Interview</a>
+      <a href="04-system-design.html"><span class="num">04</span> System Design</a>
+      <a href="05-ripple.html"><span class="num">05</span> Ripple Effects</a>
+      <a href="06-evolution.html"><span class="num">06</span> Evolution</a>
+      <a href="07-patterns.html"><span class="num">07</span> Patterns</a>
+      <a href="08-tradeoffs.html"><span class="num">08</span> Trade-offs</a>
+      <a href="09-at-scale.html"><span class="num">09</span> At Scale</a>
+      <a href="10-landscape.html"><span class="num">10</span> Landscape</a>
+      <a href="11-pitfalls.html"><span class="num">11</span> Pitfalls</a>
+      <a href="12-debugging.html"><span class="num">12</span> Debugging</a>
+      <a href="13-conversation.html"><span class="num">13</span> Conversation</a>
+      <a href="14-exercises.html" class="active"><span class="num">14</span> Exercises</a>
+      <a href="15-reference.html"><span class="num">15</span> Quick Ref</a>
+      <a href="16-whats-next.html"><span class="num">16</span> What's Next</a>
+    </div>
+  </aside>
+  <main class="main">
+    <div class="page-header">
+      <div class="badge">Section 14 · Exercises</div>
+      <h1>Practice Exercises</h1>
+      <p class="subtitle">15 exercises ordered by difficulty — from warm-up conceptual questions to expert-level design challenges. The goal isn't to memorize answers but to build durable mental models. Click to reveal answers.</p>
+    </div>
+
+    <h2>🌱 Warm-Up (Conceptual Foundations)</h2>
+
+    <div class="exercise-card">
+      <div class="ex-header" onclick="this.nextElementSibling.classList.toggle('open')">
+        <div><div class="ex-num">Exercise 1</div><div class="ex-title">Explain the difference between an image and a container to a developer who has never used Docker.</div></div>
+        <span class="tag difficulty-warm">Warm-up</span>
+      </div>
+      <div class="ex-body">
+        <div class="ex-section">
+          <div class="ex-label">Strong Answer</div>
+          <p>An image is like a <strong>class</strong> in OOP — it's a read-only template that defines what a container should look like: which files are included, what process to run, what ports to expose, and what environment variables are expected. You build an image from a Dockerfile; you can't "run" an image directly.</p>
+          <p>A container is an <strong>instance</strong> of that class — a running process with its own isolated filesystem, network, and process space, created from the image. Like instantiating an object from a class, you can create many containers from one image. When the container stops, its writable layer (any changes it made) is discarded unless you used a volume.</p>
+          <p><strong>Concrete analogy:</strong> A Docker image is like a class definition. A Docker container is like a running instance of that class. The constructor is <code>docker run</code>.</p>
+        </div>
+        <div class="ex-section">
+          <div class="ex-label">Bonus Points For</div>
+          <p>Mentioning that images are made of layers (each Dockerfile instruction creates a layer) and that multiple containers from the same image share the read-only layers, making storage efficient.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="ex-header" onclick="this.nextElementSibling.classList.toggle('open')">
+        <div><div class="ex-num">Exercise 2</div><div class="ex-title">What Linux kernel features make Docker containers possible? Why does Docker work on Mac/Windows if it needs Linux?</div></div>
+        <span class="tag difficulty-warm">Warm-up</span>
+      </div>
+      <div class="ex-body">
+        <div class="ex-section">
+          <div class="ex-label">Strong Answer</div>
+          <p>Docker requires three Linux kernel features: <strong>namespaces</strong> (isolate what a process can see — PID space, network interfaces, filesystem mounts, hostname), <strong>cgroups</strong> (control what resources a process can use — CPU, memory, I/O), and <strong>Union filesystems</strong> like OverlayFS (stack read-only image layers with a writable layer on top).</p>
+          <p>On Mac and Windows, Docker Desktop runs a lightweight Linux VM (HyperKit on older Mac, Apple Hypervisor on Apple Silicon, WSL2 on Windows). Your Docker containers run inside that VM — not directly on your Mac/Windows host. This is why Docker Desktop on Mac is slightly slower than on Linux: there's a VM hypervisor layer in the middle.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="ex-header" onclick="this.nextElementSibling.classList.toggle('open')">
+        <div><div class="ex-num">Exercise 3</div><div class="ex-title">You have a Node.js app that prints "Hello World" and exits. What's wrong with this Dockerfile?</div></div>
+        <span class="tag difficulty-warm">Warm-up</span>
+      </div>
+      <div class="ex-body">
+        <div class="ex-section">
+          <div class="ex-label">The Broken Dockerfile</div>
+          <div class="code-block">FROM ubuntu:latest
+RUN apt-get update && apt-get install -y nodejs
+COPY . /app
+RUN npm install
+CMD node /app/index.js</div>
+        </div>
+        <div class="ex-section">
+          <div class="ex-label">Problems Found</div>
+          <ul>
+            <li><strong>FROM ubuntu:latest</strong>: Mutable tag, will change under you. Use a specific version. Also, ubuntu is 100MB+ — use <code>FROM node:18-alpine</code> instead (5MB base + only what you need)</li>
+            <li><strong>apt-get without cleanup</strong>: apt cache stays in the layer, bloating the image. Need <code>&& rm -rf /var/lib/apt/lists/*</code></li>
+            <li><strong>COPY . before npm install</strong>: Cache-busting! Every source code change causes a full npm install. Should COPY package*.json first, RUN npm install, then COPY the rest</li>
+            <li><strong>No .dockerignore</strong>: node_modules from the host gets copied into the build context</li>
+            <li><strong>No USER specification</strong>: Runs as root — security risk</li>
+            <li><strong>CMD format</strong>: Shell form <code>CMD node /app</code> doesn't receive signals properly. Use exec form: <code>CMD ["node", "/app/index.js"]</code></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <h2>⚙️ Core (Building Real Understanding)</h2>
+
+    <div class="exercise-card">
+      <div class="ex-header" onclick="this.nextElementSibling.classList.toggle('open')">
+        <div><div class="ex-num">Exercise 4</div><div class="ex-title">Design a multi-stage Dockerfile for a Go REST API that produces the smallest possible production image.</div></div>
+        <span class="tag difficulty-core">Core</span>
+      </div>
+      <div class="ex-body">
+        <div class="ex-section">
+          <div class="ex-label">Ideal Approach</div>
+          <div class="code-block"><span class="comment"># Stage 1: Build</span>
+FROM golang:1.21-alpine AS builder
+WORKDIR /app
+<span class="comment"># Copy dependency manifests first (cache layer)</span>
+COPY go.mod go.sum ./
+RUN go mod download
+<span class="comment"># Copy source and build</span>
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o server .
+
+<span class="comment"># Stage 2: Minimal runtime</span>
+FROM scratch
+<span class="comment"># CA certificates for HTTPS calls</span>
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=builder /app/server /server
+EXPOSE 8080
+ENTRYPOINT ["/server"]</div>
+          <p><strong>Why scratch?</strong> Go compiles to a self-contained binary with no runtime dependencies. <code>FROM scratch</code> means literally zero OS — just the binary. Final image: ~8-15MB vs ~800MB for the build stage.</p>
+          <p><strong>-ldflags="-s -w"</strong>: Strip debug symbols and DWARF info, reducing binary size ~30%.</p>
+          <p><strong>CGO_ENABLED=0</strong>: Static binary. CGO would require glibc in the runtime stage.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="ex-header" onclick="this.nextElementSibling.classList.toggle('open')">
+        <div><div class="ex-num">Exercise 5</div><div class="ex-title">Design a docker-compose.yml for a web application with a Node.js API, PostgreSQL database, and Redis cache. The API should not start until both DB and cache are ready.</div></div>
+        <span class="tag difficulty-core">Core</span>
+      </div>
+      <div class="ex-body">
+        <div class="ex-section">
+          <div class="ex-label">Key Considerations</div>
+          <p><strong>depends_on with condition: service_healthy</strong> ensures the dependency is not just started, but passing its health check. Without this, "depends_on" only waits for the container to start — not for Postgres to be ready to accept connections (which takes longer).</p>
+          <p><strong>Named volume</strong> for postgres data persists across container restarts. <strong>tmpfs</strong> for Redis could be used if caching is purely ephemeral.</p>
+          <p><strong>healthcheck in postgres</strong>: pg_isready checks actual TCP connection acceptance, not just process start.</p>
+          <p><strong>Environment variables from .env file</strong>: Never hardcode passwords in docker-compose.yml — use env_file or variable substitution from shell environment.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="ex-header" onclick="this.nextElementSibling.classList.toggle('open')">
+        <div><div class="ex-num">Exercise 6</div><div class="ex-title">A container is running but users report it's unresponsive. Walk through your complete diagnosis process.</div></div>
+        <span class="tag difficulty-core">Core</span>
+      </div>
+      <div class="ex-body">
+        <div class="ex-section">
+          <div class="ex-label">Complete Diagnosis Flow</div>
+          <ol>
+            <li><strong>Check if the process is still running</strong>: <code>docker top &lt;container&gt;</code> — is the app process there?</li>
+            <li><strong>Check resource consumption</strong>: <code>docker stats &lt;container&gt;</code> — is it CPU-bound (100% CPU), memory-bound (near limit), or fine on both?</li>
+            <li><strong>Check recent logs</strong>: <code>docker logs --tail 100 --since 5m &lt;container&gt;</code> — any errors, panic messages, connection pool exhaustion?</li>
+            <li><strong>Test from inside</strong>: <code>docker exec &lt;container&gt; wget -qO- http://localhost:8080/health</code> — does it respond from inside?</li>
+            <li><strong>Check the health check status</strong>: <code>docker inspect --format '{{.State.Health.Status}}' &lt;container&gt;</code></li>
+            <li><strong>Check open connections</strong>: <code>docker exec &lt;container&gt; ss -s</code> — is the connection table full?</li>
+            <li><strong>If CPU is 100%</strong>: likely an infinite loop, runaway GC, or CPU-intensive operation. Profile with language-specific tools.</li>
+            <li><strong>If memory is near limit</strong>: potential OOMKill imminent, or memory leak. Check GC metrics for managed languages.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <h2>🔧 Advanced (Production Thinking)</h2>
+
+    <div class="exercise-card">
+      <div class="ex-header" onclick="this.nextElementSibling.classList.toggle('open')">
+        <div><div class="ex-num">Exercise 7</div><div class="ex-title">Your team is deploying a new container and receiving exit code 137. What does this mean and how do you fix it?</div></div>
+        <span class="tag difficulty-advanced">Advanced</span>
+      </div>
+      <div class="ex-body">
+        <div class="ex-section">
+          <div class="ex-label">Answer</div>
+          <p>Exit code 137 = SIGKILL (signal 9). In Docker context this almost always means <strong>OOMKill</strong> — the container exceeded its memory limit and the Linux kernel OOM killer killed the process.</p>
+          <p><strong>Diagnosis</strong>: Run <code>docker inspect &lt;container&gt; --format '{{.State.OOMKilled}}'</code> — if true, confirmed OOMKill. Also check kernel messages: <code>dmesg | grep -i oom</code> on the host.</p>
+          <p><strong>Fix options (in order of preference)</strong>:</p>
+          <ol>
+            <li>Profile real memory usage under load (<code>docker stats</code> at peak traffic), then set memory limit to 1.5x the measured p99</li>
+            <li>For JVM: add <code>-XX:MaxRAMPercentage=75</code> so JVM limits itself to 75% of container memory limit</li>
+            <li>Fix memory leaks in the application</li>
+            <li>If legitimately needs more memory, increase the limit</li>
+          </ol>
+          <p><strong>Never</strong> just increase memory limits without understanding why the container is using more memory than expected — it may be a memory leak that will grow indefinitely.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="ex-header" onclick="this.nextElementSibling.classList.toggle('open')">
+        <div><div class="ex-num">Exercise 8</div><div class="ex-title">How would you securely handle a private npm registry token needed during docker build?</div></div>
+        <span class="tag difficulty-advanced">Advanced</span>
+      </div>
+      <div class="ex-body">
+        <div class="ex-section">
+          <div class="ex-label">Wrong Approach (Never Do This)</div>
+          <div class="code-block"><span class="comment"># WRONG: Secret in layer history forever</span>
+ARG NPM_TOKEN
+ENV NPM_TOKEN=$NPM_TOKEN
+RUN echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc && npm install
+RUN rm .npmrc  <span class="comment"># too late — the layer with .npmrc still exists!</span></div>
+        </div>
+        <div class="ex-section">
+          <div class="ex-label">Correct Approach: BuildKit Secret Mounts</div>
+          <div class="code-block"><span class="comment"># Correct: Secret available ONLY during this RUN, never in layers</span>
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN --mount=type=secret,id=npmrc,target=/root/.npmrc npm ci
+COPY . .
+CMD ["node", "server.js"]</div>
+          <p>Build with: <code>DOCKER_BUILDKIT=1 docker build --secret id=npmrc,src=$HOME/.npmrc .</code></p>
+          <p>The secret file is available at /root/.npmrc only during that RUN instruction. It never appears in any image layer. <code>docker history</code> will not show it.</p>
+        </div>
+      </div>
+    </div>
+
+    <h2>🏛️ Expert (Architect-Level)</h2>
+
+    <div class="exercise-card">
+      <div class="ex-header" onclick="this.nextElementSibling.classList.toggle('open')">
+        <div><div class="ex-num">Exercise 9</div><div class="ex-title">Design an image build and distribution strategy for a company with 150 microservices deployed across 3 AWS regions.</div></div>
+        <span class="tag difficulty-expert">Expert</span>
+      </div>
+      <div class="ex-body">
+        <div class="ex-section">
+          <div class="ex-label">Key Decisions to Cover</div>
+          <p><strong>Registry Architecture</strong>: One ECR registry per region. Source region (us-east-1) is the primary; ECR replication automatically copies new image tags to us-west-2 and eu-west-1. Deployment in each region pulls from local regional registry — no cross-region egress costs, no latency.</p>
+          <p><strong>Golden Base Images</strong>: Create a team that maintains approved base images (company-base-node:18, company-base-java:17, company-base-python:3.11). These are security-scanned, hardened versions that all teams must use. When a CVE hits OpenSSL, one base image update flows to all 150 services via Renovate bot PRs.</p>
+          <p><strong>Build Caching Strategy</strong>: Each ECR repo has a cache layer. CI uses <code>--cache-from ECR/service:cache</code> and <code>--cache-to type=registry,ref=ECR/service:cache</code>. Different services don't share cache (too complex), but CI runners in the same AWS account pull cache from ECR cheaply.</p>
+          <p><strong>Image Tagging Convention</strong>: <code>ECR/service:commit-sha</code> (immutable, deployed) + <code>ECR/service:latest</code> (updated on main branch merge, for non-production convenience). Never deploy using <code>:latest</code>.</p>
+          <p><strong>Security Gates</strong>: ECR scanning enabled. CI pipeline blocks on critical CVEs (Trivy in CI + ECR basic scanning). Cosign signs images after push; K8s admission controller (Connaisseur or Ratify) verifies signature before allowing deployment.</p>
+          <p><strong>Retention Policy</strong>: Keep all tagged releases (semver), delete untagged after 7 days, delete all non-release tags older than 90 days. Expected storage steady state: 500GB across 3 regions.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="pagination">
+      <a href="13-conversation.html" class="page-btn">← Conversation</a>
+      <a href="15-reference.html" class="page-btn primary">Quick Reference →</a>
+    </div>
+  </main>
+</div>
+<script src="js/components.js"></script>
+</body>
+</html>

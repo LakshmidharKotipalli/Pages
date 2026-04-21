@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technology Landscape | VLM Learning Journey</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <a href="index.html" class="sidebar-title">VLMs & ECOSYSTEM</a>
+            <a href="index.html" class="nav-link ">Home / Hub</a>\n<a href="1_foundation.html" class="nav-link ">1. Foundation & Context</a>\n<a href="2_living_analogy.html" class="nav-link ">2. Living Analogy</a>\n<a href="3a_learning_journey.html" class="nav-link ">3A. Learning Journey</a>\n<a href="3b_interview_conversations.html" class="nav-link ">3B. Interview Conversations</a>\n<a href="4_system_design_integration.html" class="nav-link ">4. System Design Integration</a>\n<a href="5_ripple_effects_map.html" class="nav-link ">5. Ripple Effects Map</a>\n<a href="6_evolution_story.html" class="nav-link ">6. Evolution Story</a>\n<a href="7_patterns_anti_patterns.html" class="nav-link ">7. Patterns & Anti-Patterns</a>\n<a href="8_trade_offs_analysis.html" class="nav-link ">8. Trade-offs Analysis</a>\n<a href="9_at_scale.html" class="nav-link ">9. At Scale</a>\n<a href="10_technology_landscape.html" class="nav-link active">10. Technology Landscape</a>\n<a href="11_pitfalls_war_stories.html" class="nav-link ">11. Pitfalls & War Stories</a>\n<a href="12_debugging_process.html" class="nav-link ">12. Debugging Process</a>\n<a href="13_eloquent_conversation.html" class="nav-link ">13. Eloquent Conversation</a>\n<a href="14_practice_exercises.html" class="nav-link ">14. Practice Exercises</a>\n<a href="15_quick_reference.html" class="nav-link ">15. Quick Reference</a>\n<a href="16_whats_next.html" class="nav-link ">16. What's Next</a>\n
+        </aside>
+        <main class="main-content">
+            
+        <h1>10. Technology Landscape (Ecosystem)</h1>
+        <div class="card element-grid">
+            <h3>The Pillars of the VLM Ecosystem</h3>
+            
+            <div class="accordion-item">
+                <div class="accordion-header">1. Foundation: Contrastive Models (CLIP, SigLIP) <span class="icon">+</span></div>
+                <div class="accordion-content">
+                    <p>Models trained solely to maximize the dot product between an image embedding and its text caption embedding. They don't generate text; they provide the raw visual-semantic bridge.</p>
+                </div>
+            </div>
+            
+            <div class="accordion-item">
+                <div class="accordion-header">2. The Middle-tier: Projection-based (LLaVA, MiniGPT-4) <span class="icon">+</span></div>
+                <div class="accordion-content">
+                    <p>Take an open-source LLM (Llama 3, Mistral) and tie a CLIP-like encoder to it. Extremely effective, rapidly trained, heavily reliant on the base LLM's intelligence. LLaVA proved you only need ~1M image-text pairs to achieve 90% of state of the art.</p>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">3. Native Interleaved (Gemini, Qwen-VL, GPT-4o) <span class="icon">+</span></div>
+                <div class="accordion-content">
+                    <p>Images, audio, text tokenized seamlessly into a single transformer. Unmatched spatial reasoning. Cost millions to pre-train from scratch. Best choice for complex visual QA and UI autonomous agents.</p>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">4. Spatial Decoders / Output Modalities <span class="icon">+</span></div>
+                <div class="accordion-content">
+                    <p>Not just answering questions, but drawing bounding boxes, segmentation masks, or generating images back (e.g. Chameleon, Gemini 1.5 Pro). This completes the loop, making the model an active visual actor.</p>
+                </div>
+            </div>
+        </div>
+        
+        </main>
+    </div>
+    <script src="js/components.js"></script>
+</body>
+</html>

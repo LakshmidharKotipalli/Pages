@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Design Integration - Kubernetes Learning Journey</title>
+    <link rel="stylesheet" href="../../css/styles.css">
+    <link rel="stylesheet" href="theme.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <a href="../../index.html">Home</a>
+        <span class="current-section">System Design Integration</span>
+        <a href="../index.html">Topics</a>
+    </nav>
+
+    <div class="breadcrumb">
+        <a href="../../index.html">Home</a>
+        <span class="breadcrumb-separator">→</span>
+        <a href="../index.html">Topics</a>
+        <span class="breadcrumb-separator">→</span>
+        <a href="index.html">Kubernetes</a>
+        <span class="breadcrumb-separator">→</span>
+        <span>System Design Integration</span>
+    </div>
+
+    <main>
+        <section class="intro">
+            <h1>System Design Integration: Kubernetes in Context</h1>
+            <p class="subtitle">How Kubernetes connects to the 8 key system design pillars</p>
+        </section>
+
+        <div class="hero">
+            <p class="powerful-sentence">
+                "Kubernetes isn't just a deployment tool—it's a fundamental architectural decision that impacts every aspect of your system design, from reliability to cost to team structure."
+            </p>
+            <p class="explanation">
+                Understanding how K8s integrates with system design helps you make informed decisions about when (and when not) to use it.
+            </p>
+        </div>
+
+        <section>
+            <h2>The 8 Pillars of System Design</h2>
+            <p>Every system design decision involves trade-offs across multiple dimensions. Kubernetes significantly impacts each of these pillars. Let's explore them systematically.</p>
+
+            <div style="display: grid; gap: 1.5rem; margin: 2rem 0;">
+                <div class="card info">
+                    <h3>1. Reliability (MTTR, MTBF, SLO, SLA)</h3>
+                    <p><strong>How Kubernetes Helps:</strong></p>
+                    <ul>
+                        <li><strong>Self-healing:</strong> Automatically restarts failed containers, reschedules Pods</li>
+                        <li><strong>Health checks:</strong> Liveness and readiness probes catch failures early</li>
+                        <li><strong>Rolling updates:</strong> Zero-downtime deployments with rollback capability</li>
+                        <li><strong>Replica management:</strong> Maintains desired state automatically</li>
+                    </ul>
+
+                    <p><strong>How Kubernetes Complicates:</strong></p>
+                    <ul>
+                        <li><strong>More moving parts:</strong> Control plane, etcd, kubelet, network plugins—more things to fail</li>
+                        <li><strong>Complexity overhead:</strong> Debugging requires understanding distributed systems concepts</li>
+                        <li><strong>Dependency chain:</strong> If the control plane fails, everything suffers</li>
+                        <li><strong>Configuration drift:</strong> YAML mistakes can cascade into production incidents</li>
+                    </ul>
+
+                    <p><strong>MTTR Impact:</strong></p>
+                    <ul>
+                        <li><strong>Faster recovery:</strong> Automated restarts mean sub-minute recovery for many failures</li>
+                        <li><strong>Slower diagnosis:</strong> More layers to debug when things go wrong</li>
+                        <li><strong>Net effect:</strong> Better for common failures, worse for novel issues</li>
+                    </ul>
+
+                    <p><strong>SLO/SLA Implications:</strong></p>
+                    <ul>
+                        <li><strong>Can achieve higher availability:</strong> 99.9%+ with proper setup</li>
+                        <li><strong>But harder to reason about:</strong> Failure modes are more complex</li>
+                        <li><strong>Control plane is SLO-critical:</strong> Its health directly impacts your SLOs</li>
+                    </ul>
+
+                    <div class="card warning" style="margin-top: 1rem;">
+                        <h4>Real War Story: The Friday Incident</h4>
+                        <p><strong>Company:</strong> E-commerce startup, 50-node cluster</p>
+                        <p><strong>Incident:</strong> etcd corruption caused control plane to become unresponsive. All deployments froze. No new Pods could be scheduled. Existing Pods kept running, but the system couldn't heal or adapt.</p>
+                        <p><strong>Root Cause:</strong> No etcd backup strategy, no control plane monitoring</p>
+                        <p><strong>Impact:</strong> 4-hour outage during Black Friday traffic</p>
+                        <p><strong>Lesson:</strong> The control plane itself is a single point of failure if not properly managed</p>
+                    </div>
+                </div>
+
+                <div class="card success">
+                    <h3>2. Availability (High Availability Patterns)</h3>
+                    <p><strong>Kubernetes HA Capabilities:</strong></p>
+                    <ul>
+                        <li><strong>Multi-master setup:</strong> 3+ control plane nodes with load balancing</li>
+                        <li><strong>Pod anti-affinity:</strong> Spread replicas across nodes/zones</li>
+                        <li><strong>Pod disruption budgets:</strong> Ensure minimum replicas during maintenance</li>
+                        <li><strong>Zone redundancy:</strong> Multi-AZ deployments for cloud provider resilience</li>
+                    </ul>
+
+                    <p><strong>HA Anti-patterns in K8s:</strong></p>
+                    <ul>
+                        <li><strong>Single node clusters:</strong> Defeats the purpose, adds overhead</li>
+                        <li><strong>All Pods in one zone:</strong> AZ outage takes everything down</li>
+                        <li><strong>Monolith deployment:</strong> Single Pod for entire app (no fault isolation)</li>
+                        <li><strong>No PDBs:</strong> Node maintenance causes cascading failures</li>
+                    </ul>
+
+                    <div class="comparison-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>HA Pattern</th>
+                                    <th>K8s Implementation</th>
+                                    <th>Trade-offs</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Active-Passive</td>
+                                    <td>Deploy 2+ replicas, use readiness gates</td>
+                                    <td>Simple but wastes 50% resources</td>
+                                </tr>
+                                <tr>
+                                    <td>Active-Active</td>
+                                    <td>Multiple replicas + Service load balancing</td>
+                                    <td>Best utilization but requires stateless design</td>
+                                </tr>
+                                <tr>
+                                    <td>Blue-Green</td>
+                                    <td>Two Deployments, switch Service selector</td>
+                                    <td>2x resource cost during deployment</td>
+                                </tr>
+                                <tr>
+                                    <td>Canary</td>
+                                    <td>Split traffic between Deployments</td>
+                                    <td>Complex traffic management, requires service mesh or smart ingress</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <p><strong>Failover Scenarios:</strong></p>
+                    <ul>
+                        <li><strong>Node fails:</strong> K8s reschedules Pods to healthy nodes (2-3 min)</li>
+                        <li><strong>Zone fails:</strong> Pods in other zones continue serving traffic</li>
+                        <li><strong>Control plane node fails:</strong> Other masters take over (if setup correctly)</li>
+                        <li><strong>Entire cluster fails:</strong> Need DR strategy (multi-cluster, backup/restore)</li>
+                    </ul>
+                </div>
+
+                <div class-card info>
+                    <h3>3. Latency (Where K8s Adds Delay)</h3>
+                    <p><strong>Inherent K8s Latency Sources:</strong></p>
+                    <ul>
+                        <li><strong>Service proxy (kube-proxy):</strong> +1-3ms per hop (iptables/IPVS mode)</li>
+                        <li><strong>Ingress controller:</strong> +2-5ms for routing logic</li>
+                        <li><strong>Network overlay:</strong> +1-2ms if using VXLAN/overlay networks</li>
+                        <li><strong>Pod startup:</strong> 5-30s cold start time (image pull + initialization)</li>
+                    </ul>
+
+                    <p><strong>Latency Optimization Strategies:</strong></p>
+                    <ul>
+                        <li><strong>Host network:</strong> Skip kube-proxy for low-latency services (but lose K8s networking benefits)</li>
+                        <li><strong>Local image cache:</strong> Pre-pull images to reduce Pod startup time</li>
+                        <li><strong>Pod affinity:</strong> Co-locate communicating services (reduce network hops)</li>
+                        <li><strong>Connection pooling:</strong> Reuse connections across Pod restarts</li>
+                        <li><strong>Service mesh alternative:</strong> Use sidecar-less mesh (like Cilium) for lower overhead</li>
+                    </ul>
+
+                    <div class="card warning">
+                        <h4>Latency Budget Reality Check</h4>
+                        <p><strong>Scenario:</strong> API with 100ms latency budget</p>
+                        <p><strong>Breakdown:</strong></p>
+                        <ul>
+                            <li>Application logic: 70ms</li>
+                            <li>Database: 20ms</li>
+                            <li>K8s Service routing: 3ms</li>
+                            <li>Ingress: 5ms</li>
+                            <li>Network overhead: 2ms</li>
+                            <li><strong>Total:</strong> 100ms (no room for spikes!)</li>
+                        </ul>
+                        <p><strong>Recommendation:</strong> For tight latency budgets (<10ms), consider bypassing K8s networking or using specialized solutions like SR-IOV.</p>
+                    </div>
+
+                    <p><strong>Latency Monitoring:</strong></p>
+                    <ul>
+                        <li><strong>Distributed tracing:</strong> Track K8s-added latency per hop</li>
+                        <li><strong>Network policies:</strong> Monitor for unexpected latency spikes</li>
+                        <li><strong>Pod readiness latency:</strong> Track how long Pods take to become ready</li>
+                    </ul>
+                </div>
+
+                <div class="card success">
+                    <h3>4. Throughput (Scaling Characteristics)</h3>
+                    <p><strong>K8s Scaling Advantages:</strong></p>
+                    <ul>
+                        <li><strong>Horizontal Pod Autoscaler (HPA):</strong> Auto-scale based on CPU/memory/custom metrics</li>
+                        <li><strong>Cluster Autoscaler:</strong> Auto-add nodes when Pod capacity is full</li>
+                        <li><strong>Load balancing:</strong> Even distribution across replicas</li>
+                        <li><strong>Resource limits:</strong> Prevent noisy neighbor problems</li>
+                    </ul>
+
+                    <p><strong>Throughput Bottlenecks in K8s:</strong></p>
+                    <ul>
+                        <li><strong>Control plane limits:</strong> etcd IOPS, API server QPS (typically ~1000 Pods/node)</li>
+                        <li><strong>Network bandwidth:</strong> Node NIC limits, overlay network overhead</li>
+                        <li><strong>Service mesh:</strong> Can add 20-40% latency and reduce throughput</li>
+                        <li><strong>Storage:</strong> Persistent volume IOPS limits</li>
+                        <li><strong>DNS:</strong> CoreDNS can become bottleneck at high QPS</li>
+                    </ul>
+
+                    <div class="comparison-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Scale Tier</th>
+                                    <th>Typical Limit</th>
+                                    <th>Bottleneck</th>
+                                    <th>Mitigation</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Small</td>
+                                    <td>&lt;10 nodes, &lt;100 Pods</td>
+                                    <td>None really</td>
+                                    <td>Default config works</td>
+                                </tr>
+                                <tr>
+                                    <td>Medium</td>
+                                    <td>10-100 nodes, 100-1000 Pods</td>
+                                    <td>API server, etcd</td>
+                                    <td>Tune qps/burst, etcd compaction</td>
+                                </tr>
+                                <tr>
+                                    <td>Large</td>
+                                    <td>100-1000 nodes, 1000-10000 Pods</td>
+                                    <td>Network, node resources</td>
+                                    <td>Multiple clusters, network policies</td>
+                                </tr>
+                                <tr>
+                                    <td>Hyperscale</td>
+                                    <td>1000+ nodes, 10000+ Pods</td>
+                                    <td>Everything</td>
+                                    <td>Federation, specialized CNI, custom controllers</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <p><strong>Real-world throughput numbers:</strong></p>
+                    <ul>
+                        <li><strong>Single Pod:</strong> 10K-50K RPS (depending on app, CPU, network)</li>
+                        <li><strong>Service (10 replicas):</strong> 100K-500K RPS</li>
+                        <li><strong>Ingress controller:</strong> 50K-200K RPS per instance</li>
+                        <li><strong>Cluster (100 nodes):</strong> 1M+ RPS achievable with proper design</li>
+                    </ul>
+                </div>
+
+                <div class="card info">
+                    <h3>5. Maintainability (Operational Complexity)</h3>
+                    <p><strong>K8s Adds Complexity:</strong></p>
+                    <ul>
+                        <li><strong>Learning curve:</strong> 6-12 months to become productive for most engineers</li>
+                        <li><strong>Day 2 operations:</strong> Upgrading, monitoring, debugging, security patching</li>
+                        <li><strong>Tooling ecosystem:</strong> Need to learn Helm, kubectl, Prometheus, etc.</li>
+                        <li><strong>YAML hell:</strong> Configuration management becomes challenging at scale</li>
+                    </ul>
+
+                    <p><strong>Maintainability Best Practices:</strong></p>
+                    <ul>
+                        <li><strong>GitOps:</strong> Declarative config in Git, automated sync (ArgoCD, Flux)</li>
+                        <li><strong>Standardization:</strong> Base templates, common patterns, style guides</li>
+                        <li><strong>Documentation:</strong> Runbooks, architecture diagrams, failure playbooks</li>
+                        <li><strong>Automation:</strong> Automated testing of manifests, CI/CD integration</li>
+                        <li><strong>Managed services:</strong> EKS, GKE, AKS reduce operational burden</li>
+                    </ul>
+
+                    <div class="card warning">
+                        <h4>The "Two-Pizza Team" Reality</h4>
+                        <p><strong>Amazon's rule:</strong> A team should be feedable with two pizzas (6-10 people)</p>
+                        <p><strong>K8s reality:</strong> At scale, you need:</p>
+                        <ul>
+                            <li>Platform team (2-3 people): Cluster management, upgrades</li>
+                            <li>SRE team (2-3 people): On-call, monitoring, incident response</li>
+                            <li>Application teams (multiple): Service ownership</li>
+                        </ul>
+                        <p><strong>Implication:</strong> K8s justifies dedicated platform teams at medium+ scale</p>
+                    </div>
+
+                    <p><strong>Operational Overhead Comparison:</strong></p>
+                    <ul>
+                        <li><strong>Traditional VM deployment:</strong> 1-2 engineers manage 100 servers</li>
+                        <li><small>With K8s:</strong> 2-3 engineers manage platform, app teams focus on services</li>
+                        <li><strong>Net effect:</strong> Higher specialization, better separation of concerns</li>
+                    </ul>
+                </div>
+
+                <div class="card error">
+                    <h3>6. Cost (Infrastructure + Operational + Opportunity)</h3>
+                    <p><strong>Infrastructure Costs:</strong></p>
+                    <ul>
+                        <li><strong>Control plane overhead:</strong> 3-5% of cluster resources (masters, etcd)</li>
+                        <li><strong>System overhead:</strong> 5-10% per node (kubelet, runtime, CNI)</li>
+                        <li><strong>Overprovisioning:</strong> Need 20-30% buffer for Pod scheduling flexibility</li>
+                        <li><strong>Network costs:</strong> Inter-AZ traffic, load balancer costs</li>
+                    </ul>
+
+                    <p><strong>Operational Costs:</strong></p>
+                    <ul>
+                        <li><strong>Platform team:</strong> $500K-$1M/year (3 engineers, fully loaded cost)</li>
+                        <li><strong>Training:</strong> $5K-$10K per engineer (CKA/CKS training + time)</li>
+                        <li><strong>Tooling:</strong> Monitoring, security, service mesh licenses ($50K-$500K/year)</li>
+                        <li><strong>Incidents:</strong> Longer MTTR while learning (opportunity cost)</li>
+                    </ul>
+
+                    <p><strong>Cost Optimization Strategies:</strong></p>
+                    <ul>
+                        <li><strong>Right-sizing:</strong> Continuously monitor and adjust resource requests/limits</li>
+                        <li><strong>Spot instances:</strong> Use spot/preemptible nodes for fault-tolerant workloads</li>
+                        <li><strong>Cluster autoscaling:</strong> Scale down when idle</li>
+                        <li><strong>Multi-tenancy:</strong> Share clusters to increase utilization</li>
+                        <li><strong>Cost monitoring:</strong> Kubecost, CloudHealth, or cloud provider tools</li>
+                    </ul>
+
+                    <div class="comparison-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Deployment Size</th>
+                                    <th>Traditional (VMs)</th>
+                                    <th>K8s (Self-managed)</th>
+                                    <th>K8s (Managed)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Small (3 apps)</td>
+                                    <td>$500/month</td>
+                                    <td>$800/month + $100K ops</td>
+                                    <td>$700/month + $50K ops</td>
+                                </tr>
+                                <tr>
+                                    <td>Medium (20 apps)</td>
+                                    <td>$3,000/month</td>
+                                    <td>$3,500/month + $500K ops</td>
+                                    <td>$4,000/month + $300K ops</td>
+                                </tr>
+                                <tr>
+                                    <td>Large (100 apps)</td>
+                                    <td>$15,000/month</td>
+                                    <td>$12,000/month + $1M ops</td>
+                                    <td>$15,000/month + $600K ops</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p style="font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.8;">*Ops = annual team and tooling cost</p>
+                    </div>
+
+                    <div class="card warning">
+                        <h4>The K8s Cost Trap</h4>
+                        <p><strong>Scenario:</strong> Startup with 5 apps moves to K8s</p>
+                        <p><strong>Expectation:</strong> "It'll be cheaper with better utilization"</p>
+                        <p><strong>Reality:</strong></p>
+                        <ul>
+                            <li>Infrastructure: +40% (control plane overhead, overprovisioning)</li>
+                            <li>Tooling: +$50K/year (monitoring, security, GitOps tools)</li>
+                            <li>Team: +1 FTE for platform management ($200K/year)</li>
+                            <li><strong>Year 1 total:</strong> +$350K vs. traditional deployment</li>
+                        </ul>
+                        <p><strong>Tipping point:</strong> K8s becomes cost-effective at ~50+ services or complex scaling needs</p>
+                    </div>
+                </div>
+
+                <div class="card info">
+                    <h3>7. Security (Attack Surface + Vulnerabilities)</h3>
+                    <p><strong>Expanded Attack Surface:</strong></p>
+                    <ul>
+                        <li><strong>Control plane:</strong> API server, etcd, scheduler, controller manager</li>
+                        <li><strong>Node components:</strong> kubelet, container runtime, CNI plugin</li>
+                        <li><strong>Network:</strong> Pod-to-Pod, Service, Ingress, egress</li>
+                        <li><strong>Supply chain:</strong> Container images, Helm charts, manifests</li>
+                        <li><strong>RBAC:</strong> Overly permissive roles are common mistake</li>
+                    </ul>
+
+                    <p><strong>Security Hardening Checklist:</strong></p>
+                    <ul>
+                        <li><strong>Image security:</strong> Scan for vulnerabilities, sign images, use distroless/base images</li>
+                        <li><strong>Network policies:</strong> Default deny, whitelist only necessary traffic</li>
+                        <li><strong>RBAC:</strong> Principle of least privilege, regular audits</li>
+                        <li><strong>Pod security:</strong> Run as non-root, drop capabilities, use security contexts</li>
+                        <li><strong>Secrets management:</strong> External secret stores (Vault, AWS Secrets Manager)</li>
+                        <li><strong>Admission controllers:</strong> OPA Gatekeeper for policy enforcement</li>
+                        <li><strong>Runtime security:</strong> Falco for anomaly detection</li>
+                    </ul>
+
+                    <div class="card error">
+                        <h4>Real War Story: The Crypto Miner</h4>
+                        <p><strong>Company:</strong> Mid-sized SaaS company</p>
+                        <p><strong>Incident:</strong> Monitoring team noticed 300% spike in one node's CPU usage</p>
+                        <p><strong>Investigation:</strong> Found cryptocurrency miner running in a Pod</p>
+                        <p><strong>Root Cause:</strong></p>
+                        <ul>
+                            <li>Publicly exposed dashboard with default credentials</li>
+                            <li>No network policies (any Pod could talk to any Pod)</li>
+                            <li>RBAC allowed creation of Pods from dashboard service account</li>
+                        </ul>
+                        <p><strong>Impact:</strong> 48 hours of mining before detection, $2K in cloud costs</p>
+                        <p><strong>Fix:</strong> Network policies, RBAC audit, credential rotation, image scanning</p>
+                    </div>
+
+                    <p><strong>Compliance Considerations:</strong></p>
+                    <ul>
+                        <li><strong>PCI-DSS:</strong> Network segmentation, secrets encryption, audit logging</li>
+                        <li><strong>HIPAA:</strong> Data encryption at rest and in transit, access controls</li>
+                        <li><strong>SOC 2:</strong> Change management (GitOps), incident response, monitoring</li>
+                        <li><strong>FedRAMP:</strong> FIPS-validated encryption, continuous monitoring</li>
+                    </ul>
+
+                    <p><strong>Security Tooling:</strong></p>
+                    <ul>
+                        <li><strong>Image scanning:</strong> Trivy, Clair, Aqua</li>
+                        <li><strong>Runtime security:</strong> Falco, Aqua CSP</li>
+                        <li><strong>Network:</strong> Cilium, Calico with network policies</li>
+                        <li><strong>Policy enforcement:</strong> OPA Gatekeeper, Kyverno</li>
+                        <li><strong>Secrets:</strong> External Secrets Operator, HashiCorp Vault</li>
+                    </ul>
+                </div>
+
+                <div class="card success">
+                    <h3>8. Observability (Monitoring + Debugging)</h3>
+                    <p><strong>K8s Observability Stack:</strong></p>
+                    <ul>
+                        <li><strong>Metrics:</strong> Prometheus + Grafana (resource usage, custom app metrics)</li>
+                        <li><strong>Logs:</strong> ELK/Loki (aggregated logging with Pod metadata)</li>
+                        <li><strong>Traces:</strong> Jaeger/Tempo (distributed tracing across services)</li>
+                        <li><strong>Events:</strong> K8s event logs (Pod scheduling, scaling, errors)</li>
+                    </ul>
+
+                    <p><strong>The Three Pillars in K8s:</strong></p>
+
+                    <div class="comparison-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Pillar</th>
+                                    <th>Tool</th>
+                                    <th>What It Tells You</th>
+                                    <th>K8s Integration</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Metrics</td>
+                                    <td>Prometheus</td>
+                                    <td>"How many requests failed?"</td>
+                                    <td>Kube-state-metrics, cAdvisor</td>
+                                </tr>
+                                <tr>
+                                    <td>Logs</td>
+                                    <td>Loki/ELK</td>
+                                    <td>"Why did this request fail?"</td>
+                                    <td>Fluentd/fluent-bit tailing</td>
+                                </tr>
+                                <tr>
+                                    <td>Traces</td>
+                                    <td>Jaeger</td>
+                                    <td>"Where was time spent?"</td>
+                                    <td>Service mesh injection</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <p><strong>Key K8s Metrics to Monitor:</strong></p>
+                    <ul>
+                        <li><strong>Cluster health:</strong> Node readiness, control plane component health</li>
+                        <li><strong>Resource usage:</strong> CPU, memory, disk, network per node/Pod</li>
+                        <li><strong>Pod lifecycle:</strong> Restart count, CrashLoopBackOff, OOMKilled</li>
+                        <li><strong>API server:</strong> Request latency, error rate, queue depth</li>
+                        <li><strong>Etcd:</strong> Disk I/O, WAL size, leader changes</li>
+                    </ul>
+
+                    <p><strong>Debugging Complexities:</strong></p>
+                    <ul>
+                        <li><strong>Distributed debugging:</strong> Issues span multiple Pods/nodes</li>
+                        <li><strong>Ephemeral containers:</strong> Pod dies, logs are gone (need central logging)</li>
+                        <li><strong>Network policies:</strong> Can block legitimate traffic (hard to debug)</li>
+                        <li><strong>Resource limits:</strong> Throttling looks like performance bugs</li>
+                        <li><strong>Race conditions:</strong> Dynamic IPs make reproduction difficult</li>
+                    </ul>
+
+                    <div class="card info">
+                        <h4>Debugging Workflow Template</h4>
+                        <ol>
+                            <li><strong>Check Pod status:</strong> kubectl get pods -o wide</li>
+                            <li><strong>Describe Pod:</strong> kubectl describe pod &lt;name&gt; (check events)</li>
+                            <li><strong>Check logs:</strong> kubectl logs &lt;pod&gt; --previous (if crashed)</li>
+                            <li><strong>Check metrics:</strong> Grafana dashboards for resource usage</li>
+                            <li><strong>Network connectivity:</strong> kubectl exec -it &lt;pod&gt; -- curl</li>
+                            <li><strong>Check events:</strong> kubectl get events --sort-by=.metadata.creationTimestamp</li>
+                        </ol>
+                    </div>
+
+                    <p><strong>Observability Best Practices:</strong></p>
+                    <ul>
+                        <li><strong>Structured logging:</strong> JSON logs with consistent fields</li>
+                        <li><strong>Correlation IDs:</strong> Trace requests across services</li>
+                        <li><strong>SLI/SLO dashboards:</strong> Track error budgets, latency, throughput</li>
+                        <li><strong>Alerting:</strong> meaningful alerts, not alert fatigue</li>
+                        <li><strong>Runbooks:</strong> Documented procedures for common incidents</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>System Design Scenario: Design a Web App with Kubernetes</h2>
+            <p>Let's walk through a system design interview question: <strong>"Design a scalable web application for handling 1M requests per second."</strong> We'll evolve from naive to optimized, showing how K8s fits at each stage.</p>
+
+            <h3>Stage 1: Naive Single Instance (10 QPS)</h3>
+            <div class="card warning">
+                <h4>Architecture</h4>
+                <ul>
+                    <li>Single EC2 instance running Node.js app</li>
+                    <li>Single RDS database instance</li>
+                    <li>Cloudflare for DNS</li>
+                </ul>
+
+                <h4>Problems at Scale</h4>
+                <ul>
+                    <li>Single point of failure (SPOF)</li>
+                    <li>Can't scale beyond single machine</li>
+                    <li>Downtime during deployments</li>
+                    <li>No load balancing</li>
+                </ul>
+
+                <h4>K8s Doesn't Help Yet</h4>
+                <p>Adding K8s here would add complexity without solving the fundamental architectural issues. Don't K8s until you need to scale.</p>
+            </div>
+
+            <h3>Stage 2: Horizontal Scaling with K8s (1K QPS)</h3>
+            <div class="card info">
+                <h4>Architecture</h4>
+                <ul>
+                    <li>K8s cluster with 3 nodes (multi-AZ)</li>
+                    <li>Deployment with 3 replicas of web app</li>
+                    <li>Service for load balancing</li>
+                    <li>Ingress controller (nginx) for routing</li>
+                    <li>Managed RDS (still single instance)</li>
+                </ul>
+
+                <h4>K8s Benefits</h4>
+                <ul>
+                    <li>Self-healing: restarts failed Pods</li>
+                    <li>Zero-downtime deployments: rolling updates</li>
+                    <li>Load balancing: Service distributes traffic</li>
+                    <li>Multi-AZ: spans availability zones</li>
+                </ul>
+
+                <h4>New Bottlenecks</h4>
+                <ul>
+                    <li>Database becomes bottleneck (single instance)</li>
+                    <li>Session state issues (Pods are ephemeral)</li>
+                    <li>Ingress controller could be SPOF</li>
+                </ul>
+
+                <h4>Cost</h4>
+                <ul>
+                    <li>Infrastructure: ~$2K/month (3 nodes + LB + RDS)</li>
+                    <li>Operational: Need 1 K8s-knowledgeable engineer</li>
+                </ul>
+            </div>
+
+            <h3>Stage 3: Full Microservices with K8s (10K QPS)</h3>
+            <div class="card success">
+                <h4>Architecture</h4>
+                <ul>
+                    <li>K8s cluster: 10 nodes (multi-AZ)</li>
+                    <li>Microservices: API, auth, payments, notifications, user service</li>
+                    <li>Each service: 3+ replicas with HPA</li>
+                    <li>Service mesh (Istio) for traffic management</li>
+                    <li>Redis cluster for caching</li>
+                    <li>Read replicas for RDS</li>
+                    <li>CloudFront CDN for static assets</li>
+                </ul>
+
+                <h4>K8s Now Shines</h4>
+                <ul>
+                    <li>Service discovery: automatic DNS-based</li>
+                    <li>Isolation: resource limits per service</li>
+                    <li>Independent scaling: each service scales based on demand</li>
+                    <li>Observability: service mesh provides metrics, tracing</li>
+                    <li>Deployments: canary releases, traffic splitting</li>
+                </ul>
+
+                <h4>New Challenges</h4>
+                <ul>
+                    <li>Operational complexity: 10+ services to manage</li>
+                    <li>Network latency: service mesh adds 2-5ms per hop</li>
+                    <li>Distributed tracing: debugging across services</li>
+                    <li>Cost: service mesh adds 30% overhead</li>
+                </ul>
+
+                <h4>Cost</h4>
+                <ul>
+                    <li>Infrastructure: ~$8K/month (10 nodes + DBs + cache + CDN)</li>
+                    <li>Tooling: monitoring, security (~$50K/year)</li>
+                    <li>Team: 2 platform engineers + SRE (~$600K/year)</li>
+                </ul>
+            </div>
+
+            <h3>Stage 4: Hyperscale with K8s (1M QPS)</h3>
+            <div class="card info">
+                <h4>Architecture</h4>
+                <ul>
+                    <li>Multiple K8s clusters (regional, edge)</li>
+                    <li>Cluster federation for multi-region</li>
+                    <li>100+ nodes per cluster</li>
+                    <li>Sharded databases (Cassandra, MongoDB)</li>
+                    <li>Multi-layer caching (Redis, CDN, edge)</li>
+                    <li>Event-driven architecture (Kafka)</li>
+                    <li>Async processing (queues, workers)</li>
+                    <li>Rate limiting, circuit breaking (service mesh)</li>
+                </ul>
+
+                <h4>K8s is Essential Now</h4>
+                <ul>
+                    <li>Automated scaling: HPA + cluster autoscaler</li>
+                    <li>Multi-region: federation syncs across clusters</li>
+                    <li>Resilience: self-healing at massive scale</li>
+                    <li>Team autonomy: multiple teams deploy independently</li>
+                    <li>GitOps: declarative config for 1000+ services</li>
+                </ul>
+
+                <h4>At This Scale, K8s Has Issues</h4>
+                <ul>
+                    <li>Control plane limits: etcd I/O bottleneck</li>
+                    <li>Network: CNI performance degrades</li>
+                    <li>Monitoring: Prometheus can't handle 1M metrics/sec</li>
+                    <li>Deployments: rolling updates take hours</li>
+                </ul>
+
+                <h4>Solutions</h4>
+                <ul>
+                    <li>Multiple clusters: split by team/service</li>
+                    <li>Custom controllers: optimize for specific use cases</li>
+                    <li>Specialized monitoring: Thanos, Cortex for metrics</li>
+                    <li>Advanced CNI: Cilium with eBPF for performance</li>
+                </ul>
+
+                <h4>Cost</h4>
+                <ul>
+                    <li>Infrastructure: ~$500K/month (multi-region, 500+ nodes)</li>
+                    <li>Platform team: 5-10 engineers (~$2M/year)</li>
+                    <li>Tooling: enterprise licenses (~$500K/year)</li>
+                </ul>
+            </div>
+
+            <h3>Decision Framework: When to Introduce K8s</h3>
+            <div class="card success">
+                <h4>Use K8s When:</h4>
+                <ul>
+                    <li>You have 5+ microservices to manage</li>
+                    <li>You need sub-minute recovery from failures</li>
+                    <li>You have a team to manage the platform</li>
+                    <li>You need to scale frequently (daily/hourly)</li>
+                    <li>You're deploying to production multiple times per week</li>
+                    <li>You have complex networking/security requirements</li>
+                </ul>
+
+                <h4>Don't Use K8s Yet When:</h4>
+                <ul>
+                    <li>You have 1-3 monolithic applications</li>
+                    <li>You deploy once per week or less</li>
+                    <li>You don't have K8s expertise on the team</li>
+                    <li>Your scaling needs are predictable</li>
+                    <li>You're pre-product-market-fit (MVP stage)</li>
+                    <li>Your monthly infrastructure bill is &lt;$1K</li>
+                </ul>
+
+                <h4>Better Alternatives to K8s:</h4>
+                <ul>
+                    <li><strong>Managed PaaS:</strong> Heroku, Railway, Render (for simple apps)</li>
+                    <li><strong>Container services:</strong> AWS ECS, GCP Cloud Run (simpler than K8s)</li>
+                    <li><strong>Serverless:</strong> AWS Lambda, Cloud Functions (for event-driven workloads)</li>
+                    <li><strong>VM + Ansible:</strong> Traditional approach (for simple, stable apps)</li>
+                </ul>
+            </div>
+        </section>
+
+        <section>
+            <h2>System Design Integration Summary</h2>
+            <div class="comparison-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Pillar</th>
+                            <th>K8s Improves</th>
+                            <th>K8s Complicates</th>
+                            <th>Net Effect</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Reliability</td>
+                            <td>Self-healing, automated recovery</td>
+                            <td>More failure modes, complexity</td>
+                            <td>Positive (with expertise)</td>
+                        </tr>
+                        <tr>
+                            <td>Availability</td>
+                            <td>Multi-AZ, fault isolation, PDBs</td>
+                            <td>Control plane becomes SPOF</td>
+                            <td>Positive (if setup right)</td>
+                        </tr>
+                        <tr>
+                            <td>Latency</td>
+                            <td>Local caching, smart routing</td>
+                            <td>Service proxy overhead</td>
+                            <td>Slightly negative</td>
+                        </tr>
+                        <tr>
+                            <td>Throughput</td>
+                            <td>Horizontal scaling, load balancing</td>
+                            <td>Control plane bottlenecks</td>
+                            <td>Positive (at scale)</td>
+                        </tr>
+                        <tr>
+                            <td>Maintainability</td>
+                            <td>Declarative config, GitOps</td>
+                            <li>Steep learning curve</td>
+                            <td>Mixed (depends on team)</td>
+                        </tr>
+                        <tr>
+                            <td>Cost</td>
+                            <td>Better utilization at scale</td>
+                            <td>Operational overhead</td>
+                            <td>Positive at 50+ services</td>
+                        </tr>
+                        <tr>
+                            <td>Security</td>
+                            <td>Network policies, RBAC</td>
+                            <td>Larger attack surface</td>
+                            <td>Mixed (needs hardening)</td>
+                        </tr>
+                        <tr>
+                            <td>Observability</td>
+                            <td>Built-in metrics, events</td>
+                            <td>Distributed debugging complexity</td>
+                            <td>Positive with right tools</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card info" style="margin-top: 2rem;">
+                <h3>Key Takeaway</h3>
+                <p>Kubernetes is a <strong>force multiplier</strong>: it amplifies both your capabilities and your complexity.</p>
+                <ul>
+                    <li><strong>Small scale:</strong> Complexity outweighs benefits</li>
+                    <li><strong>Medium scale:</strong> Benefits start to justify complexity</li>
+                    <li><strong>Large scale:</strong> Benefits far outweigh complexity</li>
+                </ul>
+                <p>The decision to use K8s should be based on your current scale, team capabilities, and growth trajectory—not because it's the trendy choice.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Interview Talking Points</h2>
+            <p>When discussing Kubernetes in system design interviews, demonstrate nuanced understanding by covering:</p>
+
+            <div class="accordion">
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>"How does K8s impact reliability?"</h4>
+                    </div>
+                    <div class="accordion-content">
+                        <p><strong>Key Points:</strong></p>
+                        <ul>
+                            <li>Self-healing reduces MTTR for common failures (Pod crashes)</li>
+                            <li>But increases complexity for novel failures (control plane issues)</li>
+                            <li>Health checks are critical—need proper liveness/readiness probes</li>
+                            <li>Rolling updates with rollback improve deployment reliability</li>
+                            <li><strong>Example:</strong> "At my last company, we reduced MTTR from 30 minutes to 2 minutes for Pod crashes, but increased debugging time from 1 hour to 3 hours for complex issues."</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>"When would you NOT use K8s?"</h4>
+                    </div>
+                    <div class="accordion-content">
+                        <p><strong>Key Points:</strong></p>
+                        <ul>
+                            <li>Small scale (1-3 apps) — PaaS is simpler</li>
+                            <li>Simple apps with predictable scaling — traditional VMs work</li>
+                            <li>No K8s expertise on team — 6-12 month learning curve</li>
+                            <li>Tight latency budgets (&lt;10ms) — K8s networking adds overhead</li>
+                            <li>Stateful workloads with complex data — K8s can do it but it's complex</li>
+                            <li><strong>Example:</strong> "For a startup with 3 apps and 2 engineers, I'd recommend Heroku or AWS ECS first. Move to K8s when you hit 10+ services or need advanced scaling."</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>"How do you handle stateful applications in K8s?"</h4>
+                    </div>
+                    <div class="accordion-content">
+                        <p><strong>Key Points:</strong></p>
+                        <ul>
+                            <li>StatefulSets for ordered deployment, stable network identities</li>
+                            <li>PersistentVolumes with proper storage class (SSD vs HDD)</li>
+                            <li>But: prefer managed DB services (RDS, CloudSQL) when possible</li>
+                            <li>Run stateful in K8s when: latency requirements, cost optimization, regulatory needs</li>
+                            <li><strong>Example:</strong> "We run our Redis cache in K8s for cost savings, but use RDS for Postgres because managed is more reliable."</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>"How does K8s affect your costs?"</h4>
+                    </div>
+                    <div class="accordion-content">
+                        <p><strong>Key Points:</strong></p>
+                        <ul>
+                            <li>Infrastructure overhead: 10-15% (control plane, system overhead)</li>
+                            <li>Operational cost: platform team + tooling ($500K-$1M/year)</li>
+                            <li>Better utilization at scale can offset this</li>
+                            <li>Managed K8s (EKS, GKE) reduces but doesn't eliminate ops cost</li>
+                            <li><strong>Example:</strong> "Our K8s infrastructure costs 15% more, but we run 3x more workloads per dollar, so net is 60% savings."</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>"How do you secure a K8s cluster?"</h4>
+                    </div>
+                    <div class="accordion-content">
+                        <p><strong>Key Points:</strong></p>
+                        <ul>
+                            <li>Network policies (default deny)</li>
+                            <li>RBAC with principle of least privilege</li>
+                            <li>Image scanning + distroless images</li>
+                            <li>Pod security contexts (non-root, drop capabilities)</li>
+                            <li>Secrets encryption at rest</li>
+                            <li>Admission controllers for policy enforcement</li>
+                            <li><strong>Example:</strong> "We use OPA Gatekeeper to enforce no privileged Pods, and Trivy in CI to block vulnerable images."</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mastery-checklist">
+            <h2>Section Mastery Checklist</h2>
+            <div class="checklist-item">
+                <input type="checkbox" id="check1">
+                <label for="check1">I can explain how K8s impacts all 8 system design pillars</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="check2">
+                <label for="check2">I can articulate when K8s is worth the complexity</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="check3">
+                <label for="check3">I can design a system that evolves from simple to K8s-scaled</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="check4">
+                <label for="check4">I can discuss K8s trade-offs in an interview (pros and cons)</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="check5">
+                <label for="check5">I understand the cost implications (infrastructure + operational)</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="check6">
+                <label for="check6">I can explain K8s security best practices and common pitfalls</label>
+            </div>
+        </section>
+    </main>
+
+    <nav class="section-nav">
+        <a href="conversations.html" class="prev-btn">← Previous: Interview Conversations</a>
+        <a href="ripple-effects.html" class="next-btn">Next: Ripple Effects →</a>
+    </nav>
+
+    <footer>
+        <p>Kubernetes Learning Journey | System Design Integration</p>
+    </footer>
+
+    <script src="../../js/components.js"></script>
+</body>
+</html>

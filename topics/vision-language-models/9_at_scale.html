@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>At Scale | VLM Learning Journey</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <a href="index.html" class="sidebar-title">VLMs & ECOSYSTEM</a>
+            <a href="index.html" class="nav-link ">Home / Hub</a>\n<a href="1_foundation.html" class="nav-link ">1. Foundation & Context</a>\n<a href="2_living_analogy.html" class="nav-link ">2. Living Analogy</a>\n<a href="3a_learning_journey.html" class="nav-link ">3A. Learning Journey</a>\n<a href="3b_interview_conversations.html" class="nav-link ">3B. Interview Conversations</a>\n<a href="4_system_design_integration.html" class="nav-link ">4. System Design Integration</a>\n<a href="5_ripple_effects_map.html" class="nav-link ">5. Ripple Effects Map</a>\n<a href="6_evolution_story.html" class="nav-link ">6. Evolution Story</a>\n<a href="7_patterns_anti_patterns.html" class="nav-link ">7. Patterns & Anti-Patterns</a>\n<a href="8_trade_offs_analysis.html" class="nav-link ">8. Trade-offs Analysis</a>\n<a href="9_at_scale.html" class="nav-link active">9. At Scale</a>\n<a href="10_technology_landscape.html" class="nav-link ">10. Technology Landscape</a>\n<a href="11_pitfalls_war_stories.html" class="nav-link ">11. Pitfalls & War Stories</a>\n<a href="12_debugging_process.html" class="nav-link ">12. Debugging Process</a>\n<a href="13_eloquent_conversation.html" class="nav-link ">13. Eloquent Conversation</a>\n<a href="14_practice_exercises.html" class="nav-link ">14. Practice Exercises</a>\n<a href="15_quick_reference.html" class="nav-link ">15. Quick Reference</a>\n<a href="16_whats_next.html" class="nav-link ">16. What's Next</a>\n
+        </aside>
+        <main class="main-content">
+            
+        <h1>09. At Scale</h1>
+        <div class="card">
+            <h3>1 Million Requests / Second</h3>
+            <p><strong>The Bottleneck:</strong> Visual token generation is compute-heavy (ViT execution), but KV caching the resultant sequence is memory-heavy. If user A sends an image to a chatbot, the GPU RAM stores 2048 tokens * hidden_dim for that single request. Multiplied by concurrent users, you OOM instantly.</p>
+            <p><strong>The Solution: Continuous Batching & Pre-fill Offloading.</strong></p>
+            <ul>
+                <li><strong>Disaggregated Serving:</strong> Have specific A100/H100 nodes that ONLY encode the vision inputs (pre-fill phase). Then, shuttle the resulting dense embeddings over NVLink/RDMA to nodes running the LLM decoder (decode phase).</li>
+                <li><strong>Semantic Deduplication (Image Hashes):</strong> If 100,000 users ask a question about the same viral meme, hash the image bytes. If it hits the cache, skip the ViT entirely. Load pre-computed KV tokens.</li>
+            </ul>
+        </div>
+        
+        </main>
+    </div>
+    <script src="js/components.js"></script>
+</body>
+</html>

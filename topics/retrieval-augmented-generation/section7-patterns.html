@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patterns & Anti-Patterns - RAG Learning Journey</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="theme-dark">
+    <div class="container">
+        <header class="section-header">
+            <div class="breadcrumbs">
+                <a href="index.html">Home</a>
+                <span>/</span>
+                <span>Section 7: Patterns & Anti-Patterns</span>
+            </div>
+            <h1>Patterns & Anti-Patterns</h1>
+            <p class="section-subtitle">Proven Patterns and Common Mistakes in RAG Implementation</p>
+        </header>
+
+        <nav class="nav-buttons">
+            <a id="prevBtn" class="nav-btn" href="section6-evolution.html">
+                ← Previous
+            </a>
+            <button id="completeBtn" class="nav-btn" data-section="section7-patterns">
+                ✓ Mark Complete
+            </button>
+            <a id="nextBtn" class="nav-btn" href="section8-tradeoffs.html">
+                Next: Trade-offs →
+            </a>
+        </nav>
+
+        <main>
+            <section class="content-section">
+                <h2>The Value of Patterns</h2>
+
+                <div class="highlight info">
+                    <h4>💡 Why Patterns Matter</h4>
+                    <p><strong>Patterns:</strong> Reusable solutions to common problems. They're not rules, but starting points that have worked for others.</p>
+
+                    <p><strong>Anti-patterns:</strong> Approaches that seem right but lead to problems. Learning these helps you avoid common traps.</p>
+
+                    <p><strong>Remember:</strong> Context matters. A pattern that's perfect in one situation may be wrong in another. Always adapt to your specific needs.</p>
+                </div>
+            </section>
+
+            <!-- Proven Patterns -->
+            <section class="content-section">
+                <h2>Proven RAG Patterns</h2>
+
+                <div class="accordion-group">
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>🎯 Pattern 1: Hybrid Search</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <h4>What</h4>
+                            <p>Combine vector similarity search with keyword search (BM25), then merge and rerank results.</p>
+
+                            <h4>Why It Works</h4>
+                            <ul>
+                                <li><strong>Vector search:</strong> Great for semantic similarity ("why do I feel tired?")</li>
+                                <li><strong>Keyword search:</strong> Great for exact matches ("acetyl-L-carnitine")</li>
+                                <li><strong>Together:</strong> Best of both worlds, covers more query types</li>
+                            </ul>
+
+                            <h4>When to Use</h4>
+                            <ul>
+                                <li>Domain with specific terminology (medical, legal, technical)</li>
+                                <li>Users search by product codes, names, or exact phrases</li>
+                                <li>You're not sure which approach will work better</li>
+                            </ul>
+
+                            <h4>Implementation</h4>
+                            <div class="code-block">
+                                <code>
+# Pseudo-code for hybrid search<br>
+vector_results = vector_db.search(query, k=10)<br>
+keyword_results = keyword_db.search(query, k=10)<br>
+combined = merge_and_dedupe(vector_results, keyword_results)<br>
+reranked = reranker.rank(query, combined)<br>
+final_results = reranked[:5]
+                                </code>
+                            </div>
+
+                            <h4>Real Example</h4>
+                            <p>"A medical Q&A system improved retrieval precision from 68% to 84% by adding BM25 to vector search."</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>🎯 Pattern 2: Query Transformation</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <h4>What</h4>
+                            <p>Transform user queries before retrieval to improve relevance. Techniques include HyDE, query expansion, and rewriting.</p>
+
+                            <h4>Common Transformations</h4>
+                            <ul>
+                                <li><strong>HyDE:</strong> Generate hypothetical answer, search for similar documents</li>
+                                <li><strong>Query expansion:</strong> Add synonyms and related terms</li>
+                                <li><strong>Step-back:</strong> Abstract to higher-level concepts</li>
+                                <li><strong>Multi-query:</strong> Generate multiple query variations</li>
+                            </ul>
+
+                            <h4>When to Use</h4>
+                            <ul>
+                                <li>User queries are vague or underspecified</li>
+                                <li>Domain has multiple ways to express concepts</li>
+                                <li>Users aren't expert searchers</li>
+                            </ul>
+
+                            <h4>Real Example</h4>
+                            <p>"E-commerce site saw 35% improvement in search relevance by expanding 'phone charger' to include 'power adapter', 'charging cable', 'USB charger'."</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>🎯 Pattern 3: Parent-Child Retrieval</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <h4>What</h4>
+                            <p>Store and search small chunks for precision, but retrieve and use larger parent chunks for context.</p>
+
+                            <h4>How It Works</h4>
+                            <ol>
+                                <li>Chunk documents into small pieces (100-300 tokens)</li>
+                                <li>Link each chunk to its parent (larger section or whole document)</li>
+                                <li>Search on small chunks (more precise)</li>
+                                <li>Return parent chunks (more context)</li>
+                            </ol>
+
+                            <h4>When to Use</h4>
+                            <ul>
+                                <li>Documents have complex structure</li>
+                                <li>Context matters for answer quality</li>
+                                <li>You need precision but also surrounding information</li>
+                            </ul>
+
+                            <h4>Real Example</h4>
+                            <p>"Legal document analysis system improved by 40% when they switched from fixed-size chunks to parent-child retrieval."</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>🎯 Pattern 4: Metadata Filtering</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <h4>What</h4>
+                            <p>Use document metadata (date, author, type, etc.) to filter search results before or after vector search.</p>
+
+                            <h4>Why It Matters</h4>
+                            <ul>
+                                <li>Vector similarity doesn't capture temporal relevance</li>
+                                <li>Some queries need specific document types</li>
+                                <li>Users often care about recency or source</li>
+                            </ul>
+
+                            <h4>When to Use</h4>
+                            <ul>
+                                <li>Time-sensitive queries ("latest", "recent")</li>
+                                <li>Source-specific queries ("from the finance team")</li>
+                                <li>Type-specific queries ("policies", "guidelines")</li>
+                            </ul>
+
+                            <h4>Implementation Tips</h4>
+                            <ul>
+                                <li>Extract metadata during ingestion</li>
+                                <li>Store metadata in vector DB</li>
+                                <li>Apply filters before vector search (pre-filter) or after (post-filter)</li>
+                                <li>Make metadata queryable from user input</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>🎯 Pattern 5: Recursive Retrieval</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <h4>What</h4>
+                            <p>Iteratively retrieve and refine, using results from previous retrieval to guide the next.</p>
+
+                            <h4>How It Works</h4>
+                            <ol>
+                                <li>Initial retrieval based on user query</li>
+                                <li>Analyze results: Are they relevant? Is more information needed?</li>
+                                <li>If needed, refine query and retrieve again</li>
+                                <li>Repeat until satisfied or max iterations reached</li>
+                            </ol>
+
+                            <h4>When to Use</h4>
+                            <ul>
+                                <li>Complex, multi-hop questions</li>
+                                <li>Initial retrieval is uncertain</li>
+                                <li>Questions that require multiple pieces of information</li>
+                            </ul>
+
+                            <h4>Real Example</h4>
+                            <p>"Research assistant improved by 50% on complex queries by implementing recursive retrieval that gathered information from multiple sources."</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>🎯 Pattern 6: Decomposition</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <h4>What</h4>
+                            <p>Break complex queries into simpler sub-questions, retrieve for each, then combine answers.</p>
+
+                            <h4>How It Works</h4>
+                            <ol>
+                                <li>Analyze complex query</li>
+                                <li>Decompose into 2-5 sub-questions</li>
+                                <li>Retrieve and answer each sub-question</li>
+                                <li>Synthesize answers into comprehensive response</li>
+                            </ol>
+
+                            <h4>When to Use</h4>
+                            <ul>
+                                <li>User asks multi-part questions</li>
+                                <li>Questions require comparing multiple aspects</li>
+                                <li>Single retrieval can't capture all needed information</li>
+                            </ul>
+
+                            <h4>Real Example</h4>
+                            <p>"Customer support bot improved satisfaction by 35% by decomposing 'How does pricing work for nonprofits with annual contracts?' into separate pricing and nonprofit queries."</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>🎯 Pattern 7: Citation-First Generation</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <h4>What</h4>
+                            <p>Design the RAG system to require citations from the start. Every claim must reference a retrieved document.</p>
+
+                            <h4>How It Works</h4>
+                            <ul>
+                                <li>Prompt explicitly requires citations</li>
+                                <li>LLM includes source references</li>
+                                <li>Post-processing validates citations</li>
+                                <li>Failed citations trigger retry or fallback</li>
+                            </ul>
+
+                            <h4>When to Use</h4>
+                            <ul>
+                                <li>Always for factual content</li>
+                                <li>Especially for medical, legal, financial</li>
+                                <li>When trust and verifiability matter</li>
+                            </ul>
+
+                            <h4>Why It's Critical</h4>
+                            <p>"Citations reduce hallucinations by 60% and make errors immediately traceable. They're essential for enterprise adoption."</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Anti-Patterns -->
+            <section class="content-section">
+                <h2>Common Anti-Patterns</h2>
+
+                <div class="highlight danger">
+                    <h4>⚠️ What Are Anti-Patterns?</h4>
+                    <p>These are approaches that seem reasonable but lead to problems. They're traps that engineers commonly fall into.</p>
+                    <p><strong>Learn these so you can avoid repeating others' mistakes.</strong></p>
+                </div>
+
+                <div class="accordion-group">
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>🚫 Anti-Pattern 1: Framework Over-Reliance</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <h4>The Trap</h4>
+                            <p>Using LangChain/LlamaIndex for everything without understanding what they're doing. Copying tutorials without customization.</p>
+
+                            <h4>Why It Seems Right</h4>
+                            <ul>
+                                <li>"It's faster to use existing components"</li>
+                                <li>"The framework handles edge cases"</li>
+                                <li>"Everyone uses LangChain"</li>
+                            </ul>
+
+                            <h4>The Problems</h4>
+                            <ul>
+                                <li>Don't understand failures when they occur</li>
+                                <li>Can't optimize for specific needs</li>
+                                <li>Framework abstractions hide important details</li>
+                                <li>Debugging becomes much harder</li>
+                            </ul>
+
+                            <h4>Real Example</h4>
+                            <p>"Team spent 3 weeks debugging a RAG issue that was caused by a LangChain abstraction. They rebuilt without the framework in 2 days and fixed the problem."</p>
+
+                            <h4>Better Approach</h4>
+                            <ul>
+                                <li>Build from scratch first to learn fundamentals</li>
+                                <li>Use frameworks for speed, not as crutches</li>
+                                <li>Understand what framework components actually do</li>
+                                <li>Be ready to replace framework code when needed</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>🚫 Anti-Pattern 2: Premature Optimization</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <h4>The Trap</h4>
+                            <p>Optimizing for latency, cost, or complexity before achieving baseline functionality and quality.</p>
+
+                            <h4>Why It Seems Right</h4>
+                            <ul>
+                                <li>"We need to be production-ready from day one"</li>
+                                <li>"Optimization is part of good engineering"</li>
+                                <li>"Let's get it right the first time"</li>
+                            </ul>
+
+                            <h4>The Problems</h4>
+                            <ul>
+                                <li>Waste time optimizing the wrong things</li>
+                                <li>Add complexity before understanding needs</li>
+                                <li>Delay actual value delivery</li>
+                                <li>Can't measure if optimizations help</li>
+                            </ul>
+
+                            <h4>Real Example</h4>
+                            <p>"Team spent 6 weeks implementing custom caching and parallelization. Launch was delayed 2 months. Post-launch analysis showed 60% of their optimization was unnecessary."</p>
+
+                            <h4>Better Approach</h4>
+                            <ul>
+                                <li>Get it working first, optimize later</li>
+                                <li>Measure before optimizing</li>
+                                <li>Optimize based on actual bottlenecks, not guesses</li>
+                                <li>Simplicity beats cleverness every time</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>🚫 Anti-Pattern 3: Evaluation Neglect</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <h4>The Trap</h4>
+                            <p>Building and deploying RAG systems without implementing evaluation metrics. Relying on "it seems to work."</p>
+
+                            <h4>Why It Seems Right</h4>
+                            <ul>
+                                <li>"Evaluation is complex and time-consuming"</li>
+                                <li>"We can tell if it works by using it"</li>
+                                <li>"Let's focus on building first"</li>
+                            </ul>
+
+                            <h4>The Problems</h4>
+                            <ul>
+                                <li>Can't detect regressions</li>
+                                <li>Don't know if changes help or hurt</li>
+                                <li>Can't communicate quality objectively</li>
+                                <li>Small problems compound unnoticed</li>
+                            </ul>
+
+                            <h4>Real Example</h4>
+                            <p>"Team deployed RAG system without evaluation. Three months later, they realized retrieval precision had dropped from 75% to 58% due to data drift. No one had noticed."</p>
+
+                            <h4>Better Approach</h4>
+                            <ul>
+                                <li>Implement evaluation from day one (RAGAS, DeepEval)</li>
+                                <li>Track metrics continuously</li>
+                                <li>Set up alerts for metric degradation</li>
+                                <li>Make evaluation part of the development process</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>🚫 Anti-Pattern 4: Over-Engineering</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <h4>The Trap</h4>
+                            <p>Implementing complex features (Agentic RAG, Graph RAG, etc.) when simple solutions would suffice.</p>
+
+                            <h4>Why It Seems Right</h4>
+                            <ul>
+                                <li>"We need the best solution"</li>
+                                <li>"Complex problems need complex solutions"</li>
+                                <li>"Let's future-proof this"</li>
+                            </ul>
+
+                            <h4>The Problems</h4>
+                            <ul>
+                                <li>More complex = more failure points</li>
+                                <li>Harder to debug and maintain</li>
+                                <li>Slower and more expensive</li>
+                                <li>Often unnecessary for actual use case</li>
+                            </ul>
+
+                            <h4>Real Example</h4>
+                            <p>"Startup built Graph RAG system for FAQ bot. 6 months of work. A simple vector search would have achieved 95% of the benefit with 10% of the effort."</p>
+
+                            <h4>Better Approach</h4>
+                            <ul>
+                                <li>Start with naive RAG</li>
+                                <li>Add complexity only when needed</li>
+                                <li>Measure if complex additions actually help</li>
+                                <li>Simpler is usually better</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>🚫 Anti-Pattern 5: Ignoring Data Quality</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <h4>The Trap</h4>
+                            <p>Focusing all effort on model and retrieval optimization while neglecting the quality and preparation of source data.</p>
+
+                            <h4>Why It Seems Right</h4>
+                            <ul>
+                                <li>"The model is the smart part"</li>
+                                <li>"Retrieval is where we optimize"</li>
+                                <li>"Data prep is boring grunt work"</li>
+                            </ul>
+
+                            <h4>The Problems</h4>
+                            <ul>
+                                <li>Garbage in, garbage out</li>
+                                <li>Can't fix bad data with better models</li>
+                                <li>Data issues compound through pipeline</li>
+                                <li>Users notice poor data quality immediately</li>
+                            </ul>
+
+                            <h4>Real Example</h4>
+                            <p>"Company spent months tuning their RAG system. Then someone finally cleaned the source documents and accuracy jumped 30% overnight."</p>
+
+                            <h4>Better Approach</h4>
+                            <ul>
+                                <li>Clean and normalize data before ingestion</li>
+                                <li>Remove duplicates and low-quality content</li>
+                                <li>Structure data for retrieval</li>
+                                <li>Quality check source documents</li>
+                                <li>Data quality > Model sophistication</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>🚫 Anti-Pattern 6: One-Size-Fits-All Chunking</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <h4>The Trap</h4>
+                            <p>Using the same chunking strategy for all document types and use cases.</p>
+
+                            <h4>Why It Seems Right</h4>
+                            <ul>
+                                <li>"Keep it simple"</li>
+                                <li>"Consistency is good"</li>
+                                <li>"We don't have time to optimize per document type"</li>
+                            </ul>
+
+                            <h4>The Problems</h4>
+                            <ul>
+                                <li>Different documents have different structures</li>
+                                <li>Fixed-size chunks break semantic boundaries</li>
+                                <li>Some use cases need larger context</li>
+                                <li>Suboptimal retrieval across the board</li>
+                            </ul>
+
+                            <h4>Real Example</h4>
+                            <p>"Legal system used 500-token chunks for everything. Contracts worked okay, but court opinions (which are long and structured) failed completely."</p>
+
+                            <h4>Better Approach</h4>
+                            <ul>
+                                <li>Adapt chunking to document structure</li>
+                                <li>Use semantic chunking when possible</li>
+                                <li>Different strategies for different document types</li>
+                                <li>Test and optimize per type</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Pattern Selection Guide -->
+            <section class="content-section">
+                <h2>Pattern Selection Guide</h2>
+
+                <div class="highlight warning">
+                    <h4>🎯 How to Choose the Right Pattern</h4>
+                    <p><strong>Not all patterns apply to every situation.</strong> Use this guide to decide which patterns to implement for your use case.</p>
+                </div>
+
+                <h3>Decision Framework</h3>
+
+                <table class="matrix-table">
+                    <thead>
+                        <tr>
+                            <th>If Your Use Case Is...</th>
+                            <th>Start With These Patterns</th>
+                            <th>Consider Adding...</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Simple Q&A</strong><br>(FAQ, basic questions)</td>
+                            <td>Naive RAG, Hybrid search</td>
+                            <td>Citations, Caching</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Domain-Specific</strong><br>(Medical, legal, technical)</td>
+                            <td>Hybrid search, Domain embeddings</td>
+                            <td>Metadata filtering, Query transformation</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Complex Questions</strong><br>(Multi-hop, analytical)</td>
+                            <td>Decomposition, Recursive retrieval</td>
+                            <td>Agentic RAG, Graph RAG</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Real-Time Data</strong><br>(News, finance)</td>
+                            <td>Metadata filtering (time), Short cache TTL</td>
+                            <td>Smart invalidation, Streaming ingestion</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Large Documents</strong><br>(Contracts, reports)</td>
+                            <td>Parent-child retrieval, Semantic chunking</td>
+                            <td>Decomposition, Recursive retrieval</td>
+                        </tr>
+                        <tr>
+                            <td><strong>High Volume</strong><br>(Consumer-facing)</td>
+                            <td>Aggressive caching, Adaptive RAG</td>
+                            <td>Model routing, Query classification</li>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Progressive Pattern Adoption</h3>
+                <div class="highlight info">
+                    <h4>Start Simple, Add Complexity Thoughtfully</h4>
+                    <p><strong>Week 1-2:</strong> Naive RAG with basic vector search</p>
+                    <p><strong>Week 3-4:</strong> Add hybrid search and basic evaluation</p>
+                    <p><strong>Week 5-8:</strong> Add reranking and caching</p>
+                    <p><strong>Week 9-12:</strong> Add query transformations or other advanced patterns based on actual needs</p>
+
+                    <p><strong>Key principle:</strong> Only add complexity when you've identified a specific problem it will solve.</p>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2>Key Takeaways</h2>
+
+                <div class="highlight success">
+                    <h4>✓ Pattern Principles</h4>
+                    <ul>
+                        <li><strong>Patterns are starting points, not rules:</strong> Adapt to your specific context</li>
+                        <li><strong>Hybrid search is usually right:</strong> Vector + keyword covers more cases</li>
+                        <li><strong>Evaluation isn't optional:</strong> Implement from day one</li>
+                        <li><strong>Simple > Complex:</strong> Don't over-engineer</li>
+                        <li><strong>Data quality matters:</strong> Garbage in, garbage out</li>
+                        <li><strong>Match patterns to use cases:</strong> One size doesn't fit all</li>
+                        <li><strong>Progressive adoption:</strong> Start simple, add complexity thoughtfully</li>
+                    </ul>
+                </div>
+
+                <p><strong>Next step:</strong> Section 8 covers trade-offs analysis for making informed decisions.</p>
+            </section>
+        </main>
+
+        <footer class="main-footer">
+            <p>Continue to <a href="section8-tradeoffs.html">Section 8: Trade-offs Analysis</a></p>
+        </footer>
+    </div>
+
+    <script src="js/components.js"></script>
+</body>
+</html>

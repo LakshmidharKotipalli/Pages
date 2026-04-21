@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Reference - Learn Claude Code Ecosystem</title>
+    <link rel="stylesheet" href="../../css/styles.css">
+    <link rel="stylesheet" href="theme.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <a href="index.html" class="nav-back">Back to Overview</a>
+        <span class="current-section">Quick Reference</span>
+        <div class="nav-links">
+            <a href="practice.html">Previous</a>
+            <a href="ecosystem.html">Next</a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <h1>Quick Reference</h1>
+            <p class="powerful-sentence">A production bible for Claude Code: every command, every configuration file, every permission mode, every hook event — organized for fast lookup during active development sessions.</p>
+            <p class="explanation">Bookmark this page. This is the reference you reach for when you know what you need to do but cannot remember the exact syntax, file path, or parameter. Organized from most-frequently-used to least.</p>
+        </section>
+
+        <section>
+            <h2>Reference Index</h2>
+            <div class="terminology-grid">
+                <div class="term-card">
+                    <div class="term">Commands</div>
+                    <p>All built-in slash commands and their effects</p>
+                </div>
+                <div class="term-card">
+                    <div class="term">Config Files</div>
+                    <p>Every configuration file path and its purpose</p>
+                </div>
+                <div class="term-card">
+                    <div class="term">Permissions</div>
+                    <p>Three modes and when to use each</p>
+                </div>
+                <div class="term-card">
+                    <div class="term">Models</div>
+                    <p>Opus, Sonnet, Haiku routing guide</p>
+                </div>
+                <div class="term-card">
+                    <div class="term">Sub-agents</div>
+                    <p>Built-in types and their specializations</p>
+                </div>
+                <div class="term-card">
+                    <div class="term">Skill Format</div>
+                    <p>SKILL.md structure and YAML fields</p>
+                </div>
+                <div class="term-card">
+                    <div class="term">Hook Events</div>
+                    <p>All session lifecycle events</p>
+                </div>
+                <div class="term-card">
+                    <div class="term">Context Budget</div>
+                    <p>Token cost estimates for common operations</p>
+                </div>
+                <div class="term-card">
+                    <div class="term">Performance</div>
+                    <p>Tuning checklist for cost and speed</p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Collapsible Reference Sections</h2>
+
+            <div class="accordion">
+
+                <div class="accordion-item">
+                    <div class="accordion-header" role="button" aria-expanded="false" tabindex="0">
+                        <span>Essential Commands</span>
+                        <span class="severity medium">8 commands</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="comparison-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Command</th>
+                                        <th>What It Does</th>
+                                        <th>When to Use</th>
+                                        <th>Production Analogy</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>/help</strong></td>
+                                        <td>Show all available commands, installed skills, and plugins</td>
+                                        <td>First session on a new project or after installing plugins</td>
+                                        <td>Reading the production schedule for the day</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>/context</strong></td>
+                                        <td>Visualize context window usage as a grid with token breakdown by component</td>
+                                        <td>Every 20-30 minutes in long sessions; before starting complex work</td>
+                                        <td>Checking the budget before greenlighting a big scene</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>/compact [focus]</strong></td>
+                                        <td>Summarize conversation history to reduce token usage while preserving key context. Optional focus string directs what to preserve.</td>
+                                        <td>Context at 60-70%; before switching task phases; proactively before long file reads</td>
+                                        <td>Editing a rough cut down to a tight cut — essence preserved, bloat removed</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>/clear</strong></td>
+                                        <td>Wipe entire conversation history. CLAUDE.md reloads from disk. Auto memory persists.</td>
+                                        <td>Switching to a completely different task; session gone off the rails; starting a new day</td>
+                                        <td>Wrapping the current shoot day and starting fresh tomorrow</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>/memory</strong></td>
+                                        <td>Open MEMORY.md for direct editing. Write persistent notes that survive across sessions.</td>
+                                        <td>Before ending a long session; when you discover a decision that future-you must know about</td>
+                                        <td>Updating the production bible before the next day of shooting</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>/plugin</strong></td>
+                                        <td>Install, remove, and manage plugins from the Plugin Hub or local paths</td>
+                                        <td>Setting up a new project; adopting a team-shared plugin configuration</td>
+                                        <td>Ordering equipment from the rental house before production begins</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>/config</strong></td>
+                                        <td>View and edit Claude Code configuration including permission mode and active model</td>
+                                        <td>Before starting work in a new project or switching permission contexts</td>
+                                        <td>Reviewing the shoot parameters (locations, budget caps) before calling action</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>/status</strong></td>
+                                        <td>Show session status: active model, permission mode, connected MCP servers, loaded skills</td>
+                                        <td>After configuration changes; when MCP connectivity is uncertain</td>
+                                        <td>Checking that all departments are present and ready before the first shot of the day</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="card info">
+                            <strong>Note on Skills and Slash Commands:</strong> Since v2.0, slash commands have merged into the skills system. All installed skills are invokable with /skillname. The commands above are built-in system commands, not skills. Use /help to see the full list of available skills in your current session.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" role="button" aria-expanded="false" tabindex="0">
+                        <span>Configuration Files</span>
+                        <span class="severity medium">6 locations</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="component-explanation">
+                            <div class="component-item">
+                                <div class="component-name">~/.claude/CLAUDE.md</div>
+                                <p><strong>Scope:</strong> Global — applies to all projects on this machine.</p>
+                                <p><strong>Contains:</strong> Universal preferences that apply regardless of project. Personal style preferences, default tool behaviors, global prohibited patterns, preferences about how Claude communicates.</p>
+                                <p><strong>Loaded:</strong> At session start, before project CLAUDE.md. First 200 lines are loaded eagerly. Remainder loads based on available token budget.</p>
+                                <p><strong>Best practice:</strong> Keep under 80 lines. These are your non-negotiables across all work.</p>
+                            </div>
+                            <div class="component-item">
+                                <div class="component-name">./CLAUDE.md (project root)</div>
+                                <p><strong>Scope:</strong> Project — applies to all sessions in this project directory.</p>
+                                <p><strong>Contains:</strong> Project conventions, architecture notes, prohibited dependencies, required patterns, team standards, pointer to .claude/rules/ for domain-specific rules.</p>
+                                <p><strong>Loaded:</strong> After global CLAUDE.md. Git-versioned — changes require team review. This is the file that should be treated like an API contract.</p>
+                                <p><strong>Best practice:</strong> Under 100 lines. Move domain-specific rules to .claude/rules/. Version with pull requests.</p>
+                            </div>
+                            <div class="component-item">
+                                <div class="component-name">.claude/rules/*.md</div>
+                                <p><strong>Scope:</strong> Module — applies when activated by context or invoked explicitly.</p>
+                                <p><strong>Contains:</strong> Domain-specific rules that are too detailed for the root CLAUDE.md. One file per domain: frontend.md, backend.md, infra.md, testing.md.</p>
+                                <p><strong>Loaded:</strong> After project CLAUDE.md, in alphabetical order by filename. Later files can override earlier files for the same rule.</p>
+                                <p><strong>Best practice:</strong> Use these to keep CLAUDE.md short. Separate by concern, not by length. Each file should be independently coherent.</p>
+                            </div>
+                            <div class="component-item">
+                                <div class="component-name">.claude/settings.json</div>
+                                <p><strong>Scope:</strong> Project — technical configuration for Claude Code runtime.</p>
+                                <p><strong>Contains:</strong> MCP server definitions (name, command, arguments, environment variables), permission mode setting, tool access restrictions, model routing preferences.</p>
+                                <p><strong>Loaded:</strong> At session start, before CLAUDE.md. Changes require restarting the session to take effect.</p>
+                                <p><strong>Best practice:</strong> Version with git. Never commit API keys directly — use environment variable references. Review before every new team member onboards.</p>
+                            </div>
+                            <div class="component-item">
+                                <div class="component-name">.claude/skills/*/SKILL.md</div>
+                                <p><strong>Scope:</strong> Project skills — custom skills defined for this project specifically.</p>
+                                <p><strong>Contains:</strong> YAML frontmatter (name, description, invocation trigger, required tools) followed by instruction markdown that Claude follows when the skill is invoked.</p>
+                                <p><strong>Loaded:</strong> Lazily — only when the skill is invoked. Not loaded at session start. Consumes context only when active.</p>
+                                <p><strong>Best practice:</strong> One skill per procedure. Name files to match the skill name. Add "defer to CLAUDE.md" clause to avoid convention conflicts with project rules.</p>
+                            </div>
+                            <div class="component-item">
+                                <div class="component-name">~/.claude/projects/&lt;project&gt;/memory/</div>
+                                <p><strong>Scope:</strong> Project-specific persistent memory across sessions.</p>
+                                <p><strong>Contains:</strong> Auto-generated session notes from Claude, plus your manually written notes via /memory. Architecture decisions, key constraints, discovered patterns, session handoff notes.</p>
+                                <p><strong>Loaded:</strong> At session start, after CLAUDE.md. Content is summarized and injected into the context window automatically.</p>
+                                <p><strong>Best practice:</strong> Review periodically and remove stale entries. Use /memory before ending long sessions to write explicit handoff notes for the next session.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" role="button" aria-expanded="false" tabindex="0">
+                        <span>Permission Modes</span>
+                        <span class="severity medium">3 modes</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="safe-zones">
+                            <div class="zone-card">
+                                <div class="component-name">ask</div>
+                                <h4>Default Mode</h4>
+                                <p>Claude asks for explicit confirmation before every tool use: file reads, file writes, shell commands, MCP calls. Maximum human oversight.</p>
+                                <p><strong>Use for:</strong> Production environments, regulated industries, unfamiliar codebases, any situation where you need to review each action before it happens.</p>
+                                <p><strong>Trade-off:</strong> Slower due to confirmation prompts. Best for learning or high-stakes work.</p>
+                            </div>
+                            <div class="zone-card">
+                                <div class="component-name">auto-edit</div>
+                                <h4>File Autonomy</h4>
+                                <p>Claude can read and write files freely without asking. It still asks before running shell commands, MCP writes, or any operation with external side effects.</p>
+                                <p><strong>Use for:</strong> Most daily development work. The right balance for trusted codebases where you want speed on file operations but still review commands.</p>
+                                <p><strong>Trade-off:</strong> Files can change without per-file confirmation. Git diff and review before committing is more important here.</p>
+                            </div>
+                            <div class="zone-card">
+                                <div class="component-name">full-auto (YOLO)</div>
+                                <h4>Full Autonomy</h4>
+                                <p>Claude executes all operations without asking. File writes, shell commands, MCP operations — all run autonomously. Maximum throughput.</p>
+                                <p><strong>Use for:</strong> Trusted, isolated environments. CI/CD pipelines. Agent teams where the team lead coordinates rather than humans. Worktree-isolated work where mistakes can be discarded.</p>
+                                <p><strong>Caution:</strong> Never use in production systems. Never use in shared repositories. A mistake in full-auto requires a git reset rather than a simple "no" at the prompt.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" role="button" aria-expanded="false" tabindex="0">
+                        <span>Model Selection Guide</span>
+                        <span class="severity medium">3 models</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="comparison-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Model</th>
+                                        <th>Capability Profile</th>
+                                        <th>Ideal Tasks</th>
+                                        <th>Avoid For</th>
+                                        <th>Relative Cost</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Opus</strong></td>
+                                        <td>Highest reasoning depth. Best at multi-step planning, nuanced trade-off analysis, novel problem framing.</td>
+                                        <td>Architecture design, complex debugging with unclear root cause, system design decisions, code that requires deep contextual understanding.</td>
+                                        <td>Routine code generation, simple lookups, sub-agent tasks with clear specifications, anything that Sonnet handles reliably.</td>
+                                        <td>Highest — 3-5x Sonnet</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Sonnet</strong></td>
+                                        <td>Strong reasoning with faster response time. Handles most software engineering tasks reliably. Good default for daily work.</td>
+                                        <td>Feature implementation, code review, refactoring with moderate complexity, debugging with known symptom patterns, writing documentation.</td>
+                                        <td>Simple one-line lookups where Haiku is sufficient. Highly complex architectural decisions where Opus is worth the cost.</td>
+                                        <td>Balanced — good default</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Haiku</strong></td>
+                                        <td>Fast and cost-effective. Best for well-defined tasks with clear specifications and low ambiguity tolerance.</td>
+                                        <td>Sub-agent tasks with precise specifications, codebase search and exploration, simple file transformations, quick lookups, cost-sensitive bulk operations.</td>
+                                        <td>Complex reasoning, ambiguous tasks, anything requiring multi-step inference or nuanced judgment. Haiku can miss subtle issues that Sonnet catches.</td>
+                                        <td>Lowest — 10-20x cheaper than Opus</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="card success">
+                            <strong>Routing pattern for agent teams:</strong> Main agent (Sonnet or Opus for complex work), Explore sub-agents (Haiku — they do targeted lookups with clear specs), Plan sub-agents (Sonnet — planning requires real reasoning), Bash sub-agents (Haiku — command execution is mechanical). This pattern reduces cost by 40-60% compared to running everything on Sonnet.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" role="button" aria-expanded="false" tabindex="0">
+                        <span>Built-in Sub-agent Types</span>
+                        <span class="severity medium">50+ types</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Built-in sub-agent types prime the agent's initial context framing for specific roles. Using the right type for the task improves output quality significantly.</p>
+                        <div class="comparison-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Type</th>
+                                        <th>Primary Use</th>
+                                        <th>Typical Model</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Explore</strong></td>
+                                        <td>Codebase search and investigation. Read files, trace call chains, summarize subsystem behavior.</td>
+                                        <td>Haiku for targeted lookups, Sonnet for synthesis</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Plan</strong></td>
+                                        <td>Architecture and implementation planning. Break down tasks, identify dependencies, define work sequences.</td>
+                                        <td>Sonnet or Opus</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Bash</strong></td>
+                                        <td>Command execution. Run tests, build processes, shell scripts, git operations.</td>
+                                        <td>Haiku (mechanical execution)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>general-purpose</strong></td>
+                                        <td>Multi-step tasks that do not fit a specialized category. Falls back to broad capability.</td>
+                                        <td>Sonnet</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>frontend-developer</strong></td>
+                                        <td>UI components, React patterns, CSS, accessibility, responsive design.</td>
+                                        <td>Sonnet</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>debugger</strong></td>
+                                        <td>Error investigation, log analysis, root cause identification, reproduction step isolation.</td>
+                                        <td>Sonnet or Opus for complex bugs</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>code-reviewer</strong></td>
+                                        <td>Code quality review, convention compliance, security pattern review, test coverage analysis.</td>
+                                        <td>Sonnet</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>50+ specialized types</strong></td>
+                                        <td>Domain-specific specializations including data-engineer, security-reviewer, performance-optimizer, api-designer, test-writer, and many more.</td>
+                                        <td>Task-dependent</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" role="button" aria-expanded="false" tabindex="0">
+                        <span>SKILL.md Structure</span>
+                        <span class="severity medium">Required format</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="card info">
+                            <strong>SKILL.md is the open standard for agent skills.</strong> It works across Claude Code, OpenAI Codex, Cursor, Gemini CLI, and other agentic tools. A skill written once can be distributed to any compatible runtime.
+                        </div>
+                        <div class="component-explanation">
+                            <div class="component-item">
+                                <div class="component-name">YAML Frontmatter Fields (between --- markers)</div>
+                                <div class="comparison-table">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Field</th>
+                                                <th>Required</th>
+                                                <th>Description</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>name</td>
+                                                <td>Yes</td>
+                                                <td>Human-readable skill name. Used in /help listings.</td>
+                                            </tr>
+                                            <tr>
+                                                <td>description</td>
+                                                <td>Yes</td>
+                                                <td>What the skill does. Used by the runtime to match natural language invocations.</td>
+                                            </tr>
+                                            <tr>
+                                                <td>invocation</td>
+                                                <td>Yes</td>
+                                                <td>The trigger pattern. Can be a slash command name, a natural language phrase, or both.</td>
+                                            </tr>
+                                            <tr>
+                                                <td>tools</td>
+                                                <td>Recommended</td>
+                                                <td>List of tools the skill needs access to. Runtime can verify permissions before invoking.</td>
+                                            </tr>
+                                            <tr>
+                                                <td>model</td>
+                                                <td>Optional</td>
+                                                <td>Preferred model for this skill. Overrides session default for skill execution.</td>
+                                            </tr>
+                                            <tr>
+                                                <td>version</td>
+                                                <td>Optional</td>
+                                                <td>Semantic version of the skill. Useful for skills distributed via marketplace or plugins.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="component-item">
+                                <div class="component-name">Markdown Body</div>
+                                <p>Everything after the closing --- is instruction markdown that Claude reads and follows when the skill is invoked. This is standard markdown — use headers, lists, and emphasis to structure the procedure clearly.</p>
+                                <p><strong>Recommended structure for the body:</strong></p>
+                                <p>1. One-paragraph description of what the skill accomplishes and when it should be used.</p>
+                                <p>2. Prerequisite conditions — what must be true before the skill starts.</p>
+                                <p>3. Step-by-step procedure — numbered list of actions. Be specific about what to check, read, write, or verify at each step.</p>
+                                <p>4. Success criteria — how to know the skill completed correctly.</p>
+                                <p>5. Failure handling — what to do if a step fails or produces unexpected results.</p>
+                                <p>6. "Defer to CLAUDE.md for all project conventions" — prevents skill instructions from overriding project standards.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" role="button" aria-expanded="false" tabindex="0">
+                        <span>Hook Events Reference</span>
+                        <span class="severity medium">5 events</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Hooks are shell commands that run at specific session lifecycle events. They receive JSON context about the event and can take action, log, or modify the environment.</p>
+                        <div class="comparison-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Event</th>
+                                        <th>When It Fires</th>
+                                        <th>JSON Context Available</th>
+                                        <th>Common Uses</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>session.start</strong></td>
+                                        <td>When a new Claude Code session begins</td>
+                                        <td>Session ID, project path, timestamp, user identity</td>
+                                        <td>Usage tracking, environment validation, dependency checks, notification to team that a session started</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>session.resume</strong></td>
+                                        <td>When a paused or detached session resumes</td>
+                                        <td>Session ID, previous end time, project path</td>
+                                        <td>Logging session gap duration, refreshing environment variables, checking for upstream changes since last session</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>tool.pre</strong></td>
+                                        <td>Before any tool call executes (Bash, Read, Write, Edit, MCP, etc.)</td>
+                                        <td>Tool name, tool parameters, session context</td>
+                                        <td>Security scanning before writes, secret detection before commits, compliance checks, rate limiting, cost budgeting</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>tool.post</strong></td>
+                                        <td>After a tool call completes</td>
+                                        <td>Tool name, parameters, result summary, duration</td>
+                                        <td>Usage metering, audit logging, cost tracking, performance profiling</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>config.change</strong></td>
+                                        <td>When CLAUDE.md or settings.json changes</td>
+                                        <td>Changed file path, change type (add/modify/delete)</td>
+                                        <td>Notification when project configuration changes, triggering validation of the new configuration, team alerts for significant CLAUDE.md updates</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="card info">
+                            <strong>Hook configuration location:</strong> Hooks are defined in .claude/settings.json under the hooks key. Each hook entry specifies the event, the shell command to run, and whether to block (await the hook result before continuing) or non-block (fire and continue).
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" role="button" aria-expanded="false" tabindex="0">
+                        <span>Context Management Cheat Sheet</span>
+                        <span class="severity medium">Token budgets</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Use these estimates to reason about context budget before starting work. Actual token counts vary by content, but these ballpark figures hold for typical code files and conversations.</p>
+                        <div class="comparison-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Operation</th>
+                                        <th>Approximate Token Cost</th>
+                                        <th>Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Fresh session start</td>
+                                        <td>5,000 – 10,000</td>
+                                        <td>CLAUDE.md + system prompt + any auto memory loaded</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Reading a small file (100 lines)</td>
+                                        <td>+2,000 – 5,000</td>
+                                        <td>Dense code costs more than sparse documentation</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Reading a large file (1,000 lines)</td>
+                                        <td>+20,000 – 50,000</td>
+                                        <td>A single large file can consume 5-10% of a 1M token window</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Sub-agent delegation</td>
+                                        <td>+0 to main context</td>
+                                        <td>Sub-agents have isolated windows. Only the result summary returns to main context.</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Sub-agent result summary</td>
+                                        <td>+1,000 – 5,000</td>
+                                        <td>The finding returned to main context, not the files the sub-agent read</td>
+                                    </tr>
+                                    <tr>
+                                        <td>/compact operation</td>
+                                        <td>Reduces to ~20-30% of current usage</td>
+                                        <td>With a good focus string, key context is preserved at high fidelity</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Auto-compaction threshold</td>
+                                        <td>Triggers at ~80% window utilization</td>
+                                        <td>Blunt summarization — less precise than manual /compact with focus string</td>
+                                    </tr>
+                                    <tr>
+                                        <td>MCP tool descriptions (without lazy loading)</td>
+                                        <td>+2,000 – 8,000 per server</td>
+                                        <td>Each MCP server's tool manifest loaded at session start</td>
+                                    </tr>
+                                    <tr>
+                                        <td>MCP lazy loading (Tool Search)</td>
+                                        <td>~95% reduction vs. eager loading</td>
+                                        <td>Only the tools actually used are loaded, not the entire server manifest</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" role="button" aria-expanded="false" tabindex="0">
+                        <span>Performance Tuning Checklist</span>
+                        <span class="severity medium">Optimization guide</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>A team that applies these optimizations consistently can reduce Claude Code costs by 40-70% and reduce average session duration without reducing output quality.</p>
+
+                        <div class="card success">
+                            <strong>Context Optimizations (highest impact):</strong>
+                            <p><strong>Keep CLAUDE.md under 100 lines.</strong> Every line of CLAUDE.md occupies permanent space in every session. Bloated CLAUDE.md files are the single most common cause of unnecessary token consumption. Extract to .claude/rules/ modules for domain-specific content.</p>
+                            <p><strong>Use sub-agents for all research operations.</strong> Reading files to understand the codebase is exploratory work that belongs in a sub-agent's isolated context, not the main context. If you need to understand 20 files to plan a feature, spawn an Explore agent — do not read 20 files inline.</p>
+                            <p><strong>Run /compact proactively at task phase boundaries.</strong> Do not wait for auto-compaction. Manual compaction with a targeted focus string preserves significantly more useful context than automatic compaction at the 80% threshold.</p>
+                            <p><strong>Use /clear between unrelated tasks.</strong> Carrying context from a morning bug fix into an afternoon feature implementation adds noise and costs tokens. A fresh start costs 10 minutes of re-orientation and saves hours of context-related debugging.</p>
+                        </div>
+
+                        <div class="card info">
+                            <strong>Model Routing Optimizations (second highest impact):</strong>
+                            <p><strong>Haiku for sub-agents with precise specifications.</strong> Explore sub-agents with clear tasks (find all functions matching pattern X) need fast lookup capability, not deep reasoning. Haiku is 10-20x cheaper than Opus for this workload with comparable output quality on well-specified tasks.</p>
+                            <p><strong>Sonnet for main agent default.</strong> Opus is warranted for genuinely complex architectural decisions. Most daily development work sits comfortably in Sonnet's capability profile. Reserve Opus for the 10-15% of tasks that genuinely require it.</p>
+                        </div>
+
+                        <div class="card warning">
+                            <strong>MCP Optimizations (server connection management):</strong>
+                            <p><strong>Enable lazy loading (Tool Search) for all MCP servers.</strong> This reduces per-session context overhead by ~95% for MCP tool descriptions. The tools load only when actually needed rather than pre-loading every server's full tool manifest at session start.</p>
+                            <p><strong>Limit active MCP connections to 5-7 servers.</strong> Each connected server adds overhead even with lazy loading. Disconnect servers not needed for the current project context. Re-connect when the project scope requires them.</p>
+                        </div>
+
+                        <div class="card info">
+                            <strong>Parallel Work Optimizations:</strong>
+                            <p><strong>Use worktrees for parallel agent work.</strong> Sequential agent work is inherently serial and often avoidable. Two agents in two worktrees working on independent features complete in half the time of sequential execution.</p>
+                            <p><strong>Use agent teams for work with genuine parallelism.</strong> Do not apply agent teams to tasks that are fundamentally sequential. The coordination overhead (~20-30% of total time) is only justified when the parallel speedup exceeds that cost — typically tasks where at least 2 streams can run simultaneously for 60%+ of the total duration.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <footer class="section-footer">
+        <a href="practice.html" class="btn">Previous: Practice Exercises</a>
+        <a href="ecosystem.html" class="btn">Next: The Full Ecosystem</a>
+    </footer>
+
+    <script src="../../js/components.js"></script>
+</body>
+</html>

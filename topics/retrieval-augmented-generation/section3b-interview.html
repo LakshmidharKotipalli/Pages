@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Conversations - RAG Learning Journey</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="theme-dark">
+    <div class="container">
+        <header class="section-header">
+            <div class="breadcrumbs">
+                <a href="index.html">Home</a>
+                <span>/</span>
+                <span>Section 3B: Interview Conversations</span>
+            </div>
+            <h1>Interview Conversations</h1>
+            <p class="section-subtitle">7 Essential Question Trees with Talking Points, Real Examples, and Production Stories</p>
+        </header>
+
+        <nav class="nav-buttons">
+            <a id="prevBtn" class="nav-btn" href="section3a-learning-journey.html">
+                ← Previous
+            </a>
+            <button id="completeBtn" class="nav-btn" data-section="section3b-interview">
+                ✓ Mark Complete
+            </button>
+            <a id="nextBtn" class="nav-btn" href="section4-system-design.html">
+                Next: System Design →
+            </a>
+        </nav>
+
+        <main>
+            <section class="content-section">
+                <h2>Mastering RAG Interviews</h2>
+
+                <p>RAG interviews aren't about memorizing facts. They're about demonstrating understanding, problem-solving, and production experience. These 7 question trees cover the most common and important topics.</p>
+
+                <div class="highlight info">
+                    <h4>💡 Interview Strategy</h4>
+                    <p><strong>For each question:</strong> Start with a simple explanation, then add depth. Use examples from your experience. Mention trade-offs. Show you've seen production issues.</p>
+
+                    <p><strong>The "I don't know" rule:</strong> If you truly don't know, say so. Then explain how you'd find out. Interviewers value honesty and problem-solving over fake knowledge.</p>
+                </div>
+            </section>
+
+            <!-- Question 1: Fundamentals -->
+            <section class="content-section">
+                <h2>Question 1: "Explain RAG to me like I'm a non-technical stakeholder"</h2>
+
+                <div class="highlight success">
+                    <h4>🎯 What They're Testing</h4>
+                    <p>Can you communicate complex concepts simply? Do you understand the business value? Can you avoid jargon while maintaining accuracy?</p>
+                </div>
+
+                <h3>Talking Points</h3>
+                <div class="accordion-group">
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>The Elevator Pitch</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Simple explanation:</strong> "Think of AI like a brilliant researcher who's read everything up to 2022, but doesn't know anything since. RAG gives this researcher instant access to our latest documents before answering questions. It's like giving them a library card to our private collection."</p>
+
+                            <p><strong>Business value:</strong> "This means our AI can answer questions about today's data, our private documents, and do it accurately by citing sources. It's faster, cheaper, and more reliable than retraining models."</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>The Analogy Approach</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Use the library analogy:</strong> "Imagine you're writing a report. You could write from memory, but you'd be limited to what you already know. Or you could research first, then write using your findings. RAG does the second - it researches our documents, then writes an answer based on what it found."</p>
+
+                            <p><strong>Why it matters:</strong> "This means accurate, current answers without the massive cost of constantly retraining the AI."</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Follow-up Questions to Prepare For</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <ul>
+                                <li><strong>"Why not just fine-tune?"</strong> - Discuss cost, timeliness, privacy benefits of RAG</li>
+                                <li><strong>"How accurate is it?"</strong> - Mention grounding, citations, 60% reduction in hallucinations</li>
+                                <li><strong>"What about our private data?"</strong> - Explain data stays in your infrastructure</li>
+                                <li><strong>"How fast is it?"</strong> - Discuss latency trade-offs, typically 200-500ms for good systems</li>
+                                <li><strong>"How much does it cost?"</strong> - Compare to fine-tuning, mention $0.50-2 per 1K queries typical</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Production Story: The Healthcare Example</h3>
+                <div class="highlight info">
+                    <p><strong>Context:</strong> "At a healthcare startup, we needed to answer questions about latest treatments. LLMs couldn't do it - treatment guidelines change monthly."</p>
+
+                    <p><strong>Solution:</strong> "We built a RAG system that pulled from latest medical journals and guidelines. Doctors could ask about treatment options and get answers with citations to recent studies."</p>
+
+                    <p><strong>Result:</strong> "90% of doctors found it useful, and we could update knowledge weekly instead of quarterly."</p>
+                </div>
+            </section>
+
+            <!-- Question 2: Architecture -->
+            <section class="content-section">
+                <h2>Question 2: "How would you architect a RAG system for [specific use case]?"</h2>
+
+                <div class="highlight success">
+                    <h4>🎯 What They're Testing</h4>
+                    <p>Can you design systems? Do you understand trade-offs? Can you think through requirements? Can you justify your decisions?</p>
+                </div>
+
+                <h3>Framework for Answering</h3>
+                <div class="cards-grid">
+                    <div class="info-card">
+                        <h4>1. Clarify Requirements</h4>
+                        <p>Ask about: data volume, query volume, latency requirements, accuracy needs, privacy concerns, budget, team size</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>2. Start Simple</h4>
+                        <p>Propose naive RAG first. Explain each component. Show you understand fundamentals before adding complexity.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>3. Add Complexity Thoughtfully</h4>
+                        <p>Add: reranking, hybrid search, caching, evaluation. Explain why each addition helps with specific requirements.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>4. Discuss Trade-offs</h4>
+                        <p>Every choice has costs. Show you understand latency vs. accuracy, cost vs. capability, simplicity vs. features.</p>
+                    </div>
+                </div>
+
+                <h3>Example: Enterprise Knowledge Base</h3>
+                <div class="accordion-group">
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Requirements Gathering</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Ask:</strong> "How many documents? How many queries per day? What's the acceptable latency? How important is accuracy vs. speed? What's the budget?"</p>
+
+                            <p><strong>Assume:</strong> 1M documents, 10K queries/day, 500ms latency, high accuracy importance, $50K/year budget.</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Basic Architecture</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Ingestion:</strong> Document parsing → chunking (500 tokens, 100 overlap) → embedding (OpenAI text-embedding-3) → vector storage (Pinecone)</p>
+
+                            <p><strong>Retrieval:</strong> Query → preprocessing → vector search (k=10) → rerank (Cohere) → take top 5</p>
+
+                            <p><strong>Generation:</strong> Prompt assembly with context → GPT-4o → response with citations</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Enhancements & Justifications</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Hybrid search:</strong> "Add BM25 for exact keyword matches. Some queries need exact terms, not just semantic similarity."</p>
+
+                            <p><strong>Caching:</strong> "Cache common queries. 60% of queries are repeats. Saves cost and latency."</p>
+
+                            <p><strong>Evaluation:</strong> "Implement RAGAS for continuous monitoring. Need to know if quality drops."</p>
+
+                            <p><strong>Fallback:</strong> "If retrieval fails, direct to LLM with warning. Better to respond than fail completely."</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Trade-offs Discussion</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Vector DB choice:</strong> "Pinecone for managed, but Weaviate saves cost if we want self-hosted."</p>
+
+                            <p><strong>Model choice:</strong> "GPT-4o for accuracy, but GPT-3.5 for cost. Could use 3.5 for 80% of queries and 4o for complex ones (adaptive)."</p>
+
+                            <p><strong>Chunking strategy:</strong> "500 tokens with overlap balances context and precision. Could try smaller for more precise retrieval."</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Question 3: Trade-offs -->
+            <section class="content-section">
+                <h2>Question 3: "What are the key trade-offs in RAG system design?"</h2>
+
+                <div class="highlight success">
+                    <h4>🎯 What They're Testing</h4>
+                    <p>Do you understand that every decision has costs? Can you think strategically? Are you aware of production realities?</p>
+                </div>
+
+                <h3>Major Trade-offs</h3>
+
+                <table class="matrix-table">
+                    <thead>
+                        <tr>
+                            <th>Decision Axis</th>
+                            <th>Option A</th>
+                            <th>Option B</th>
+                            <th>When to Choose A</th>
+                            <th>When to Choose B</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Model</strong></td>
+                            <td>GPT-4/Claude Opus</td>
+                            <td>GPT-3.5/Llama 2</td>
+                            <td>Accuracy critical, budget available</td>
+                            <td>Cost-sensitive, speed important</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Reranking</strong></td>
+                            <td>Yes</td>
+                            <td>No</td>
+                            <td>Accuracy matters, 50ms latency acceptable</td>
+                            <td>Speed critical, budget tight</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Search Type</strong></td>
+                            <td>Hybrid (vector + BM25)</td>
+                            <td>Vector only</td>
+                            <td>Domain has specific terminology</td>
+                            <td>Purely conceptual queries</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Chunk Size</strong></td>
+                            <td>Small (100-300)</td>
+                            <td>Large (500-1000)</td>
+                            <td>Precision critical, reranking available</td>
+                            <td>Context important, simpler retrieval</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Infrastructure</strong></td>
+                            <td>Managed (Pinecone)</td>
+                            <td>Self-hosted (Weaviate)</td>
+                            <td>Team small, budget available</td>
+                            <td>Team has DevOps, cost sensitive</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Production War Stories</h3>
+                <div class="accordion-group">
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Story 1: The Reranking Decision</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Situation:</strong> "We had a RAG system with 85% accuracy. Adding reranking would cost $0.002 per query and add 60ms latency."</p>
+
+                            <p><strong>Analysis:</strong> "Reranking would improve accuracy to 92%. For our use case (medical Q&A), accuracy was critical. The 7% improvement meant 700 fewer wrong answers per 10K queries."</p>
+
+                            <p><strong>Decision:</strong> "Added reranking. The cost increase was worth it for the accuracy gain."</p>
+
+                            <p><strong>Lesson:</strong> "Trade-offs aren't absolute - they depend on your specific context and requirements."</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Story 2: Chunk Size Nightmare</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Situation:</strong> "Started with 1000-token chunks for simplicity. Retrieval was fast but answers were generic - too much irrelevant context."</p>
+
+                            <p><strong>Experiment:</strong> "Tried 200-token chunks. Retrieval became less reliable - sometimes missing key information."</p>
+
+                            <p><strong>Solution:</strong> "Settled on 500 tokens with 100 overlap. Added reranking. Best of both worlds."</p>
+
+                            <p><strong>Lesson:</strong> "Sweet spots exist. You need to experiment with your specific data and use case."</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Question 4: Production Issues -->
+            <section class="content-section">
+                <h2>Question 4: "Tell me about a time your RAG system had issues in production. How did you debug it?"</h2>
+
+                <div class="highlight success">
+                    <h4>🎯 What They're Testing</h4>
+                    <p>Do you have real production experience? Can you debug systematically? How do you handle pressure? Do you learn from failures?</p>
+                </div>
+
+                <h3>Framework for Answering</h3>
+                <div class="highlight info">
+                    <h4>S.T.A.R. Method</h4>
+                    <ul>
+                        <li><strong>S</strong>ituation: What was the context?</li>
+                        <li><strong>T</strong>ask: What was the problem?</li>
+                        <li><strong>A</strong>ction: What did you do?</li>
+                        <li><strong>R</strong>esult: What was the outcome?</li>
+                    </ul>
+                </div>
+
+                <h3>Real Production Stories</h3>
+
+                <div class="accordion-group">
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Story 1: The Latency Spike</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Situation:</strong> "RAG system running at 300ms average latency. Suddenly spiked to 2+ seconds during peak hours."</p>
+
+                            <p><strong>Task:</strong> "Users were abandoning queries. Need to fix before impacting business metrics."</p>
+
+                            <p><strong>Action:</strong></p>
+                            <ol>
+                                <li>Checked metrics: Vector DB was the bottleneck (not the LLM)</li>
+                                <li>Investigated: Query volume increased 5x during peak</li>
+                                <li>Root cause: Vector DB wasn't scaled for load spikes</li>
+                                <li>Implemented: Query caching and connection pooling</li>
+                            </ol>
+
+                            <p><strong>Result:</strong> "Latency back to 250ms even during peak. Caching hit rate of 55% meant actual vector queries were manageable."</p>
+
+                            <p><strong>Lesson:</strong> "Always design for peak load, not average. Caching is your friend."</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Story 2: The Hallucination Crisis</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Situation:</strong> "User reported the system giving completely wrong answers. Confidence was high but facts were wrong."</p>
+
+                            <p><strong>Task:</strong> "Investigate and fix before eroding user trust completely."</p>
+
+                            <p><strong>Action:</strong></p>
+                            <ol>
+                                <li>Examined the query: It was highly specific technical question</li>
+                                <li>Checked retrieval: Retrieved documents weren't actually relevant</li>
+                                <li>Root cause: Semantic search was finding conceptually similar but factually incorrect content</li>
+                                <li>Fix: Added hybrid search (keyword + vector) and improved query preprocessing</li>
+                            </ol>
+
+                            <p><strong>Result:</strong> "Specific technical queries improved by 40%. Added monitoring for 'low relevance retrieval' to catch future issues."</p>
+
+                            <p><strong>Lesson:</strong> "Pure semantic search isn't always enough. Hybrid search catches edge cases."</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Story 3: The Memory Explosion</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Situation:</strong> "System kept crashing with OOM errors during ingestion of large documents."</p>
+
+                            <p><strong>Task:</strong> "Need to ingest documents reliably without crashing."</p>
+
+                            <p><strong>Action:</strong></p>
+                            <ol>
+                                <li>Profiled memory usage: Embedding generation was the issue</li>
+                                <li>Problem: Loading entire document into memory for chunking</li>
+                                <li>Solution: Streaming chunking, batch processing</li>
+                                <li>Added: Memory limits and proper cleanup</li>
+                            </ol>
+
+                            <p><strong>Result:</strong> "Can now ingest 10GB documents without issues. Processing is slower but reliable."</p>
+
+                            <p><strong>Lesson:</strong> "Always consider memory limits when processing large files."</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Question 5: Evaluation -->
+            <section class="content-section">
+                <h2>Question 5: "How do you evaluate RAG system performance?"</h2>
+
+                <div class="highlight success">
+                    <h4>🎯 What They're Testing</h4>
+                    <p>Do you understand metrics? Can you measure what matters? Do you know evaluation frameworks? Can you connect metrics to business value?</p>
+                </div>
+
+                <h3>Key Metrics Framework</h3>
+
+                <div class="cards-grid">
+                    <div class="info-card">
+                        <h4>🎯 Retrieval Metrics</h4>
+                        <p><strong>Precision@K:</strong> How many retrieved docs are relevant?</p>
+                        <p><strong>Recall@K:</strong> How many relevant docs did we retrieve?</p>
+                        <p><strong>MRR:</strong> Mean Reciprocal Rank - is the first result relevant?</p>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>📝 Generation Metrics</h4>
+                        <p><strong>Faithfulness:</strong> Does the answer match retrieved context?</p>
+                        <p><strong>Answer Relevance:</strong> Does it answer the question?</p>
+                        <p><strong>Citation Accuracy:</strong> Are sources correctly cited?</p>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>⚡ System Metrics</h4>
+                        <p><strong>Latency:</strong> P50, P95, P99 response times</p>
+                        <p><strong>Throughput:</strong> Queries per second</p>
+                        <p><strong>Cost:</strong> Per-query and total costs</p>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>💼 Business Metrics</h4>
+                        <p><strong>User Satisfaction:</strong> Ratings, feedback</p>
+                        <p><strong>Adoption:</strong> Active users, query volume</p>
+                        <p><strong>Impact:</strong> Time saved, tasks completed</p>
+                    </div>
+                </div>
+
+                <h3>Evaluation Frameworks</h3>
+                <div class="accordion-group">
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>RAGAS Framework</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>What it measures:</strong> Faithfulness, answer relevance, context precision, context recall</p>
+
+                            <p><strong>How it works:</strong> Uses LLMs to evaluate your RAG outputs. Generates synthetic questions, compares retrieved context to ground truth.</p>
+
+                            <p><strong>Pros:</strong> Comprehensive, open-source, actively maintained</p>
+                            <p><strong>Cons:</strong> Can be expensive (uses GPT-4 for evaluation), may need customization for domain</p>
+
+                            <p><strong>Production use:</strong> "We run RAGAS daily on a sample of queries. Set up alerts if metrics drop more than 5%."</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>TruLens (TruEra)</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>What it measures:</strong> Similar to RAGAS but with more focus on explainability and visualization</p>
+
+                            <p><strong>Key features:</strong> Good for debugging, shows which parts of context were used, visualizes retrieval quality</p>
+
+                            <p><strong>Production use:</strong> "Great for development and debugging. We use it to investigate specific failures."</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>DeepEval</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>What it measures:</strong> Similar metrics with focus on CI/CD integration and continuous evaluation</p>
+
+                            <p><strong>Key features:</strong> Easy to integrate into test suites, good for regression testing</p>
+
+                            <p><strong>Production use:</strong> "We run DeepEval in our CI pipeline. Prevents deployments that would hurt quality."</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Question 6: Advanced Patterns -->
+            <section class="content-section">
+                <h2>Question 6: "What advanced RAG patterns have you used? When would you use them?"</h2>
+
+                <div class="highlight success">
+                    <h4>🎯 What They're Testing</h4>
+                    <p>Are you up-to-date with current research? Can you apply advanced concepts appropriately? Do you understand when complexity is warranted?</p>
+                </div>
+
+                <h3>Advanced Patterns Overview</h3>
+
+                <table class="matrix-table">
+                    <thead>
+                        <tr>
+                            <th>Pattern</th>
+                            <th>What It Does</th>
+                            <th>When to Use</th>
+                            <th>Trade-offs</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Adaptive RAG</strong></td>
+                            <td>Selects strategy based on query complexity</td>
+                            <td>Mixed query complexity, cost optimization</td>
+                            <td>More complex, needs classification</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Agentic RAG</strong></td>
+                            <td>Uses autonomous agents for retrieval</td>
+                            <td>Complex, multi-step questions</td>
+                            <td>Higher latency, more complex</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Self-RAG</strong></td>
+                            <td>Self-reflection during generation</td>
+                            <td>High accuracy requirements</td>
+                            <td>Slower, more expensive</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Graph RAG</strong></td>
+                            <td>Uses knowledge graphs</td>
+                            <td>Complex relationships, multi-hop</td>
+                            <td>Complex to build and maintain</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Corrective RAG</strong></td>
+                            <td>Iterates to fix retrieval issues</td>
+                            <td>When retrieval quality varies</td>
+                            <td>Multiple LLM calls, slower</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Deep Dive: Adaptive RAG</h3>
+                <div class="highlight warning">
+                    <h4>The Game-Changer for Production Systems</h4>
+                    <p><strong>Core insight:</strong> Not all queries need the same processing. Some are simple, some are complex. Adaptive RAG routes queries to different processing paths based on their characteristics.</p>
+
+                    <p><strong>Example routing:</strong></p>
+                    <ul>
+                        <li><strong>Simple factual:</strong> Direct LLM response (no retrieval)</li>
+                        <li><strong>Moderate complexity:</strong> Single-step retrieval + generate</li>
+                        <li><strong>Complex multi-hop:</strong> Multiple retrieval steps, Agentic RAG</li>
+                    </ul>
+
+                    <p><strong>Production benefit:</strong> "We reduced costs by 40% while maintaining 95% of accuracy by routing simple queries away from expensive retrieval."</p>
+                </div>
+            </section>
+
+            <!-- Question 7: Future & Trends -->
+            <section class="content-section">
+                <h2>Question 7: "Where do you see RAG heading in the next 2-3 years?"</h2>
+
+                <div class="highlight success">
+                    <h4>🎯 What They're Testing</h4>
+                    <p>Are you engaged with the field? Can you think strategically? Do you understand long-term implications? Can you separate hype from reality?</p>
+                </div>
+
+                <h3>Trends to Discuss</h3>
+
+                <div class="cards-grid">
+                    <div class="info-card">
+                        <h4>🤖 Multimodal RAG</h4>
+                        <p><strong>What:</strong> RAG that works with images, audio, video, not just text</p>
+                        <p><strong>Why:</strong> Real-world data is multimodal</p>
+                        <p><strong>Status:</strong> Early but rapidly evolving</p>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>⚡ Real-time RAG</h4>
+                        <p><strong>What:</strong> RAG on streaming data, constantly updating knowledge</p>
+                        <p><strong>Why:</strong> News, finance, social media need real-time</p>
+                        <p><strong>Status:</strong> technically feasible, production challenges</p>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>🔒 Privacy-Preserving RAG</h4>
+                        <p><strong>What:</strong> RAG that doesn't expose raw data to LLMs</p>
+                        <p><strong>Why:</strong> Enterprise, healthcare, legal requirements</p>
+                        <p><strong>Status:</strong> Active research area</p>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>🧠 Specialized RAG Models</h4>
+                        <p><strong>What:</strong> Models purpose-built for RAG tasks</p>
+                        <p><strong>Why:</strong> Better performance, lower cost</p>
+                        <p><strong>Status:</strong> Emerging, open-source advances</p>
+                    </div>
+                </div>
+
+                <h3>Your Vision</h3>
+                <div class="highlight info">
+                    <p><strong>Sample answer:</strong> "I think RAG will become standard infrastructure, not a specialized feature. Every company will have RAG platforms. The focus will shift from 'can we build RAG' to 'how do we optimize cost, latency, and accuracy.' Adaptive RAG will become default. We'll see better evaluation frameworks and more domain-specific approaches."</p>
+
+                    <p><strong>Show you think strategically:</strong> "The big question is whether RAG remains distinct or gets absorbed into LLM training. My bet is RAG remains essential because the data freshness and privacy problems don't go away."</p>
+                </div>
+            </section>
+
+            <!-- Quick Reference -->
+            <section class="content-section">
+                <h2>Interview Quick Reference</h2>
+
+                <div class="highlight success">
+                    <h4>📋 Before Any Interview</h4>
+                    <ul>
+                        <li>Review your RAG projects and prepare STAR stories</li>
+                        <li>Practice explaining RAG to non-technical audiences</li>
+                        <li>Be ready to discuss trade-offs for every decision</li>
+                        <li>Have 2-3 production failure stories and what you learned</li>
+                        <li>Know current RAG research and trends</li>
+                    </ul>
+                </div>
+
+                <div class="highlight warning">
+                    <h4>🚩 Red Flags to Avoid</h4>
+                    <ul>
+                        <li>Can't explain why you made specific technical choices</li>
+                        <li>No production experience or only toy projects</li>
+                        <li>Can't discuss trade-offs or alternatives</li>
+                        <li>Unfamiliar with evaluation frameworks</li>
+                        <li>Haven't read recent papers or blogs on RAG</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2>Key Takeaways</h2>
+
+                <div class="highlight success">
+                    <h4>✓ Remember These Interview Principles</h4>
+                    <ul>
+                        <li><strong>Structure your answers:</strong> Simple → Complex → Trade-offs → Real examples</li>
+                        <li><strong>Use stories:</strong> People remember narratives better than facts</li>
+                        <li><strong>Show don't tell:</strong> Describe what you did, not what you would do</li>
+                        <li><strong>Admit what you don't know:</strong> Honesty + problem-solving beats fake knowledge</li>
+                        <li><strong>Connect to business value:</strong> Always explain why it matters</li>
+                    </ul>
+                </div>
+
+                <p><strong>Next step:</strong> Section 4 covers system design integration for RAG.</p>
+            </section>
+        </main>
+
+        <footer class="main-footer">
+            <p>Continue to <a href="section4-system-design.html">Section 4: System Design Integration</a> to understand architecture</p>
+        </footer>
+    </div>
+
+    <script src="js/components.js"></script>
+</body>
+</html>

@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practice Exercises - LangChain Learning Journey</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <span class="logo">LangChain Learning</span>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="breadcrumbs">
+            <a href="index.html">Home</a> <span class="separator">&rsaquo;</span> Section 14: Practice Exercises
+        </div>
+
+        <h1>Section 14: Practice Exercises</h1>
+
+        <div class="core-insight">
+            <h2>Learn by Building</h2>
+            <p class="emphasis">Theory without practice is just trivia. These exercises progress from beginner-friendly chains to production-grade systems. Each exercise includes the problem statement, architecture blueprint, key decisions, and success criteria. Build all of them and you'll have a portfolio that proves LangChain mastery.</p>
+        </div>
+
+        <!-- Exercise 1 -->
+        <div class="section">
+            <h2>Exercise 1: Simple Chain &mdash; Haiku Generator (Beginner)</h2>
+            <div class="card-grid">
+                <div class="card info">
+                    <h3>Objective</h3>
+                    <p>Build your first LCEL chain that generates haikus about any given topic. Introduces the fundamental chain pattern: Prompt &rarr; Model &rarr; Parser.</p>
+                    <p><strong>Time estimate:</strong> 30 minutes</p>
+                </div>
+                <div class="card">
+                    <h3>Architecture</h3>
+                    <ul>
+                        <li><strong>Input:</strong> Topic string from user</li>
+                        <li><strong>Prompt template:</strong> Instructs LLM to write a 5-7-5 syllable haiku</li>
+                        <li><strong>Model:</strong> GPT-3.5 Turbo (temperature 0.9 for creativity)</li>
+                        <li><strong>Output parser:</strong> String output parser (clean text)</li>
+                        <li><strong>Chain:</strong> Prompt | Model | Parser using LCEL pipe operator</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="key-takeaway">
+                <h3>Success Criteria</h3>
+                <ul>
+                    <li>Chain produces valid haiku output</li>
+                    <li>Works with at least 5 different topics</li>
+                    <li>Uses LCEL pipe operator (not legacy LLMChain)</li>
+                    <li><strong>Bonus:</strong> Add streaming output</li>
+                    <li><strong>Bonus:</strong> Generate haikus in different languages</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Exercise 2 -->
+        <div class="section">
+            <h2>Exercise 2: RAG System &mdash; PDF Question Answering (Intermediate)</h2>
+            <div class="card-grid">
+                <div class="card info">
+                    <h3>Objective</h3>
+                    <p>Build a complete RAG pipeline that answers questions about any PDF document. This is the most commonly asked LangChain interview exercise.</p>
+                    <p><strong>Time estimate:</strong> 2-3 hours</p>
+                </div>
+                <div class="card">
+                    <h3>Requirements</h3>
+                    <ul>
+                        <li>Load a PDF document</li>
+                        <li>Split text into optimal chunks (500 chars, 100 overlap)</li>
+                        <li>Create embeddings and store in vector database</li>
+                        <li>Retrieve relevant chunks with MMR search</li>
+                        <li>Generate answers grounded in retrieved context</li>
+                        <li>Return source page citations with every answer</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Architecture Blueprint</h3>
+            <div class="diagram-container">
+                <h4>PDF RAG Pipeline</h4>
+                <svg viewBox="0 0 800 280" class="architecture-diagram">
+                    <defs><marker id="aw5" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#888"/></marker></defs>
+
+                    <!-- Ingestion Row -->
+                    <text x="400" y="25" text-anchor="middle" fill="#3b82f6" font-size="14" font-weight="bold">INGESTION PIPELINE (One-time)</text>
+
+                    <rect x="20" y="40" width="120" height="60" rx="8" fill="#1a2035" stroke="#3b82f6" stroke-width="2"/>
+                    <text x="80" y="65" text-anchor="middle" fill="#3b82f6" font-size="11" font-weight="bold">PDF Loader</text>
+                    <text x="80" y="82" text-anchor="middle" fill="#a1a1aa" font-size="9">PyPDFLoader</text>
+
+                    <rect x="175" y="40" width="120" height="60" rx="8" fill="#0d1f17" stroke="#10b981" stroke-width="2"/>
+                    <text x="235" y="65" text-anchor="middle" fill="#10b981" font-size="11" font-weight="bold">Text Splitter</text>
+                    <text x="235" y="82" text-anchor="middle" fill="#a1a1aa" font-size="9">500 chars, 100 overlap</text>
+
+                    <rect x="330" y="40" width="120" height="60" rx="8" fill="#1a1530" stroke="#8b5cf6" stroke-width="2"/>
+                    <text x="390" y="65" text-anchor="middle" fill="#8b5cf6" font-size="11" font-weight="bold">Embeddings</text>
+                    <text x="390" y="82" text-anchor="middle" fill="#a1a1aa" font-size="9">text-embedding-3-small</text>
+
+                    <rect x="485" y="40" width="120" height="60" rx="8" fill="#1f1a15" stroke="#f59e0b" stroke-width="2"/>
+                    <text x="545" y="65" text-anchor="middle" fill="#f59e0b" font-size="11" font-weight="bold">Vector Store</text>
+                    <text x="545" y="82" text-anchor="middle" fill="#a1a1aa" font-size="9">Chroma (persistent)</text>
+
+                    <line x1="140" y1="70" x2="173" y2="70" stroke="#888" stroke-width="2" marker-end="url(#aw5)"/>
+                    <line x1="295" y1="70" x2="328" y2="70" stroke="#888" stroke-width="2" marker-end="url(#aw5)"/>
+                    <line x1="450" y1="70" x2="483" y2="70" stroke="#888" stroke-width="2" marker-end="url(#aw5)"/>
+
+                    <!-- Query Row -->
+                    <text x="400" y="140" text-anchor="middle" fill="#ec4899" font-size="14" font-weight="bold">QUERY PIPELINE (Every request)</text>
+
+                    <rect x="20" y="155" width="100" height="60" rx="8" fill="#1a2035" stroke="#3b82f6" stroke-width="2"/>
+                    <text x="70" y="180" text-anchor="middle" fill="#3b82f6" font-size="11" font-weight="bold">Question</text>
+                    <text x="70" y="197" text-anchor="middle" fill="#a1a1aa" font-size="9">User input</text>
+
+                    <rect x="150" y="155" width="120" height="60" rx="8" fill="#1a1530" stroke="#8b5cf6" stroke-width="2"/>
+                    <text x="210" y="180" text-anchor="middle" fill="#8b5cf6" font-size="11" font-weight="bold">MMR Retriever</text>
+                    <text x="210" y="197" text-anchor="middle" fill="#a1a1aa" font-size="9">k=4, fetch_k=10</text>
+
+                    <rect x="300" y="155" width="120" height="60" rx="8" fill="#0d1f17" stroke="#10b981" stroke-width="2"/>
+                    <text x="360" y="180" text-anchor="middle" fill="#10b981" font-size="11" font-weight="bold">Context Builder</text>
+                    <text x="360" y="197" text-anchor="middle" fill="#a1a1aa" font-size="9">Format + page citations</text>
+
+                    <rect x="450" y="155" width="100" height="60" rx="8" fill="#1f1520" stroke="#ec4899" stroke-width="2"/>
+                    <text x="500" y="180" text-anchor="middle" fill="#ec4899" font-size="11" font-weight="bold">GPT-4o</text>
+                    <text x="500" y="197" text-anchor="middle" fill="#a1a1aa" font-size="9">temp=0</text>
+
+                    <rect x="580" y="155" width="120" height="60" rx="8" fill="#1f1a15" stroke="#f59e0b" stroke-width="2"/>
+                    <text x="640" y="175" text-anchor="middle" fill="#f59e0b" font-size="11" font-weight="bold">Answer</text>
+                    <text x="640" y="192" text-anchor="middle" fill="#a1a1aa" font-size="9">With page sources</text>
+                    <text x="640" y="205" text-anchor="middle" fill="#a1a1aa" font-size="9">or "I don't know"</text>
+
+                    <line x1="120" y1="185" x2="148" y2="185" stroke="#888" stroke-width="2" marker-end="url(#aw5)"/>
+                    <line x1="270" y1="185" x2="298" y2="185" stroke="#888" stroke-width="2" marker-end="url(#aw5)"/>
+                    <line x1="420" y1="185" x2="448" y2="185" stroke="#888" stroke-width="2" marker-end="url(#aw5)"/>
+                    <line x1="550" y1="185" x2="578" y2="185" stroke="#888" stroke-width="2" marker-end="url(#aw5)"/>
+
+                    <!-- Connection from vector store to retriever -->
+                    <line x1="545" y1="100" x2="545" y2="120" stroke="#888" stroke-width="1" stroke-dasharray="5,5"/>
+                    <line x1="545" y1="120" x2="210" y2="120" stroke="#888" stroke-width="1" stroke-dasharray="5,5"/>
+                    <line x1="210" y1="120" x2="210" y2="153" stroke="#888" stroke-width="1" stroke-dasharray="5,5" marker-end="url(#aw5)"/>
+                    <text x="380" y="118" text-anchor="middle" fill="#a1a1aa" font-size="9">searches stored vectors</text>
+
+                    <!-- Key Decisions -->
+                    <text x="400" y="260" text-anchor="middle" fill="#10b981" font-size="11" font-weight="bold">Key Decisions: MMR search for diverse results | Small chunks for precision | "I don't know" for missing info</text>
+                </svg>
+            </div>
+
+            <div class="key-takeaway">
+                <h3>Success Criteria</h3>
+                <ul>
+                    <li>Can load and query any PDF successfully</li>
+                    <li>Answers include source page citations</li>
+                    <li>Returns "I don't know" for questions not in the document</li>
+                    <li><strong>Bonus:</strong> Add re-ranking for better retrieval quality</li>
+                    <li><strong>Bonus:</strong> Support multiple PDFs with metadata filtering</li>
+                    <li><strong>Bonus:</strong> Add a simple Streamlit UI</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Exercise 3 -->
+        <div class="section">
+            <h2>Exercise 3: Tool-Using Agent (Intermediate)</h2>
+            <div class="card-grid">
+                <div class="card info">
+                    <h3>Objective</h3>
+                    <p>Build an agent that dynamically chooses between multiple tools to answer complex questions requiring reasoning and external data.</p>
+                    <p><strong>Time estimate:</strong> 2-3 hours</p>
+                </div>
+                <div class="card">
+                    <h3>Architecture</h3>
+                    <ul>
+                        <li><strong>3+ Custom Tools:</strong> Search, Calculator, Date/Time</li>
+                        <li><strong>Agent Type:</strong> OpenAI Functions Agent (reliable tool selection)</li>
+                        <li><strong>Safety Limits:</strong> max_iterations=10, timeout=60s</li>
+                        <li><strong>Error Handling:</strong> Graceful parse error recovery</li>
+                        <li><strong>Logging:</strong> All reasoning steps captured</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Agent Decision Flow</h3>
+            <div class="diagram-container">
+                <h4>ReAct Pattern: Reason &rarr; Act &rarr; Observe &rarr; Repeat</h4>
+                <svg viewBox="0 0 800 200" class="architecture-diagram">
+                    <defs><marker id="aw6" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#888"/></marker></defs>
+
+                    <rect x="20" y="60" width="100" height="70" rx="8" fill="#1a2035" stroke="#3b82f6" stroke-width="2"/>
+                    <text x="70" y="85" text-anchor="middle" fill="#3b82f6" font-size="11" font-weight="bold">User Query</text>
+                    <text x="70" y="105" text-anchor="middle" fill="#a1a1aa" font-size="9">Complex question</text>
+
+                    <rect x="155" y="40" width="130" height="110" rx="10" fill="#1a1530" stroke="#8b5cf6" stroke-width="2"/>
+                    <text x="220" y="65" text-anchor="middle" fill="#8b5cf6" font-size="12" font-weight="bold">REASON</text>
+                    <text x="220" y="85" text-anchor="middle" fill="#a1a1aa" font-size="9">LLM thinks:</text>
+                    <text x="220" y="100" text-anchor="middle" fill="#a1a1aa" font-size="9">"I need to calculate"</text>
+                    <text x="220" y="115" text-anchor="middle" fill="#a1a1aa" font-size="9">"I'll use the</text>
+                    <text x="220" y="130" text-anchor="middle" fill="#a1a1aa" font-size="9">calculator tool"</text>
+
+                    <rect x="320" y="40" width="130" height="110" rx="10" fill="#0d1f17" stroke="#10b981" stroke-width="2"/>
+                    <text x="385" y="65" text-anchor="middle" fill="#10b981" font-size="12" font-weight="bold">ACT</text>
+                    <text x="385" y="85" text-anchor="middle" fill="#a1a1aa" font-size="9">Call chosen tool:</text>
+                    <text x="385" y="100" text-anchor="middle" fill="#a1a1aa" font-size="9">&#128270; Search</text>
+                    <text x="385" y="115" text-anchor="middle" fill="#a1a1aa" font-size="9">&#128290; Calculator</text>
+                    <text x="385" y="130" text-anchor="middle" fill="#a1a1aa" font-size="9">&#128197; Date/Time</text>
+
+                    <rect x="485" y="40" width="130" height="110" rx="10" fill="#1f1a15" stroke="#f59e0b" stroke-width="2"/>
+                    <text x="550" y="65" text-anchor="middle" fill="#f59e0b" font-size="12" font-weight="bold">OBSERVE</text>
+                    <text x="550" y="85" text-anchor="middle" fill="#a1a1aa" font-size="9">Tool returns result</text>
+                    <text x="550" y="100" text-anchor="middle" fill="#a1a1aa" font-size="9">LLM evaluates:</text>
+                    <text x="550" y="115" text-anchor="middle" fill="#a1a1aa" font-size="9">"Do I have enough</text>
+                    <text x="550" y="130" text-anchor="middle" fill="#a1a1aa" font-size="9">to answer now?"</text>
+
+                    <rect x="650" y="60" width="120" height="70" rx="8" fill="#1f1520" stroke="#ec4899" stroke-width="2"/>
+                    <text x="710" y="85" text-anchor="middle" fill="#ec4899" font-size="11" font-weight="bold">Final Answer</text>
+                    <text x="710" y="105" text-anchor="middle" fill="#a1a1aa" font-size="9">or loop back</text>
+
+                    <line x1="120" y1="95" x2="153" y2="95" stroke="#888" stroke-width="2" marker-end="url(#aw6)"/>
+                    <line x1="285" y1="95" x2="318" y2="95" stroke="#888" stroke-width="2" marker-end="url(#aw6)"/>
+                    <line x1="450" y1="95" x2="483" y2="95" stroke="#888" stroke-width="2" marker-end="url(#aw6)"/>
+                    <line x1="615" y1="95" x2="648" y2="95" stroke="#888" stroke-width="2" marker-end="url(#aw6)"/>
+
+                    <!-- Loop back arrow -->
+                    <path d="M550 150 C550 180, 220 180, 220 150" stroke="#f59e0b" stroke-width="1.5" fill="none" stroke-dasharray="5,5" marker-end="url(#aw6)"/>
+                    <text x="385" y="185" text-anchor="middle" fill="#f59e0b" font-size="9">Need more info? Loop back (max 10 iterations)</text>
+                </svg>
+            </div>
+
+            <div class="key-takeaway">
+                <h3>Success Criteria</h3>
+                <ul>
+                    <li>Agent correctly selects the right tool for different query types</li>
+                    <li>Handles multi-step queries requiring multiple tools</li>
+                    <li>Gracefully handles tool errors without crashing</li>
+                    <li><strong>Bonus:</strong> Add web search tool (Tavily/SerpAPI)</li>
+                    <li><strong>Bonus:</strong> Add conversation memory so agent remembers context</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Exercise 4 -->
+        <div class="section">
+            <h2>Exercise 4: Conversational Chatbot with Memory (Intermediate)</h2>
+            <div class="card-grid">
+                <div class="card info">
+                    <h3>Objective</h3>
+                    <p>Build a multi-turn chatbot that remembers context across messages and supports configurable personas.</p>
+                    <p><strong>Time estimate:</strong> 1-2 hours</p>
+                </div>
+                <div class="card">
+                    <h3>Architecture</h3>
+                    <ul>
+                        <li><strong>Memory Type:</strong> Summary Buffer Memory (auto-summarizes old messages)</li>
+                        <li><strong>Token Limit:</strong> 1,000 tokens max in memory</li>
+                        <li><strong>Personas:</strong> Configurable system prompts (helpful, pirate, teacher, debug)</li>
+                        <li><strong>Chat Template:</strong> System message + memory history + human input</li>
+                        <li><strong>Reset Capability:</strong> Clear memory to start fresh conversation</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="key-takeaway">
+                <h3>Success Criteria</h3>
+                <ul>
+                    <li>Bot remembers user's name and previous context across turns</li>
+                    <li>Memory stays within token limits (doesn't grow unbounded)</li>
+                    <li>Different personas produce noticeably different responses</li>
+                    <li><strong>Bonus:</strong> Persist memory to Redis for session persistence</li>
+                    <li><strong>Bonus:</strong> Build a Gradio or Streamlit chat interface</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Exercise 5 -->
+        <div class="section">
+            <h2>Exercise 5: Multi-Agent Research Team (Advanced)</h2>
+            <div class="card-grid">
+                <div class="card info">
+                    <h3>Objective</h3>
+                    <p>Build a multi-agent system where specialized agents collaborate to produce a comprehensive research report.</p>
+                    <p><strong>Time estimate:</strong> 4-6 hours</p>
+                </div>
+                <div class="card">
+                    <h3>Agent Roles</h3>
+                    <ul>
+                        <li><strong>Researcher Agent:</strong> Gathers information using search tools</li>
+                        <li><strong>Writer Agent:</strong> Produces clear, structured content from research</li>
+                        <li><strong>Critic Agent:</strong> Reviews for accuracy and completeness</li>
+                        <li><strong>Coordinator:</strong> Orchestrates the workflow between agents</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Multi-Agent Pipeline Architecture</h3>
+            <div class="diagram-container">
+                <h4>Coordinator &rarr; Researcher &rarr; Writer &rarr; Critic &rarr; Revision &rarr; Final Output</h4>
+                <svg viewBox="0 0 800 200" class="architecture-diagram">
+                    <defs><marker id="aw7" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#888"/></marker></defs>
+
+                    <rect x="20" y="60" width="110" height="80" rx="8" fill="#1a2035" stroke="#3b82f6" stroke-width="2"/>
+                    <text x="75" y="85" text-anchor="middle" fill="#3b82f6" font-size="11" font-weight="bold">Topic Input</text>
+                    <text x="75" y="105" text-anchor="middle" fill="#a1a1aa" font-size="9">"Future of</text>
+                    <text x="75" y="117" text-anchor="middle" fill="#a1a1aa" font-size="9">AI Agents"</text>
+
+                    <rect x="160" y="60" width="120" height="80" rx="8" fill="#0d1f17" stroke="#10b981" stroke-width="2"/>
+                    <text x="220" y="85" text-anchor="middle" fill="#10b981" font-size="11" font-weight="bold">Researcher</text>
+                    <text x="220" y="105" text-anchor="middle" fill="#a1a1aa" font-size="9">Facts, stats,</text>
+                    <text x="220" y="117" text-anchor="middle" fill="#a1a1aa" font-size="9">perspectives</text>
+
+                    <rect x="310" y="60" width="120" height="80" rx="8" fill="#1a1530" stroke="#8b5cf6" stroke-width="2"/>
+                    <text x="370" y="85" text-anchor="middle" fill="#8b5cf6" font-size="11" font-weight="bold">Writer</text>
+                    <text x="370" y="105" text-anchor="middle" fill="#a1a1aa" font-size="9">Structured article</text>
+                    <text x="370" y="117" text-anchor="middle" fill="#a1a1aa" font-size="9">with headers</text>
+
+                    <rect x="460" y="60" width="120" height="80" rx="8" fill="#1f1a15" stroke="#f59e0b" stroke-width="2"/>
+                    <text x="520" y="85" text-anchor="middle" fill="#f59e0b" font-size="11" font-weight="bold">Critic</text>
+                    <text x="520" y="105" text-anchor="middle" fill="#a1a1aa" font-size="9">Review &amp; feedback</text>
+                    <text x="520" y="117" text-anchor="middle" fill="#a1a1aa" font-size="9">accuracy check</text>
+
+                    <rect x="610" y="60" width="120" height="80" rx="8" fill="#1f1520" stroke="#ec4899" stroke-width="2"/>
+                    <text x="670" y="85" text-anchor="middle" fill="#ec4899" font-size="11" font-weight="bold">Final Article</text>
+                    <text x="670" y="105" text-anchor="middle" fill="#a1a1aa" font-size="9">Revised &amp; polished</text>
+                    <text x="670" y="117" text-anchor="middle" fill="#a1a1aa" font-size="9">publication-ready</text>
+
+                    <line x1="130" y1="100" x2="158" y2="100" stroke="#888" stroke-width="2" marker-end="url(#aw7)"/>
+                    <line x1="280" y1="100" x2="308" y2="100" stroke="#888" stroke-width="2" marker-end="url(#aw7)"/>
+                    <line x1="430" y1="100" x2="458" y2="100" stroke="#888" stroke-width="2" marker-end="url(#aw7)"/>
+                    <line x1="580" y1="100" x2="608" y2="100" stroke="#888" stroke-width="2" marker-end="url(#aw7)"/>
+
+                    <!-- Revision loop -->
+                    <path d="M520 140 C520 170, 370 170, 370 140" stroke="#f59e0b" stroke-width="1.5" fill="none" stroke-dasharray="5,5" marker-end="url(#aw7)"/>
+                    <text x="445" y="175" text-anchor="middle" fill="#f59e0b" font-size="9">Needs revision? Writer rewrites</text>
+                </svg>
+            </div>
+
+            <div class="key-takeaway">
+                <h3>Success Criteria</h3>
+                <ul>
+                    <li>Pipeline produces a polished article from just a topic string</li>
+                    <li>Critic provides substantive feedback that improves final output</li>
+                    <li>Each agent has a clear, distinct role visible in output</li>
+                    <li><strong>Bonus:</strong> Add web search to the researcher for real data</li>
+                    <li><strong>Bonus:</strong> Implement with LangGraph for stateful graph execution</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Exercise 6 -->
+        <div class="section">
+            <h2>Exercise 6: Production RAG with Evaluation (Advanced)</h2>
+            <div class="card-grid">
+                <div class="card info">
+                    <h3>Objective</h3>
+                    <p>Build a production-quality RAG pipeline with comprehensive evaluation, monitoring, and optimization. The capstone project.</p>
+                    <p><strong>Time estimate:</strong> 6-8 hours</p>
+                </div>
+                <div class="card">
+                    <h3>Architecture Components</h3>
+                    <ul>
+                        <li><strong>Multi-source ingestion:</strong> PDF, web, markdown document loaders</li>
+                        <li><strong>Hybrid search:</strong> Dense embeddings (60%) + sparse BM25 (40%) + re-ranking</li>
+                        <li><strong>Semantic caching:</strong> Redis-based cache for similar queries</li>
+                        <li><strong>LangSmith evaluation:</strong> Gold-standard dataset with QA, helpfulness, relevance metrics</li>
+                        <li><strong>Streaming responses:</strong> Server-sent events with source citations</li>
+                        <li><strong>Cost tracking:</strong> Per-query cost with model routing</li>
+                        <li><strong>Automated testing:</strong> Regression tests against evaluation datasets</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="key-takeaway">
+                <h3>Success Criteria</h3>
+                <ul>
+                    <li>Achieves &gt;85% accuracy on evaluation dataset</li>
+                    <li>Implements caching with measurable cost savings</li>
+                    <li>Full LangSmith tracing with searchable metadata</li>
+                    <li>Streaming responses under 500ms time-to-first-token</li>
+                    <li><strong>Bonus:</strong> A/B test different chunk sizes and measure impact</li>
+                    <li><strong>Bonus:</strong> Deploy as API using LangServe</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Learning Path -->
+        <div class="section">
+            <h2>Recommended Learning Path</h2>
+            <table>
+                <tr><th>Week</th><th>Exercise</th><th>Key Skill</th></tr>
+                <tr><td>Week 1</td><td>Exercise 1: Haiku Generator</td><td>LCEL basics, chain composition</td></tr>
+                <tr><td>Week 1-2</td><td>Exercise 4: Chatbot with Memory</td><td>Memory management, personas</td></tr>
+                <tr><td>Week 2-3</td><td>Exercise 2: PDF RAG</td><td>Full RAG pipeline, retrieval</td></tr>
+                <tr><td>Week 3-4</td><td>Exercise 3: Tool-Using Agent</td><td>Agent patterns, tool design</td></tr>
+                <tr><td>Week 4-5</td><td>Exercise 5: Multi-Agent Team</td><td>Multi-agent orchestration</td></tr>
+                <tr><td>Week 5-6</td><td>Exercise 6: Production RAG</td><td>Evaluation, optimization, deployment</td></tr>
+            </table>
+        </div>
+
+        <div class="navigation">
+            <a href="13-eloquent.html" class="button secondary">&larr; Eloquent Conversation</a>
+            <a href="15-reference.html" class="button primary">Quick Reference &rarr;</a>
+        </div>
+    </div>
+    <script src="js/components.js"></script>
+</body>
+</html>

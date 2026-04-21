@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trade-offs Analysis — Docker</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+.vs-container {
+  display: grid; grid-template-columns: 1fr auto 1fr; gap: 0; margin: 1.5rem 0;
+  border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden;
+}
+.vs-side { padding: 1.5rem; }
+.vs-side.left { background: rgba(36,150,237,0.05); }
+.vs-side.right { background: rgba(124,58,237,0.05); }
+.vs-divider { display: flex; align-items: center; justify-content: center; padding: 0 1rem; background: var(--bg3); }
+.vs-badge { width: 40px; height: 40px; border-radius: 50%; background: var(--bg); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.75rem; color: var(--text3); }
+.vs-title { font-weight: 700; font-size: 1rem; margin-bottom: 0.75rem; }
+.vs-title.blue { color: var(--docker-blue); }
+.vs-title.purple { color: var(--accent2); }
+.vs-list { list-style: none; padding: 0; margin: 0; }
+.vs-list li { padding: 5px 0; font-size: 0.85rem; color: var(--text2); border-bottom: 1px solid rgba(46,51,80,0.4); display: flex; gap: 6px; }
+.vs-list li:last-child { border-bottom: none; }
+.vs-list .check { color: var(--green); flex-shrink: 0; }
+.vs-list .cross { color: var(--red); flex-shrink: 0; }
+.decision-box {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.25rem; margin-top: 0.75rem;
+}
+.decision-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); margin-bottom: 0.5rem; }
+.itdepends { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.3); border-radius: var(--radius-sm); padding: 1rem; margin: 1rem 0; }
+.itdepends-title { color: var(--yellow); font-weight: 700; font-size: 0.85rem; margin-bottom: 0.5rem; }
+</style>
+</head>
+<body>
+<nav class="topnav">
+  <a class="topnav-brand" href="index.html">🐳 Docker & Ecosystem</a>
+  <div class="topnav-links">
+    <a href="01-foundation.html">Foundation</a>
+    <a href="03b-interview.html">Interview</a>
+    <a href="08-tradeoffs.html" class="active">Trade-offs</a>
+    <a href="15-reference.html">Quick Ref</a>
+  </div>
+</nav>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Core Sections</div>
+      <a href="index.html"><span class="num">00</span> Overview</a>
+      <a href="01-foundation.html"><span class="num">01</span> Foundation</a>
+      <a href="02-analogy.html"><span class="num">02</span> Analogy</a>
+      <a href="03a-journey.html"><span class="num">03A</span> Journey</a>
+      <a href="03b-interview.html"><span class="num">03B</span> Interview</a>
+      <a href="04-system-design.html"><span class="num">04</span> System Design</a>
+      <a href="05-ripple.html"><span class="num">05</span> Ripple Effects</a>
+      <a href="06-evolution.html"><span class="num">06</span> Evolution</a>
+      <a href="07-patterns.html"><span class="num">07</span> Patterns</a>
+      <a href="08-tradeoffs.html" class="active"><span class="num">08</span> Trade-offs</a>
+      <a href="09-at-scale.html"><span class="num">09</span> At Scale</a>
+      <a href="10-landscape.html"><span class="num">10</span> Landscape</a>
+      <a href="11-pitfalls.html"><span class="num">11</span> Pitfalls</a>
+      <a href="12-debugging.html"><span class="num">12</span> Debugging</a>
+      <a href="13-conversation.html"><span class="num">13</span> Conversation</a>
+      <a href="14-exercises.html"><span class="num">14</span> Exercises</a>
+      <a href="15-reference.html"><span class="num">15</span> Quick Ref</a>
+      <a href="16-whats-next.html"><span class="num">16</span> What's Next</a>
+    </div>
+  </aside>
+  <main class="main">
+    <div class="page-header">
+      <div class="badge">Section 08 · Trade-offs</div>
+      <h1>Trade-offs Analysis</h1>
+      <p class="subtitle">The hardest Docker questions don't have single right answers — they depend on context, team maturity, security requirements, and workload characteristics. Here's how to think through the most important decisions.</p>
+    </div>
+
+    <h2>1. Containers vs Virtual Machines</h2>
+    <div class="vs-container">
+      <div class="vs-side left">
+        <div class="vs-title blue">🐳 Containers</div>
+        <ul class="vs-list">
+          <li><span class="check">✓</span> Start in milliseconds</li>
+          <li><span class="check">✓</span> ~5-100x higher density per host</li>
+          <li><span class="check">✓</span> Shared kernel = less overhead</li>
+          <li><span class="check">✓</span> Image sizes in MB, not GB</li>
+          <li><span class="check">✓</span> Perfect dev/prod parity</li>
+          <li><span class="cross">✗</span> Shared kernel = security boundary is weaker</li>
+          <li><span class="cross">✗</span> Kernel exploits affect all containers</li>
+          <li><span class="cross">✗</span> Can't run different OS kernels</li>
+          <li><span class="cross">✗</span> More complex networking</li>
+        </ul>
+      </div>
+      <div class="vs-divider"><div class="vs-badge">VS</div></div>
+      <div class="vs-side right">
+        <div class="vs-title purple">🖥️ Virtual Machines</div>
+        <ul class="vs-list">
+          <li><span class="check">✓</span> Strong hardware isolation boundary</li>
+          <li><span class="check">✓</span> Can run any OS kernel</li>
+          <li><span class="check">✓</span> Hypervisor escape harder to achieve</li>
+          <li><span class="check">✓</span> Kernel-level isolation for untrusted code</li>
+          <li><span class="cross">✗</span> Boot in minutes, not milliseconds</li>
+          <li><span class="cross">✗</span> Full OS overhead per workload</li>
+          <li><span class="cross">✗</span> GB-scale images</li>
+          <li><span class="cross">✗</span> Complex configuration management</li>
+          <li><span class="cross">✗</span> No easy dev/prod parity</li>
+        </ul>
+      </div>
+    </div>
+    <div class="itdepends">
+      <div class="itdepends-title">⚖️ It Depends On...</div>
+      <ul>
+        <li><strong>Security requirements:</strong> Running untrusted multi-tenant code (public cloud functions)? Use VMs or microVMs (Firecracker). Running your own trusted services? Containers are fine.</li>
+        <li><strong>OS diversity:</strong> Need Windows and Linux on the same host? VMs. All Linux? Containers.</li>
+        <li><strong>Density requirements:</strong> Trying to maximize hosts? Containers win by a wide margin.</li>
+        <li><strong>Real answer:</strong> Most organizations use both — VMs as the cloud infrastructure layer, containers as the workload packaging layer. Kubernetes nodes are VMs; pods are containers.</li>
+      </ul>
+    </div>
+
+    <h2>2. Docker vs Podman</h2>
+    <div class="vs-container">
+      <div class="vs-side left">
+        <div class="vs-title blue">🐳 Docker</div>
+        <ul class="vs-list">
+          <li><span class="check">✓</span> Industry-standard developer experience</li>
+          <li><span class="check">✓</span> Docker Desktop: outstanding Mac/Win support</li>
+          <li><span class="check">✓</span> Largest ecosystem and documentation</li>
+          <li><span class="check">✓</span> BuildKit: best-in-class image builder</li>
+          <li><span class="check">✓</span> Docker Compose well-established</li>
+          <li><span class="cross">✗</span> Requires running daemon (dockerd)</li>
+          <li><span class="cross">✗</span> Daemon runs as root by default</li>
+          <li><span class="cross">✗</span> Docker Desktop paid for orgs >250 employees</li>
+          <li><span class="cross">✗</span> Docker socket is a security concern</li>
+        </ul>
+      </div>
+      <div class="vs-divider"><div class="vs-badge">VS</div></div>
+      <div class="vs-side right">
+        <div class="vs-title purple">🦭 Podman</div>
+        <ul class="vs-list">
+          <li><span class="check">✓</span> Daemonless — no background service required</li>
+          <li><span class="check">✓</span> Rootless by default — better security posture</li>
+          <li><span class="check">✓</span> OCI-compliant — Docker images work fine</li>
+          <li><span class="check">✓</span> <code>alias docker=podman</code> for most workflows</li>
+          <li><span class="check">✓</span> Pods: group containers like K8s pods</span></li>
+          <li><span class="cross">✗</span> Less polished desktop experience</li>
+          <li><span class="cross">✗</span> Fewer third-party integrations assume Podman</li>
+          <li><span class="cross">✗</span> Compose support via podman-compose is less mature</li>
+          <li><span class="cross">✗</span> Smaller community, less documentation</li>
+        </ul>
+      </div>
+    </div>
+    <div class="itdepends">
+      <div class="itdepends-title">⚖️ It Depends On...</div>
+      <p><strong>Developer machines:</strong> Docker Desktop is the better experience, especially on Mac. <strong>CI/CD servers:</strong> Podman or kaniko are often better — no daemon to manage, rootless by default. <strong>RHEL/Fedora/CentOS environments:</strong> Podman is the default and Red Hat's preferred tool. <strong>Large enterprises concerned about Docker Desktop licensing:</strong> Podman or Rancher Desktop as alternatives.</p>
+    </div>
+
+    <h2>3. Docker Compose vs Kubernetes</h2>
+    <div class="vs-container">
+      <div class="vs-side left">
+        <div class="vs-title blue">🐙 Docker Compose</div>
+        <ul class="vs-list">
+          <li><span class="check">✓</span> Simple YAML that most devs understand in an hour</li>
+          <li><span class="check">✓</span> Perfect for local development</li>
+          <li><span class="check">✓</span> Small team production deployments viable</li>
+          <li><span class="check">✓</span> No control plane to manage</li>
+          <li><span class="check">✓</span> Fast iteration cycle</li>
+          <li><span class="cross">✗</span> No automatic rescheduling on node failure</li>
+          <li><span class="cross">✗</span> No built-in horizontal autoscaling</li>
+          <li><span class="cross">✗</span> Single-host limitation (Swarm for multi-host)</li>
+          <li><span class="cross">✗</span> Limited to Docker's networking model</li>
+        </ul>
+      </div>
+      <div class="vs-divider"><div class="vs-badge">VS</div></div>
+      <div class="vs-side right">
+        <div class="vs-title purple">☸️ Kubernetes</div>
+        <ul class="vs-list">
+          <li><span class="check">✓</span> Automatic rescheduling on node failures</li>
+          <li><span class="check">✓</span> Horizontal pod autoscaling</li>
+          <li><span class="check">✓</span> Rich ecosystem (service mesh, operators, GitOps)</li>
+          <li><span class="check">✓</span> Battle-tested at massive scale</li>
+          <li><span class="check">✓</span> Declarative, self-healing</li>
+          <li><span class="cross">✗</span> Steep learning curve (weeks to months)</li>
+          <li><span class="cross">✗</span> Control plane overhead (3 masters minimum for HA)</li>
+          <li><span class="cross">✗</span> YAML verbosity (Deployment + Service + Ingress for one service)</li>
+          <li><span class="cross">✗</span> Operational complexity at small scales</li>
+        </ul>
+      </div>
+    </div>
+    <div class="itdepends">
+      <div class="itdepends-title">⚖️ The Decision Framework</div>
+      <ul>
+        <li><strong>Team size ≤ 5, ≤ 10 services:</strong> Docker Compose on a single server or simple VPS. Kubernetes overhead exceeds benefit.</li>
+        <li><strong>Team size 5-20, multiple services, starting to hit scaling needs:</strong> Managed Kubernetes (EKS, GKE, AKS). Let the cloud manage the control plane.</li>
+        <li><strong>Large org, complex requirements, compliance:</strong> Kubernetes with full platform engineering investment — GitOps, service mesh, custom operators.</li>
+        <li><strong>The false dichotomy:</strong> Compose for local dev, Kubernetes for production is the most common setup. They're not mutually exclusive.</li>
+      </ul>
+    </div>
+
+    <h2>4. Base Image Trade-offs</h2>
+    <table class="compare-table">
+      <tr>
+        <th>Base Image</th>
+        <th>Size</th>
+        <th>Packages</th>
+        <th>CVE Surface</th>
+        <th>Shell</th>
+        <th>Best For</th>
+      </tr>
+      <tr>
+        <td><strong>Ubuntu/Debian full</strong></td>
+        <td>~100MB</td>
+        <td>~1000+</td>
+        <td class="no">High</td>
+        <td class="yes">bash</td>
+        <td>Development, debugging</td>
+      </tr>
+      <tr>
+        <td><strong>Alpine Linux</strong></td>
+        <td>~5MB</td>
+        <td>~50</td>
+        <td class="partial">Low</td>
+        <td class="yes">sh</td>
+        <td>Production (glibc gotchas!)</td>
+      </tr>
+      <tr>
+        <td><strong>Distroless</strong></td>
+        <td>~2MB</td>
+        <td>~10</td>
+        <td class="yes">Very Low</td>
+        <td class="no">None</td>
+        <td>Minimal attack surface production</td>
+      </tr>
+      <tr>
+        <td><strong>scratch</strong></td>
+        <td>0MB</td>
+        <td>0</td>
+        <td class="yes">Minimal</td>
+        <td class="no">None</td>
+        <td>Statically compiled binaries (Go, Rust)</td>
+      </tr>
+      <tr>
+        <td><strong>Official language images</strong></td>
+        <td>Varies</td>
+        <td>Varies</td>
+        <td class="partial">Medium</td>
+        <td class="yes">bash/sh</td>
+        <td>Quick start, well-maintained</td>
+      </tr>
+    </table>
+    <div class="callout callout-warn">
+      <div class="callout-title">Alpine glibc Warning</div>
+      Alpine uses musl libc instead of glibc. Most C software is compiled against glibc. Some packages (cryptographic libraries, some Python packages with C extensions, some Node native modules) may behave differently or fail on Alpine. Test thoroughly before using Alpine in production. When in doubt, use the slim variant of official images (node:18-slim, python:3.11-slim) which are Debian-based but minimal.
+    </div>
+
+    <h2>5. Image Build Strategy</h2>
+    <div class="tabs">
+      <div class="tab-list">
+        <button class="tab-btn active" data-tab="t1">Local Dockerfile</button>
+        <button class="tab-btn" data-tab="t2">Buildpacks</button>
+        <button class="tab-btn" data-tab="t3">Jib / ko</button>
+      </div>
+      <div class="tab-panel active" id="t1">
+        <h4>Traditional Dockerfile</h4>
+        <p><strong>Best for:</strong> Full control, custom requirements, all languages, security-specific needs.</p>
+        <p><strong>Requires:</strong> Team expertise to write good Dockerfiles. Ongoing maintenance as base images update.</p>
+        <p><strong>Risk:</strong> Bad Dockerfiles are common — layer ordering mistakes, secrets baked in, oversized images.</p>
+      </div>
+      <div class="tab-panel" id="t2">
+        <h4>Cloud Native Buildpacks (CNB)</h4>
+        <p><strong>Best for:</strong> Heroku-like experience. Automatic language detection. No Dockerfile required.</p>
+        <p><strong>Used by:</strong> Heroku, Google Cloud Run, Paketo Buildpacks (Spring, Node, Go, Python, Ruby).</p>
+        <p><strong>Trade-off:</strong> Less control over the final image. Buildpack must support your specific requirements. Harder to customize for unusual configurations.</p>
+      </div>
+      <div class="tab-panel" id="t3">
+        <h4>Language-Specific Builders (Jib for Java, ko for Go)</h4>
+        <p><strong>Best for:</strong> Teams that want optimal images without Dockerfile expertise.</p>
+        <p><strong>Jib:</strong> Builds Docker images directly from Maven/Gradle without Docker daemon. Produces layered images that cache extremely well (dependencies layer is rarely rebuilt). Part of Google Cloud ecosystem.</p>
+        <p><strong>ko:</strong> Builds OCI images from Go binaries in a single command. No Dockerfile. Produces minimal images from scratch. Excellent for K8s operators and CLI tools.</p>
+        <p><strong>Trade-off:</strong> Framework-specific. Not appropriate for non-Java/Go projects. Less flexibility than Dockerfiles.</p>
+      </div>
+    </div>
+
+    <div class="pagination">
+      <a href="07-patterns.html" class="page-btn">← Patterns</a>
+      <a href="09-at-scale.html" class="page-btn primary">At Scale →</a>
+    </div>
+  </main>
+</div>
+<script src="js/components.js"></script>
+</body>
+</html>

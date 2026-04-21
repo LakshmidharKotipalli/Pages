@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="What's Next — Large Language Models Learning Journey">
+    <title>What's Next | LLM Learning Journey</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <a href="index.html" class="sidebar-brand">Large Language Models</a>
+            <span class="sidebar-subtitle">A Complete Learning Journey</span>
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="1_foundation.html" class="nav-link"><span class="nav-num">01</span> Foundation & Context</a>
+            <a href="2_living_analogy.html" class="nav-link"><span class="nav-num">02</span> Living Analogy</a>
+            <a href="3a_learning_journey.html" class="nav-link"><span class="nav-num">3a</span> Learning Journey</a>
+            <a href="3b_interview_conversations.html" class="nav-link"><span class="nav-num">3b</span> Interview Conversations</a>
+            <a href="4_system_design.html" class="nav-link"><span class="nav-num">04</span> System Design Integration</a>
+            <a href="5_ripple_effects.html" class="nav-link"><span class="nav-num">05</span> Ripple Effects Map</a>
+            <a href="6_evolution.html" class="nav-link"><span class="nav-num">06</span> Evolution Story</a>
+            <a href="7_patterns.html" class="nav-link"><span class="nav-num">07</span> Patterns & Anti-Patterns</a>
+            <a href="8_tradeoffs.html" class="nav-link"><span class="nav-num">08</span> Trade-offs Analysis</a>
+            <a href="9_at_scale.html" class="nav-link"><span class="nav-num">09</span> At Scale</a>
+            <a href="10_landscape.html" class="nav-link"><span class="nav-num">10</span> Technology Landscape</a>
+            <a href="11_pitfalls.html" class="nav-link"><span class="nav-num">11</span> Pitfalls & War Stories</a>
+            <a href="12_debugging.html" class="nav-link"><span class="nav-num">12</span> Debugging Process</a>
+            <a href="13_eloquent.html" class="nav-link"><span class="nav-num">13</span> Eloquent Conversation</a>
+            <a href="14_exercises.html" class="nav-link"><span class="nav-num">14</span> Practice Exercises</a>
+            <a href="15_quick_ref.html" class="nav-link"><span class="nav-num">15</span> Quick Reference</a>
+            <a href="16_whats_next.html" class="nav-link active"><span class="nav-num">16</span> What's Next</a>
+
+        </aside>
+        <main class="main-content">
+
+            <h4>Section Sixteen</h4>
+            <h1>What's Next</h1>
+            <p class="page-intro">Where to go after mastering the LLM landscape. Each of these topics builds on what you've learned.</p>
+
+            <div class="card card--accent">
+                <span class="card-label">High Priority</span>
+                <h3>Retrieval-Augmented Generation (RAG)</h3>
+                <p><strong>Connection:</strong> The most common production pattern for LLMs. You learned the model side; now learn the retrieval side — embedding models, vector databases, chunk strategies, re-ranking.</p>
+                <p><strong>Difficulty:</strong> Intermediate. Prerequisites: basic LLM API usage, understanding of embeddings.</p>
+                <p><strong>Why it matters:</strong> 80%+ of enterprise LLM deployments use RAG. It solves hallucination, knowledge freshness, and auditability simultaneously.</p>
+            </div>
+
+            <div class="card card--sage">
+                <span class="card-label">High Priority</span>
+                <h3>AI Agents & Tool Use</h3>
+                <p><strong>Connection:</strong> LLMs as orchestrators — calling APIs, executing code, browsing the web, making decisions in multi-step workflows. The frontier of applied AI.</p>
+                <p><strong>Difficulty:</strong> Advanced. Prerequisites: solid LLM fundamentals, prompt engineering, understanding of function calling.</p>
+                <p><strong>Why it matters:</strong> The industry is moving from "chatbots that answer questions" to "agents that complete tasks." This is where the most business value is being created in 2025-2026.</p>
+            </div>
+
+            <div class="card">
+                <span class="card-label">Recommended</span>
+                <h3>Vision-Language Models</h3>
+                <p><strong>Connection:</strong> Extending LLMs to see — processing images, documents, screenshots alongside text. Same transformer architecture, new modality.</p>
+                <p><strong>Difficulty:</strong> Intermediate. Prerequisites: understanding of transformers, tokenization.</p>
+                <p><strong>Why it matters:</strong> Document processing, UI automation, and visual QA are high-value enterprise applications. Models like GPT-4o and Qwen-VL are making this accessible.</p>
+            </div>
+
+            <div class="card">
+                <span class="card-label">Recommended</span>
+                <h3>MLOps for LLMs (LLMOps)</h3>
+                <p><strong>Connection:</strong> Taking LLMs from prototype to production — CI/CD for prompts, model versioning, A/B testing, monitoring, cost management.</p>
+                <p><strong>Difficulty:</strong> Intermediate. Prerequisites: basic DevOps knowledge, LLM API usage.</p>
+                <p><strong>Why it matters:</strong> The gap between "works in a notebook" and "runs reliably in production" is enormous. LLMOps is the bridge.</p>
+            </div>
+
+            <div class="card card--danger">
+                <span class="card-label">Advanced</span>
+                <h3>Distributed Training & Pre-Training</h3>
+                <p><strong>Connection:</strong> Training LLMs from scratch — data pipelines, distributed computing (FSDP, DeepSpeed), training stability, evaluation during training.</p>
+                <p><strong>Difficulty:</strong> Expert. Prerequisites: deep ML fundamentals, distributed systems, GPU programming.</p>
+                <p><strong>Why it matters:</strong> If you ever work at a frontier lab or need to train domain-specific foundation models, this is essential knowledge. It's also the most fascinating area of the field.</p>
+            </div>
+
+            <div class="card">
+                <span class="card-label">Advanced</span>
+                <h3>AI Safety & Alignment</h3>
+                <p><strong>Connection:</strong> RLHF, DPO, Constitutional AI, red teaming, prompt injection defense — ensuring LLMs are safe, controllable, and aligned with human intent.</p>
+                <p><strong>Difficulty:</strong> Advanced. Prerequisites: understanding of fine-tuning and reward modeling.</p>
+                <p><strong>Why it matters:</strong> Every production LLM system needs safety guardrails. As models become more capable, alignment becomes more critical — and more difficult.</p>
+            </div>
+
+            <div class="section-divider"></div>
+
+            <div class="highlight-box">
+                Learning sequence: <strong>RAG</strong> → <strong>Agents & Tool Use</strong> → <strong>Vision-Language Models</strong> → <strong>LLMOps</strong> → <strong>Alignment</strong> → <strong>Distributed Training</strong>. Each layer builds on the previous one. Start with RAG — it's the highest-ROI skill for an AI engineer today.
+            </div>
+
+        </main>
+    </div>
+    <script src="js/components.js"></script>
+</body>
+</html>

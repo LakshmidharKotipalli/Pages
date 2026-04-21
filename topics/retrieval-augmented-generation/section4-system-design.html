@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Design Integration - RAG Learning Journey</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="theme-dark">
+    <div class="container">
+        <header class="section-header">
+            <div class="breadcrumbs">
+                <a href="index.html">Home</a>
+                <span>/</span>
+                <span>Section 4: System Design Integration</span>
+            </div>
+            <h1>System Design Integration</h1>
+            <p class="section-subtitle">How RAG Connects to Reliability, Availability, Latency, Throughput, and Maintainability</p>
+        </header>
+
+        <nav class="nav-buttons">
+            <a id="prevBtn" class="nav-btn" href="section3b-interview.html">
+                ← Previous
+            </a>
+            <button id="completeBtn" class="nav-btn" data-section="section4-system-design">
+                ✓ Mark Complete
+            </button>
+            <a id="nextBtn" class="nav-btn" href="section5-ripple-effects.html">
+                Next: Ripple Effects →
+            </a>
+        </nav>
+
+        <main>
+            <section class="content-section">
+                <h2>RAG in the System Design Landscape</h2>
+
+                <div class="highlight info">
+                    <h4>💡 RAG Doesn't Exist in Isolation</h4>
+                    <p>RAG systems exist within larger system architectures. Understanding how RAG connects to fundamental system design principles is crucial for building production-ready solutions.</p>
+
+                    <p><strong>This section covers:</strong> How RAG integrates with reliability, availability, scalability, maintainability, and security - the core concerns of system design.</p>
+                </div>
+            </section>
+
+            <!-- Reliability -->
+            <section class="content-section">
+                <h2>1. Reliability: Making RAG Dependable</h2>
+
+                <div class="highlight warning">
+                    <h4>🎯 The Reliability Challenge</h4>
+                    <p><strong>Reliability = "Does it work consistently?"</strong> RAG systems have multiple failure points. Each component in the pipeline can fail, and the system must handle these failures gracefully.</p>
+                </div>
+
+                <h3>Failure Points in RAG</h3>
+
+                <table class="matrix-table">
+                    <thead>
+                        <tr>
+                            <th>Component</th>
+                            <th>Failure Modes</th>
+                            <th>Mitigation Strategies</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Vector Database</strong></td>
+                            <td>Outage, slow queries, connection failures</td>
+                            <td>Multiple replicas, connection pooling, timeouts, retries</td>
+                        </tr>
+                        <tr>
+                            <td><strong>LLM API</strong></td>
+                            <td>Rate limits, outages, degraded performance</td>
+                            <td>Multiple providers, exponential backoff, queuing</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Embedding Model</strong></td>
+                            <td>API failures, timeout, resource exhaustion</td>
+                            <td>Caching embeddings, fallback models</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Network</strong></td>
+                            <td>Latency spikes, packet loss, DNS failures</td>
+                            <td>Retries with backoff, multiple regions, circuit breakers</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Reliability Patterns</h3>
+
+                <div class="cards-grid">
+                    <div class="info-card">
+                        <h4>Retry with Exponential Backoff</h4>
+                        <p><strong>What:</strong> Retry failed requests with increasing delays</p>
+                        <p><strong>Implementation:</strong> 1s, 2s, 4s, 8s delays before giving up</p>
+                        <p><strong>Use for:</strong> Transient failures (network blips, rate limits)</p>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>Circuit Breakers</h4>
+                        <p><strong>What:</strong> Stop calling failing services automatically</p>
+                        <p><strong>Implementation:</strong> Open circuit after N failures, retry after timeout</p>
+                        <p><strong>Use for:</strong> Preventing cascade failures</p>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>Fallback Mechanisms</h4>
+                        <p><strong>What:</strong> Alternative approaches when primary fails</p>
+                        <p><strong>Examples:</strong> Vector DB → Keyword search; GPT-4 → GPT-3.5</p>
+                        <p><strong>Use for:</strong> Maintaining availability during degradation</p>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>Graceful Degradation</h4>
+                        <p><strong>What:</strong> Reduce functionality rather than fail completely</p>
+                        <p><strong>Example:</strong> Skip reranking under load, return cached results</p>
+                        <p><strong>Use for:</strong> Handling traffic spikes</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Availability -->
+            <section class="content-section">
+                <h2>2. Availability: Keeping RAG Accessible</h2>
+
+                <div class="highlight warning">
+                    <h4>🎯 The Availability Challenge</h4>
+                    <p><strong>Availability = "Is it up when users need it?"</strong> High availability requires redundancy and the ability to survive component failures without service interruption.</p>
+                </div>
+
+                <h3>Availability Targets</h3>
+
+                <table class="matrix-table">
+                    <thead>
+                        <tr>
+                            <th>Availability Level</th>
+                            <th>Uptime Percentage</th>
+                            <th>Downtime Per Year</th>
+                            <th>Typical Use Case</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>99%</strong></td>
+                            <td>99%</td>
+                            <td>3.65 days</td>
+                            <td>Internal tools, non-critical</td>
+                        </tr>
+                        <tr>
+                            <td><strong>99.9%</strong></td>
+                            <td>99.9%</td>
+                            <td>8.76 hours</td>
+                            <td>Business applications</td>
+                        </tr>
+                        <tr>
+                            <td><strong>99.95%</strong></td>
+                            <td>99.95%</td>
+                            <td>4.38 hours</td>
+                            <td>Production systems</td>
+                        </tr>
+                        <tr>
+                            <td><strong>99.99%</strong></td>
+                            <td>99.99%</td>
+                            <td>52.56 minutes</td>
+                            <td>Critical systems</td>
+                        </tr>
+                        <tr>
+                            <td><strong>99.999%</strong></td>
+                            <td>99.999%</td>
+                            <td>5.26 minutes</td>
+                            <td>Life-critical systems</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Availability Strategies</h3>
+
+                <div class="accordion-group">
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Redundancy</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Application layer:</strong> Multiple instances behind load balancer</p>
+                            <p><strong>Database layer:</strong> Master-replica setup, automatic failover</p>
+                            <p><strong> Geographic:</strong> Multi-region deployment for disaster recovery</p>
+                            <p><strong>Vendor:</strong> Multiple LLM providers (don't rely on single vendor)</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Health Checks</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Application health:</strong> /health endpoint that checks dependencies</p>
+                            <p><strong>Dependency health:</strong> Can we reach vector DB? LLM API?</p>
+                            <p><strong>Readiness checks:</strong> Is the service ready to receive traffic?</p>
+                            <p><strong>Automated recovery:</strong> Restart unhealthy instances automatically</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Blue-Green Deployments</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>What:</strong> Maintain two identical production environments</p>
+                            <p><strong>Process:</strong> Deploy to green, test, switch traffic, decommission blue</p>
+                            <p><strong>Benefit:</strong> Zero-downtime deployments, instant rollback</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Scalability -->
+            <section class="content-section">
+                <h2>3. Scalability: Handling Growth</h2>
+
+                <div class="highlight warning">
+                    <h4>🎯 The Scalability Challenge</h4>
+                    <p><strong>Scalability = "Can it handle growth?"</strong> RAG systems must scale both in terms of data (more documents) and traffic (more queries).</p>
+                </div>
+
+                <h3>Two Types of Scaling</h3>
+
+                <div class="cards-grid">
+                    <div class="info-card">
+                        <h4>Vertical Scaling (Scale Up)</h4>
+                        <p><strong>What:</strong> Add more resources to single machine</p>
+                        <p><strong>Examples:</strong> Larger CPU, more RAM, faster SSD</p>
+                        <p><strong>Pros:</strong> Simple, no architecture changes</p>
+                        <p><strong>Cons:</strong> Expensive, limited by hardware capacity</p>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>Horizontal Scaling (Scale Out)</h4>
+                        <p><strong>What:</strong> Add more machines to handle load</p>
+                        <p><strong>Examples:</strong> More application instances, distributed DB</p>
+                        <p><strong>Pros:</strong> Theoretically unlimited, cost-effective</p>
+                        <p><strong>Cons:</strong> Complex, requires distributed architecture</p>
+                    </div>
+                </div>
+
+                <h3>Scaling Strategies by Component</h3>
+
+                <table class="matrix-table">
+                    <thead>
+                        <tr>
+                            <th>Component</th>
+                            <th>Scaling Challenge</th>
+                            <th>Scaling Strategy</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Application</strong></td>
+                            <td>Stateful, single points of failure</td>
+                            <td>Stateless design, load balancing, auto-scaling</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Vector Database</strong></td>
+                            <td>Large embeddings, complex queries</td>
+                            <td>Distributed indexing, sharding, read replicas</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cache</strong></td>
+                            <td>Memory limits, cache invalidation</td>
+                            <td>Distributed cache (Redis cluster), sharding</td>
+                        </tr>
+                        <tr>
+                            <td><strong>LLM API</strong></td>
+                            <td>Rate limits, cost at scale</td>
+                            <td>Request queuing, multiple providers, self-hosting</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Maintainability -->
+            <section class="content-section">
+                <h2>4. Maintainability: Long-Term Sustainability</h2>
+
+                <div class="highlight warning">
+                    <h4>🎯 The Maintainability Challenge</h4>
+                    <p><strong>Maintainability = "Can the team keep it running?"</strong> RAG systems require ongoing maintenance: updates, monitoring, debugging, and evolution.</p>
+                </div>
+
+                <h3>Maintainability Best Practices</h3>
+
+                <div class="accordion-group">
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Observability</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Logging:</strong> Structured logs at each pipeline stage</p>
+                            <p><strong>Metrics:</strong> Track latency, errors, quality, cost</p>
+                            <p><strong>Tracing:</strong> Distributed tracing for requests</p>
+                            <p><strong>Alerting:</strong> Proactive alerts for anomalies</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Documentation</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Architecture docs:</strong> System design, data flow</p>
+                            <p><strong>Runbooks:</strong> Common issues and resolutions</p>
+                            <p><strong>API docs:</strong> Interface specifications</p>
+                            <p><strong>Decision logs:</strong> Why specific choices were made</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Testing</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Unit tests:</strong> Individual components</p>
+                            <p><strong>Integration tests:</strong> Component interactions</p>
+                            <p><strong>E2E tests:</strong> Full pipeline tests</p>
+                            <p><strong>Evaluation tests:</strong> Quality metrics (RAGAS, DeepEval)</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Configuration Management</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Environment configs:</strong> Dev, staging, production</p>
+                            <p><strong>Feature flags:</strong> Enable/disable features without deployment</p>
+                            <p><strong>Parameter tuning:</strong> Externalize parameters (chunk size, k values)</p>
+                            <p><strong>Secrets management:</strong> API keys, passwords</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Security -->
+            <section class="content-section">
+                <h2>5. Security: Protecting RAG Systems</h2>
+
+                <div class="highlight warning">
+                    <h4>🎯 The Security Challenge</h4>
+                    <p><strong>RAG systems handle sensitive data.</strong> Documents may contain confidential information, and queries may expose user intentions. Security is non-negotiable.</p>
+                </div>
+
+                <h3>Security Considerations</h3>
+
+                <table class="matrix-table">
+                    <thead>
+                        <tr>
+                            <th>Security Aspect</th>
+                            <th>Concerns</th>
+                            <th>Mitigation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Data Privacy</strong></td>
+                            <td>PII in documents, queries, responses</td>
+                            <td>Redaction, encryption, access controls</td>
+                        </tr>
+                        <tr>
+                            <td><strong>API Security</strong></td>
+                            <td>Unauthorized access, rate limiting abuse</td>
+                            <td>Authentication, rate limiting, API keys</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Prompt Injection</strong></td>
+                            <td>Users manipulating system behavior</td>
+                            <td>Input sanitization, prompt hardening</td>
+                        </tr>
+                        <tr>
+                            <td><strong>LLM Provider</strong></td>
+                            <td>Data sent to external LLM APIs</td>
+                            <td>Self-hosting, redaction, contractual protections</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Vector Database</strong></td>
+                            <td>Unauthorized access to embeddings</td>
+                            <td>Encryption at rest, network isolation</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Security Best Practices</h3>
+
+                <div class="highlight success">
+                    <ul>
+                        <li><strong>Encrypt everything:</strong> Data at rest and in transit</li>
+                        <li><strong>Implement access controls:</strong> Who can query which documents?</li>
+                        <li><strong>Audit everything:</strong> Log access and queries</li>
+                        <li><strong>Redact PII:</strong> Before sending to LLMs</li>
+                        <li><strong>Rate limit:</strong> Prevent abuse and DoS</li>
+                        <li><strong>Validate inputs:</strong> Sanitize all user inputs</li>
+                        <li><strong>Secure dependencies:</strong> Keep libraries updated</li>
+                        <li><strong>Penetration testing:</strong> Regular security audits</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- System Design Example -->
+            <section class="content-section">
+                <h2>Putting It All Together: Design Example</h2>
+
+                <div class="highlight info">
+                    <h4>🎯 Design a RAG System for Enterprise Knowledge Base</h4>
+                    <p><strong>Requirements:</strong> 50K employees, 99.9% uptime, handle sensitive data, global availability</p>
+                </div>
+
+                <h3>Architecture Decisions</h3>
+
+                <div class="accordion-group">
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Reliability Decisions</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <ul>
+                                <li><strong>Multi-region deployment:</strong> US, EU, APAC for disaster recovery</li>
+                                <li><strong>Redundant vector DB:</strong> 3 replicas per region, automatic failover</li>
+                                <li><strong>Multiple LLM providers:</strong> OpenAI primary, Anthropic fallback</li>
+                                <li><strong>Circuit breakers:</strong> Prevent cascade failures</li>
+                                <li><strong>Comprehensive monitoring:</strong> Detect issues before users</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Scalability Decisions</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <ul>
+                                <li><strong>Auto-scaling:</strong> Application instances scale based on load</li>
+                                <li><strong>Distributed cache:</strong> Redis cluster in each region</li>
+                                <li><strong>Load balancing:</strong> Geographic routing with regional failover</li>
+                                <li><strong>Query queues:</strong> Smooth traffic spikes</li>
+                                <li><strong>Database sharding:</strong> Partition data by department/region</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Security Decisions</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <ul>
+                                <li><strong>On-prem deployment:</strong> Keep data within company infrastructure</li>
+                                <li><strong>Access controls:</strong> Users only see documents they have permission for</li>
+                                <li><strong>PII redaction:</strong> Automatically redact before LLM calls</li>
+                                <li><strong>Audit logging:</strong> Track all access and queries</li>
+                                <li><strong>Network isolation:</strong> Private VPC, no public internet access</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Maintainability Decisions</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <ul>
+                                <li><strong>Comprehensive observability:</strong> Metrics, logs, traces for everything</li>
+                                <li><strong>Automated testing:</strong> CI/CD with evaluation tests</li>
+                                <li><strong>Configuration management:</strong> Externalized parameters</li>
+                                <li><strong>Documentation:</strong> Runbooks, architecture docs, API docs</li>
+                                <li><strong>On-call rotation:</strong> Team responsible for 24/7 operations</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2>Key Takeaways</h2>
+
+                <div class="highlight success">
+                    <h4>✓ System Design Principles for RAG</h4>
+                    <ul>
+                        <li><strong>Reliability:</strong> Handle failures gracefully with retries, circuit breakers, fallbacks</li>
+                        <li><strong>Availability:</strong> Design redundancy and failover for high uptime</li>
+                        <li><strong>Scalability:</strong> Plan for both data and query growth</li>
+                        <li><strong>Maintainability:</strong> Build for operations, not just functionality</li>
+                        <li><strong>Security:</strong> Protect data at every stage of the pipeline</li>
+                        <li><strong>Integration:</strong> RAG fits within larger system architecture</li>
+                        <li><strong>Trade-offs:</strong> Every design decision involves trade-offs</li>
+                    </ul>
+                </div>
+
+                <p><strong>Next step:</strong> Section 5 covers how RAG decisions create cascading effects.</p>
+            </section>
+        </main>
+
+        <footer class="main-footer">
+            <p>Continue to <a href="section5-ripple-effects.html">Section 5: Ripple Effects Map</a></p>
+        </footer>
+    </div>
+
+    <script src="js/components.js"></script>
+</body>
+</html>

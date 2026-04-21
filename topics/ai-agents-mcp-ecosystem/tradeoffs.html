@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trade-offs Analysis - Learn AI Agents, Skills, Tools &amp; MCP</title>
+    <link rel="stylesheet" href="../../css/styles.css">
+    <link rel="stylesheet" href="theme.css">
+    <style>
+        .tradeoff-section {
+            margin: 3rem 0;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .tradeoff-intro {
+            font-size: 1.1rem;
+            color: var(--text-color);
+            opacity: 0.85;
+            margin-bottom: 1.5rem;
+        }
+        .matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.92rem;
+        }
+        .matrix-table th {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1rem;
+            text-align: left;
+        }
+        .matrix-table td {
+            padding: 0.65rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: top;
+        }
+        .matrix-table tr:nth-child(even) td {
+            background: var(--card-bg);
+        }
+        .decision-matrix {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        .decision-cell {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+        .decision-cell h5 {
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--primary-color);
+        }
+        .it-depends {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid var(--warning-color);
+            padding: 1rem 1.25rem;
+            margin: 1rem 0;
+            border-radius: 0 6px 6px 0;
+        }
+        .it-depends strong {
+            color: var(--warning-color);
+        }
+        .verdict-row {
+            display: flex;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+        .verdict-box {
+            flex: 1;
+            min-width: 200px;
+            border-radius: 8px;
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+        }
+        .verdict-box.choose {
+            border-color: var(--success-color);
+            background: rgba(16, 185, 129, 0.08);
+        }
+        .verdict-box.avoid {
+            border-color: var(--error-color);
+            background: rgba(239, 68, 68, 0.08);
+        }
+        .verdict-box.hybrid {
+            border-color: var(--primary-color);
+            background: rgba(59, 130, 246, 0.08);
+        }
+        .verdict-box h5 {
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        .takeaways-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.25rem;
+            margin: 1.5rem 0;
+        }
+        .takeaway-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.25rem;
+        }
+        .takeaway-card h4 {
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="main-nav">
+        <a href="index.html" class="nav-back">Back to Overview</a>
+        <span class="current-section">Trade-offs Analysis</span>
+        <div class="nav-links">
+            <a href="patterns.html">Previous</a>
+            <a href="scale.html">Next</a>
+        </div>
+    </nav>
+
+    <main>
+        <h1>Trade-offs Analysis</h1>
+        <p class="powerful-sentence">Every architectural decision in agent systems is a negotiation between competing forces — knowing which lever to pull, and when, is what separates architects from implementers.</p>
+        <p class="explanation">There are no universally correct answers in agent architecture. The right choice depends on your risk tolerance, latency budget, cost constraints, team maturity, and business requirements. This section builds the decision frameworks to reason clearly under uncertainty.</p>
+
+        <div class="card info">
+            <h3>The Hospital Decision Framework</h3>
+            <p>A hospital doesn't use the most advanced scanner for every patient — it matches the instrument to the clinical need. A routine check uses a stethoscope; a complex diagnosis requires an MRI. Cost, time, and risk all factor into the decision. Agent architecture works the same way: match the complexity of your solution to the complexity of your problem, and be honest about the trade-offs you're accepting.</p>
+        </div>
+
+        <!-- TRADE-OFF 1 -->
+        <section class="tradeoff-section">
+            <h2>Trade-off 1: Autonomy vs Control</h2>
+            <p class="tradeoff-intro">The most fundamental decision in agent design: how much independent decision-making authority should the agent have? This directly determines your risk exposure, iteration speed, and operational complexity.</p>
+
+            <table class="matrix-table">
+                <thead>
+                    <tr>
+                        <th>Dimension</th>
+                        <th>Fully Autonomous Agent</th>
+                        <th>Human-in-the-Loop</th>
+                        <th>Hybrid (Supervised Autonomy)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Decision Speed</strong></td>
+                        <td>Milliseconds to seconds — no human wait time</td>
+                        <td>Minutes to hours — human approval gates</td>
+                        <td>Fast for low-risk, slow for high-risk actions</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Error Blast Radius</strong></td>
+                        <td>High — agent can take unrecoverable actions</td>
+                        <td>Low — human catches mistakes before execution</td>
+                        <td>Bounded — high-stakes actions require review</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Throughput</strong></td>
+                        <td>Unlimited concurrent operations</td>
+                        <td>Bounded by human reviewer capacity</td>
+                        <td>High for routine tasks, human-limited for critical paths</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Regulatory Compliance</strong></td>
+                        <td>Difficult — auditability and accountability unclear</td>
+                        <td>Clear — human decision trail</td>
+                        <td>Configurable — approval records for regulated actions</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cost</strong></td>
+                        <td>Low marginal cost per task</td>
+                        <td>High — human time is expensive</td>
+                        <td>Moderate — pay for human attention only where it matters</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Trust Building</strong></td>
+                        <td>None — requires pre-existing trust in the system</td>
+                        <td>Natural — humans observe and build confidence</td>
+                        <td>Gradual — autonomy expands as trust is earned</td>
+                    </tr>
+                    <tr>
+                        <td><strong>When It Breaks</strong></td>
+                        <td>Silent, sometimes catastrophic</td>
+                        <td>Human sees failure and intervenes</td>
+                        <td>Depends on where in the flow failure occurs</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="accordion" data-multiple-open="true">
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Choose Full Autonomy When...</h4>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="verdict-row">
+                            <div class="verdict-box choose">
+                                <h5>Good Fit</h5>
+                                <ul>
+                                    <li>Actions are completely reversible (read-only, staging environments)</li>
+                                    <li>Failure modes are well-understood and bounded</li>
+                                    <li>Volume is too high for human review (thousands of events/minute)</li>
+                                    <li>The domain is well-defined with narrow scope (monitoring, log parsing)</li>
+                                    <li>Cost of wrong action is low; cost of latency is high</li>
+                                </ul>
+                            </div>
+                            <div class="verdict-box avoid">
+                                <h5>Poor Fit</h5>
+                                <ul>
+                                    <li>Actions touch financial transactions, user data, or production systems</li>
+                                    <li>The agent has access to destructive tools (delete, overwrite, send)</li>
+                                    <li>Regulatory audit trail is required</li>
+                                    <li>The system is new and failure modes are unknown</li>
+                                    <li>Stakeholders need to build confidence before trusting automation</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Choose Human-in-the-Loop When...</h4>
+                    </div>
+                    <div class="accordion-content">
+                        <ul>
+                            <li>The agent is in early deployment — use HITL to observe behavior and build a dataset of corrections</li>
+                            <li>Actions are irreversible (sending emails, modifying production databases, executing financial trades)</li>
+                            <li>Compliance or legal liability requires documented human authorization</li>
+                            <li>The LLM reasoning quality for the domain is still unproven</li>
+                            <li>Edge cases occur frequently enough that automation confidence is below acceptable threshold</li>
+                        </ul>
+                        <p><strong>Hospital analogy:</strong> A medical trainee (early-stage agent) doesn't write prescriptions without attending physician sign-off. The oversight isn't a lack of trust — it is the mechanism by which trust is earned and risk is managed during the learning phase.</p>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Hybrid Design: The Right Default for Most Systems</h4>
+                    </div>
+                    <div class="accordion-content">
+                        <p><strong>The architecture:</strong> Define action categories by reversibility and blast radius. Low-stakes actions execute autonomously. High-stakes actions pause and surface a structured approval request to a human.</p>
+                        <div class="diagram-container" style="margin: 1.5rem 0;">
+                            <svg width="100%" height="200" viewBox="0 0 700 200" style="max-width:700px; display:block; margin:0 auto;">
+                                <rect x="20" y="80" width="120" height="40" rx="8" fill="#3b82f6" opacity="0.8"/>
+                                <text x="80" y="105" text-anchor="middle" fill="white" font-size="13" font-weight="bold">Agent Decides</text>
+                                <polygon points="150,100 170,90 170,110" fill="#6b7280"/>
+                                <rect x="178" y="70" width="130" height="60" rx="8" fill="#f59e0b" opacity="0.8"/>
+                                <text x="243" y="95" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Risk</text>
+                                <text x="243" y="113" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Classifier</text>
+                                <polygon points="318,100 338,90 338,110" fill="#6b7280"/>
+                                <rect x="346" y="55" width="140" height="40" rx="8" fill="#10b981" opacity="0.8"/>
+                                <text x="416" y="80" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Low Risk</text>
+                                <text x="416" y="96" text-anchor="middle" fill="white" font-size="11">Execute Immediately</text>
+                                <rect x="346" y="108" width="140" height="40" rx="8" fill="#ef4444" opacity="0.8"/>
+                                <text x="416" y="132" text-anchor="middle" fill="white" font-size="12" font-weight="bold">High Risk</text>
+                                <text x="416" y="148" text-anchor="middle" fill="white" font-size="11">Queue for Approval</text>
+                                <polygon points="496,75 516,68 516,82" fill="#6b7280"/>
+                                <polygon points="496,128 516,121 516,135" fill="#6b7280"/>
+                                <rect x="524" y="55" width="130" height="90" rx="8" fill="#1f2937" opacity="0.85"/>
+                                <text x="589" y="90" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Outcome</text>
+                                <text x="589" y="110" text-anchor="middle" fill="#10b981" font-size="11">Auto-executed</text>
+                                <text x="589" y="128" text-anchor="middle" fill="#f59e0b" font-size="11">or Human-approved</text>
+                            </svg>
+                        </div>
+                        <div class="it-depends">
+                            <strong>It depends on:</strong> Risk tolerance thresholds shift over time. Start conservative (flag more for review), observe false positive rates, and gradually expand autonomous range as confidence grows. Treat the risk classifier itself as a tunable parameter, not a hard-coded rule.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TRADE-OFF 2 -->
+        <section class="tradeoff-section">
+            <h2>Trade-off 2: Latency vs Capability</h2>
+            <p class="tradeoff-intro">Agent reasoning chains add capability at the cost of latency. Every additional tool call, reflection step, or model invocation is measurable time. The question is whether the capability gain justifies the latency cost for your use case.</p>
+
+            <table class="matrix-table">
+                <thead>
+                    <tr>
+                        <th>Approach</th>
+                        <th>Typical Latency</th>
+                        <th>Capability Level</th>
+                        <th>Best For</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Single LLM Call (no tools)</strong></td>
+                        <td>0.5 – 3 seconds</td>
+                        <td>Knowledge cutoff, no real-time data</td>
+                        <td>Text generation, summarization, classification</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Single Tool Call + LLM</strong></td>
+                        <td>2 – 8 seconds</td>
+                        <td>Real-time data for one domain</td>
+                        <td>Lookup-and-respond, single-source Q&amp;A</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Sequential Multi-Tool Agent</strong></td>
+                        <td>10 – 45 seconds</td>
+                        <td>Multi-source, reasoned composition</td>
+                        <td>Research tasks, multi-step workflows</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Parallel Tool Calls</strong></td>
+                        <td>5 – 20 seconds (fan-out)</td>
+                        <td>Multi-source at reduced latency</td>
+                        <td>Independent lookups that don't depend on each other</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Multi-Agent Orchestration</strong></td>
+                        <td>30 seconds – several minutes</td>
+                        <td>Complex cross-domain reasoning</td>
+                        <td>Autonomous research, code generation pipelines</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MCP via Indirect Transport</strong></td>
+                        <td>+50 – 200ms per hop overhead</td>
+                        <td>Same as direct, but standardized</td>
+                        <td>Ecosystem flexibility vs raw performance</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="accordion" data-multiple-open="true">
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Streaming vs Batch: The Perception Trick</h4>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Token streaming does not reduce total latency — it reduces <em>perceived</em> latency. The first token arrives in &lt;1 second even if the full response takes 15 seconds. For user-facing agents, streaming is almost always worth implementing. For backend pipelines where downstream systems need the complete output, batch is cleaner.</p>
+                        <div class="verdict-row">
+                            <div class="verdict-box choose">
+                                <h5>Use Streaming</h5>
+                                <ul>
+                                    <li>User-facing chat interfaces</li>
+                                    <li>Long-form generation where partial output has value</li>
+                                    <li>Latency-sensitive customer experiences</li>
+                                </ul>
+                            </div>
+                            <div class="verdict-box avoid">
+                                <h5>Use Batch</h5>
+                                <ul>
+                                    <li>Downstream systems parsing structured output</li>
+                                    <li>Tool results fed back into orchestration loops</li>
+                                    <li>Workflows requiring complete response before next step</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>MCP Indirection: Real Cost vs Architectural Value</h4>
+                    </div>
+                    <div class="accordion-content">
+                        <p>A direct API call to a database takes ~5ms. The same call through an MCP server over stdio or SSE transport adds 50–200ms of overhead per invocation. For a 10-step agent workflow, that is 500ms–2 seconds of pure transport cost.</p>
+                        <p><strong>When the overhead is worth it:</strong> Teams maintaining many agents across many tools. Standardization, security auditing, and ecosystem reuse deliver far more value than 100ms of latency savings. The hospital's standardized records system (MCP) adds processing time compared to the doctor memorizing every patient — but at scale, the standardization makes the whole system more reliable and maintainable.</p>
+                        <div class="it-depends">
+                            <strong>It depends on:</strong> Latency budgets. A customer-facing chatbot that needs sub-2-second response might use a direct integration for the critical path. An internal research agent running background analysis can afford MCP overhead in exchange for ecosystem flexibility. Never optimize prematurely — measure first.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TRADE-OFF 3 -->
+        <section class="tradeoff-section">
+            <h2>Trade-off 3: Cost vs Intelligence</h2>
+            <p class="tradeoff-intro">Frontier models are more capable but dramatically more expensive per token. Structuring agent workflows around cost efficiency without sacrificing outcome quality is one of the most important practical skills in production agent development.</p>
+
+            <table class="matrix-table">
+                <thead>
+                    <tr>
+                        <th>Strategy</th>
+                        <th>Cost Profile</th>
+                        <th>Intelligence Level</th>
+                        <th>Risk</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Frontier model, minimal tools</strong></td>
+                        <td>High per-call, fewer calls</td>
+                        <td>Very high reasoning quality</td>
+                        <td>Low — model handles ambiguity well</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Small model, many tool lookups</strong></td>
+                        <td>Low per-call, more calls</td>
+                        <td>Compensated by external data</td>
+                        <td>Medium — model may misinterpret tool results</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tiered routing (small first, escalate)</strong></td>
+                        <td>Low average, variable</td>
+                        <td>Adaptive</td>
+                        <td>Low if routing classifier is accurate</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cached reasoning (prompt caching)</strong></td>
+                        <td>90%+ reduction on repeated context</td>
+                        <td>Unchanged — only input is cached</td>
+                        <td>Very low — well-supported by major providers</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Distilled/fine-tuned small model</strong></td>
+                        <td>Very low at scale</td>
+                        <td>High for narrow domain</td>
+                        <td>High for out-of-distribution inputs</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="accordion" data-multiple-open="true">
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Token Optimization Without Losing Quality</h4>
+                    </div>
+                    <div class="accordion-content">
+                        <p><strong>The biggest lever is prompt size, not model choice.</strong> Bloated system prompts with redundant instructions, over-specified tool schemas, and verbose example sets often triple token costs with no improvement in output quality.</p>
+                        <ul>
+                            <li><strong>Compress tool descriptions:</strong> A tool schema is part of the prompt. Verbose parameter descriptions consume tokens on every call. Write them like a senior engineer reads code — precise, not verbose.</li>
+                            <li><strong>Summarize conversation history:</strong> In long agentic loops, older turns lose relevance. Roll up completed sub-task context into a compact summary rather than carrying the full transcript.</li>
+                            <li><strong>Prompt caching:</strong> If your system prompt is stable across many requests, provider-level caching (Anthropic's prompt caching, OpenAI's context caching) eliminates re-encoding costs, often at 90%+ discount.</li>
+                            <li><strong>Pre-filter before LLM:</strong> Use deterministic logic to filter, classify, or reject inputs before they reach the model. A 5ms regex check that handles 30% of inputs cheaply is a 30% cost reduction with zero quality impact.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Cache vs Recompute: The Real Decision</h4>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Caching LLM outputs is viable only when inputs are stable enough that the same output would be produced. The freshness window is the key variable.</p>
+                        <div class="decision-matrix">
+                            <div class="decision-cell">
+                                <h5>Cache aggressively</h5>
+                                <p>Static knowledge lookups, document summaries, code explanation, FAQ-style Q&amp;A with bounded input space</p>
+                            </div>
+                            <div class="decision-cell">
+                                <h5>Cache with TTL</h5>
+                                <p>Structured data that changes slowly: product catalog descriptions, policy summaries, help documentation</p>
+                            </div>
+                            <div class="decision-cell">
+                                <h5>Never cache</h5>
+                                <p>Real-time decisions, personalized responses, anything with user-specific context, security-sensitive reasoning</p>
+                            </div>
+                        </div>
+                        <div class="it-depends">
+                            <strong>It depends on:</strong> The semantic space of inputs. High input entropy (every user input is unique) means caching hits will be rare and the overhead isn't worth it. Low entropy inputs (fixed templates, structured queries) can see cache hit rates above 80%.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TRADE-OFF 4 -->
+        <section class="tradeoff-section">
+            <h2>Trade-off 4: Flexibility vs Reliability</h2>
+            <p class="tradeoff-intro">Generic agents can handle a wide range of tasks but behave unpredictably at the edges. Specialized agents are highly reliable within their domain but break when inputs fall outside it. MCP's flexibility introduces similar tensions with custom integrations.</p>
+
+            <table class="matrix-table">
+                <thead>
+                    <tr>
+                        <th>Dimension</th>
+                        <th>Generic Agent + MCP</th>
+                        <th>Specialized Agent + Custom Integration</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Task Coverage</strong></td>
+                        <td>Broad — handles novel tasks through composition</td>
+                        <td>Narrow — optimized for one problem class</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Failure Modes</strong></td>
+                        <td>Unpredictable — emergent behavior at boundaries</td>
+                        <td>Predictable — fails in known, testable ways</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Testing Coverage</strong></td>
+                        <td>Difficult — input space is unbounded</td>
+                        <td>High — bounded domain enables comprehensive tests</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Schema Evolution</strong></td>
+                        <td>MCP versioning handles gracefully</td>
+                        <td>Breaking changes require coordinated updates</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Deployment Complexity</strong></td>
+                        <td>MCP server deployment + agent deployment (separate)</td>
+                        <td>Single deployment unit, tightly coupled</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SLA Achievability</strong></td>
+                        <td>Difficult — unpredictable path through tool calls</td>
+                        <td>High — deterministic execution path</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Reuse Potential</strong></td>
+                        <td>High — other agents can use same MCP servers</td>
+                        <td>Low — tied to one agent's requirements</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="accordion" data-multiple-open="true">
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Schema Strictness: When to Be Rigid, When to Be Lenient</h4>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Tool schemas define the contract between the LLM's intent and the tool's execution. Strict schemas catch misuse early. Lenient schemas accommodate edge cases but let errors through silently.</p>
+                        <div class="verdict-row">
+                            <div class="verdict-box choose">
+                                <h5>Strict Schema</h5>
+                                <p>Use when the tool performs mutations (write, delete, send). Reject any call that doesn't conform exactly. Let the agent retry with corrected parameters rather than guessing intent.</p>
+                            </div>
+                            <div class="verdict-box hybrid">
+                                <h5>Lenient Schema</h5>
+                                <p>Use for read-only tools where a best-effort response is better than a failure. Accept reasonable variations and normalize before processing.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>MCP Flexibility vs Custom Integration Reliability</h4>
+                    </div>
+                    <div class="accordion-content">
+                        <p>A custom integration is faster, tighter, and more reliable — in the short term. An MCP server is slower to build initially but creates a reusable, discoverable capability that any agent in your ecosystem can use without reinventing the connection.</p>
+                        <p><strong>Hospital analogy:</strong> A doctor could memorize each patient's special chart format (custom integration) or use the hospital's standardized medical records system (MCP). The custom approach is faster for one doctor with one patient. The standardized approach is essential when any doctor might be on call for any patient.</p>
+                        <div class="it-depends">
+                            <strong>It depends on:</strong> How many agents will consume this capability? If one agent will use one tool forever, custom is fine. If you're building a platform where five future agents will need access to the same data source, the investment in MCP pays off quickly.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TRADE-OFF 5 -->
+        <section class="tradeoff-section">
+            <h2>Trade-off 5: Build vs Adopt</h2>
+            <p class="tradeoff-intro">The temptation to build custom frameworks is powerful in a field moving as fast as AI agents. But the "not invented here" syndrome is expensive. Conversely, community tools carry their own risks: implicit constraints, opaque behavior, and dependency on external maintenance.</p>
+
+            <table class="matrix-table">
+                <thead>
+                    <tr>
+                        <th>Decision</th>
+                        <th>Build Custom</th>
+                        <th>Adopt Community</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Time to First Value</strong></td>
+                        <td>Weeks to months</td>
+                        <td>Hours to days</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Fit to Exact Requirements</strong></td>
+                        <td>Perfect — designed for your constraints</td>
+                        <td>Good enough for 80%, friction at the edges</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Maintenance Burden</strong></td>
+                        <td>Entirely on your team</td>
+                        <td>Shared — community and maintainers carry most</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Observability &amp; Debugging</strong></td>
+                        <td>Full — you own the code</td>
+                        <td>Depends on framework quality and docs</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Ecosystem Compatibility</strong></td>
+                        <td>Must build integrations manually</td>
+                        <td>Often pre-integrated with popular tools</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Long-Term Risk</strong></td>
+                        <td>Resource drain if team changes</td>
+                        <td>Abandonment risk if project loses momentum</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Performance Optimization</strong></td>
+                        <td>Possible — no framework overhead</td>
+                        <td>Limited — constrained by framework design</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="accordion" data-multiple-open="true">
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Custom MCP Servers vs Community MCP Ecosystem</h4>
+                    </div>
+                    <div class="accordion-content">
+                        <p><strong>The community MCP ecosystem is growing fast.</strong> As of 2025, there are community-maintained MCP servers for filesystems, GitHub, Slack, PostgreSQL, web search, and dozens of other systems. Before building, check whether a well-maintained server already exists.</p>
+                        <p><strong>When to build a custom MCP server:</strong></p>
+                        <ul>
+                            <li>Your internal system has no community equivalent</li>
+                            <li>The community server doesn't meet your security or compliance requirements</li>
+                            <li>You need tool-level optimizations specific to your data model</li>
+                            <li>You're wrapping a proprietary API that cannot be open-sourced</li>
+                        </ul>
+                        <p><strong>When to adopt community:</strong> Standard systems (GitHub, databases, search, Slack). The community has battle-tested edge cases you haven't encountered yet. Adopt, contribute back, and avoid reinventing the wheel.</p>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Custom Agent Framework vs Established One</h4>
+                    </div>
+                    <div class="accordion-content">
+                        <p><strong>The "not invented here" trap:</strong> Developers often look at LangChain, CrewAI, or the Anthropic Agent SDK and think "I could build something cleaner in a week." That estimate is almost always wrong once you account for error handling, retry logic, context management, observability, streaming, multi-tool coordination, and schema validation.</p>
+                        <p><strong>Build a custom framework only when:</strong></p>
+                        <ul>
+                            <li>Your use case has hard constraints (latency, memory, language) that existing frameworks can't meet</li>
+                            <li>You've used an established framework for 6+ months and hit genuine walls, not unfamiliarity walls</li>
+                            <li>You have the dedicated engineering capacity to maintain a framework long-term</li>
+                            <li>The framework is your product, not just a tool you're using</li>
+                        </ul>
+                        <div class="it-depends">
+                            <strong>It depends on:</strong> Your team's opportunity cost. An 8-person startup building an agent framework instead of their product is almost certainly making a mistake. A platform team at a 500-person company building core infrastructure may have a legitimate need.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SUMMARY -->
+        <section>
+            <h2>Decision Framework Summary</h2>
+            <p>When facing any trade-off in agent system design, run through these questions before choosing:</p>
+            <div class="takeaways-grid">
+                <div class="takeaway-card">
+                    <h4>What's the Blast Radius?</h4>
+                    <p>If this decision is wrong, how bad is the worst case? Scope the downside before optimizing for the upside. High blast radius decisions demand more control mechanisms.</p>
+                </div>
+                <div class="takeaway-card">
+                    <h4>What's the Reversibility?</h4>
+                    <p>Can you course-correct later? Architecture that locks you in warrants more upfront analysis. Decisions you can undo in a sprint warrant less.</p>
+                </div>
+                <div class="takeaway-card">
+                    <h4>What Stage Are You At?</h4>
+                    <p>Early prototype? Optimize for speed of learning. Production with 10k daily active users? Optimize for reliability and cost. The right trade-off shifts with maturity.</p>
+                </div>
+                <div class="takeaway-card">
+                    <h4>What Does the Data Say?</h4>
+                    <p>Latency claims, cost estimates, and capability assessments should be measured, not assumed. Instrument your agents from day one and let data drive trade-off decisions.</p>
+                </div>
+                <div class="takeaway-card">
+                    <h4>What's Your Team's Leverage?</h4>
+                    <p>The best technology is the one your team can operate confidently. A simpler approach your team masters beats a sophisticated approach they struggle to debug at 2 AM.</p>
+                </div>
+                <div class="takeaway-card">
+                    <h4>What's the Integration Cost?</h4>
+                    <p>Evaluate not just the chosen approach but the total system change it requires — new monitoring, new runbooks, new on-call knowledge. Hidden integration costs often dwarf the initial implementation cost.</p>
+                </div>
+            </div>
+            <div class="card success">
+                <h3>The Architect's Perspective</h3>
+                <p>The best agent architectures are not those that use the most advanced techniques — they are those that use the <em>minimum necessary complexity</em> to reliably solve the problem. Every trade-off you accept in favor of simplicity is a trade-off in favor of debuggability, maintainability, and operational sanity. Start simple, measure everything, and add sophistication only when your data demands it.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="section-footer">
+        <a href="patterns.html" class="btn">Previous: Patterns &amp; Anti-Patterns</a>
+        <a href="scale.html" class="btn">Next: At Scale</a>
+    </footer>
+
+    <script src="../../js/components.js"></script>
+</body>
+</html>

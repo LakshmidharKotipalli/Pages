@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Technology Landscape — Docker</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<nav class="topnav">
+  <a class="topnav-brand" href="index.html">🐳 Docker & Ecosystem</a>
+  <div class="topnav-links">
+    <a href="01-foundation.html">Foundation</a>
+    <a href="03b-interview.html">Interview</a>
+    <a href="10-landscape.html" class="active">Landscape</a>
+    <a href="08-tradeoffs.html">Trade-offs</a>
+    <a href="15-reference.html">Quick Ref</a>
+  </div>
+</nav>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Core Sections</div>
+      <a href="index.html"><span class="num">00</span> Overview</a>
+      <a href="01-foundation.html"><span class="num">01</span> Foundation</a>
+      <a href="02-analogy.html"><span class="num">02</span> Analogy</a>
+      <a href="03a-journey.html"><span class="num">03A</span> Journey</a>
+      <a href="03b-interview.html"><span class="num">03B</span> Interview</a>
+      <a href="04-system-design.html"><span class="num">04</span> System Design</a>
+      <a href="05-ripple.html"><span class="num">05</span> Ripple Effects</a>
+      <a href="06-evolution.html"><span class="num">06</span> Evolution</a>
+      <a href="07-patterns.html"><span class="num">07</span> Patterns</a>
+      <a href="08-tradeoffs.html"><span class="num">08</span> Trade-offs</a>
+      <a href="09-at-scale.html"><span class="num">09</span> At Scale</a>
+      <a href="10-landscape.html" class="active"><span class="num">10</span> Landscape</a>
+      <a href="11-pitfalls.html"><span class="num">11</span> Pitfalls</a>
+      <a href="12-debugging.html"><span class="num">12</span> Debugging</a>
+      <a href="13-conversation.html"><span class="num">13</span> Conversation</a>
+      <a href="14-exercises.html"><span class="num">14</span> Exercises</a>
+      <a href="15-reference.html"><span class="num">15</span> Quick Ref</a>
+      <a href="16-whats-next.html"><span class="num">16</span> What's Next</a>
+    </div>
+  </aside>
+  <main class="main">
+    <div class="page-header">
+      <div class="badge">Section 10 · Landscape</div>
+      <h1>Technology Landscape</h1>
+      <p class="subtitle">Docker is one product in a rich ecosystem. Understanding what else exists — and when to use each tool — is the mark of a container-mature practitioner.</p>
+    </div>
+
+    <h2>The Container Technology Stack</h2>
+    <div class="diagram-container">
+      <div class="diagram-title">Where Each Tool Fits in the Stack</div>
+      <svg viewBox="0 0 760 380" width="100%" style="max-width:760px">
+        <!-- Layer labels -->
+        <text x="20" y="45" fill="#64748b" font-size="10" font-family="monospace">Developer Experience</text>
+        <text x="20" y="120" fill="#64748b" font-size="10" font-family="monospace">Orchestration</text>
+        <text x="20" y="195" fill="#64748b" font-size="10" font-family="monospace">Container Engine</text>
+        <text x="20" y="270" fill="#64748b" font-size="10" font-family="monospace">Runtime (OCI)</text>
+        <text x="20" y="345" fill="#64748b" font-size="10" font-family="monospace">Kernel Primitives</text>
+
+        <!-- Row 1: Developer tools -->
+        <rect x="160" y="20" width="130" height="50" rx="8" fill="#0f1f35" stroke="#10b981" stroke-width="1.5"/>
+        <text x="225" y="42" text-anchor="middle" fill="#10b981" font-size="11" font-weight="bold">Docker Desktop</text>
+        <text x="225" y="58" text-anchor="middle" fill="#94a3b8" font-size="9">Mac / Windows</text>
+
+        <rect x="300" y="20" width="130" height="50" rx="8" fill="#0f1f35" stroke="#10b981" stroke-width="1.5"/>
+        <text x="365" y="42" text-anchor="middle" fill="#10b981" font-size="11" font-weight="bold">Rancher Desktop</text>
+        <text x="365" y="58" text-anchor="middle" fill="#94a3b8" font-size="9">FOSS alternative</text>
+
+        <rect x="440" y="20" width="120" height="50" rx="8" fill="#0f1f35" stroke="#10b981" stroke-width="1.5"/>
+        <text x="500" y="42" text-anchor="middle" fill="#10b981" font-size="11" font-weight="bold">Docker CLI</text>
+        <text x="500" y="58" text-anchor="middle" fill="#94a3b8" font-size="9">podman CLI compat</text>
+
+        <rect x="570" y="20" width="120" height="50" rx="8" fill="#0f1f35" stroke="#10b981" stroke-width="1.5"/>
+        <text x="630" y="42" text-anchor="middle" fill="#10b981" font-size="11" font-weight="bold">BuildKit / Buildx</text>
+        <text x="630" y="58" text-anchor="middle" fill="#94a3b8" font-size="9">Image builder</text>
+
+        <!-- Row 2: Orchestration -->
+        <rect x="160" y="95" width="145" height="50" rx="8" fill="#1a1535" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="232" y="117" text-anchor="middle" fill="#c084fc" font-size="11" font-weight="bold">Kubernetes</text>
+        <text x="232" y="133" text-anchor="middle" fill="#94a3b8" font-size="9">EKS / GKE / AKS / K3s</text>
+
+        <rect x="315" y="95" width="130" height="50" rx="8" fill="#1a1535" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="380" y="117" text-anchor="middle" fill="#c084fc" font-size="11" font-weight="bold">Docker Swarm</text>
+        <text x="380" y="133" text-anchor="middle" fill="#94a3b8" font-size="9">Simple orchestration</text>
+
+        <rect x="455" y="95" width="120" height="50" rx="8" fill="#1a1535" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="515" y="117" text-anchor="middle" fill="#c084fc" font-size="11" font-weight="bold">Nomad</text>
+        <text x="515" y="133" text-anchor="middle" fill="#94a3b8" font-size="9">HashiCorp, non-K8s</text>
+
+        <rect x="585" y="95" width="120" height="50" rx="8" fill="#1a1535" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="645" y="117" text-anchor="middle" fill="#c084fc" font-size="11" font-weight="bold">Docker Compose</text>
+        <text x="645" y="133" text-anchor="middle" fill="#94a3b8" font-size="9">Local / small prod</text>
+
+        <!-- Row 3: Engine -->
+        <rect x="160" y="170" width="145" height="50" rx="8" fill="#1a2035" stroke="#2496ed" stroke-width="1.5"/>
+        <text x="232" y="192" text-anchor="middle" fill="#2496ed" font-size="11" font-weight="bold">Docker Engine</text>
+        <text x="232" y="208" text-anchor="middle" fill="#94a3b8" font-size="9">dockerd + containerd</text>
+
+        <rect x="315" y="170" width="130" height="50" rx="8" fill="#1a2035" stroke="#2496ed" stroke-width="1.5"/>
+        <text x="380" y="192" text-anchor="middle" fill="#2496ed" font-size="11" font-weight="bold">Podman</text>
+        <text x="380" y="208" text-anchor="middle" fill="#94a3b8" font-size="9">Daemonless, rootless</text>
+
+        <rect x="455" y="170" width="120" height="50" rx="8" fill="#1a2035" stroke="#2496ed" stroke-width="1.5"/>
+        <text x="515" y="192" text-anchor="middle" fill="#2496ed" font-size="11" font-weight="bold">containerd</text>
+        <text x="515" y="208" text-anchor="middle" fill="#94a3b8" font-size="9">K8s default (CRI)</text>
+
+        <rect x="585" y="170" width="120" height="50" rx="8" fill="#1a2035" stroke="#2496ed" stroke-width="1.5"/>
+        <text x="645" y="192" text-anchor="middle" fill="#2496ed" font-size="11" font-weight="bold">CRI-O</text>
+        <text x="645" y="208" text-anchor="middle" fill="#94a3b8" font-size="9">OpenShift favorite</text>
+
+        <!-- Row 4: Runtime -->
+        <rect x="160" y="245" width="145" height="50" rx="8" fill="#1a2530" stroke="#0891b2" stroke-width="1.5"/>
+        <text x="232" y="267" text-anchor="middle" fill="#0891b2" font-size="11" font-weight="bold">runc</text>
+        <text x="232" y="283" text-anchor="middle" fill="#94a3b8" font-size="9">OCI ref. implementation</text>
+
+        <rect x="315" y="245" width="130" height="50" rx="8" fill="#1a2530" stroke="#0891b2" stroke-width="1.5"/>
+        <text x="380" y="267" text-anchor="middle" fill="#0891b2" font-size="11" font-weight="bold">Kata Containers</text>
+        <text x="380" y="283" text-anchor="middle" fill="#94a3b8" font-size="9">Lightweight VM runtime</text>
+
+        <rect x="455" y="245" width="120" height="50" rx="8" fill="#1a2530" stroke="#0891b2" stroke-width="1.5"/>
+        <text x="515" y="267" text-anchor="middle" fill="#0891b2" font-size="11" font-weight="bold">gVisor</text>
+        <text x="515" y="283" text-anchor="middle" fill="#94a3b8" font-size="9">Syscall sandbox</text>
+
+        <rect x="585" y="245" width="120" height="50" rx="8" fill="#1a2530" stroke="#0891b2" stroke-width="1.5"/>
+        <text x="645" y="267" text-anchor="middle" fill="#0891b2" font-size="11" font-weight="bold">Firecracker</text>
+        <text x="645" y="283" text-anchor="middle" fill="#94a3b8" font-size="9">microVM (AWS Lambda)</text>
+
+        <!-- Row 5: Kernel -->
+        <rect x="160" y="320" width="545" height="50" rx="8" fill="#0f1117" stroke="#374151" stroke-width="1.5"/>
+        <text x="432" y="342" text-anchor="middle" fill="#64748b" font-size="11" font-weight="bold">Linux Kernel</text>
+        <text x="432" y="358" text-anchor="middle" fill="#4b5563" font-size="9">namespaces · cgroups · OverlayFS · seccomp · capabilities · eBPF</text>
+      </svg>
+    </div>
+
+    <h2 id="containerd">containerd — The Real Workhorse</h2>
+    <div class="eco-card">
+      <div class="eco-icon">📦</div>
+      <div>
+        <div class="eco-title">containerd</div>
+        <div class="eco-tags">
+          <span class="tag tag-blue">CNCF Graduated</span>
+          <span class="tag tag-green">K8s Default</span>
+          <span class="tag tag-cyan">OCI Compliant</span>
+        </div>
+        <p>The industry's most widely deployed container runtime — used underneath both Docker and directly by Kubernetes. containerd handles image pulls, storage, and container lifecycle. It's the runtime that actually runs your containers; Docker is the user-friendly experience layer on top.</p>
+        <p><strong>Why it matters:</strong> Understanding containerd means understanding what actually runs in production Kubernetes. When "docker ps" doesn't work on a K8s node, <code>crictl ps</code> using containerd's CRI interface is the equivalent.</p>
+        <p><strong>Key feature:</strong> Snapshotter plugins (overlayfs, stargz, nydus) — different ways to manage image layer storage. stargz enables lazy pulling (start container before image fully downloaded), crucial for large ML model containers.</p>
+      </div>
+    </div>
+
+    <h2 id="podman">Podman — The Rootless Alternative</h2>
+    <div class="eco-card">
+      <div class="eco-icon">🦭</div>
+      <div>
+        <div class="eco-title">Podman (Pod Manager)</div>
+        <div class="eco-tags">
+          <span class="tag tag-purple">Red Hat / RHEL</span>
+          <span class="tag tag-green">Rootless</span>
+          <span class="tag tag-cyan">Daemonless</span>
+        </div>
+        <p>Podman runs containers without a privileged background daemon. Each <code>podman run</code> is a direct process — no daemon intercepting. This means better security (no root daemon), easier systemd integration (containers as systemd units), and no single-point-of-failure daemon.</p>
+        <p><strong>Pods:</strong> Podman supports pod groups (multiple containers sharing network/IPC namespace) matching Kubernetes pod semantics. Generate Kubernetes YAML directly from a running pod: <code>podman generate kube mypod</code>.</p>
+        <p><strong>When to choose Podman:</strong> RHEL/Fedora/CentOS environments (it's the default). CI runners where you want rootless builds. Organizations migrating away from Docker Desktop licensing. Systems where systemd integration matters.</p>
+      </div>
+    </div>
+
+    <h2 id="kata">Kata Containers — Strong Isolation</h2>
+    <div class="eco-card">
+      <div class="eco-icon">🔒</div>
+      <div>
+        <div class="eco-title">Kata Containers</div>
+        <div class="eco-tags">
+          <span class="tag tag-red">Higher Security</span>
+          <span class="tag tag-yellow">OCI Compatible</span>
+          <span class="tag tag-blue">Multi-tenant</span>
+        </div>
+        <p>OCI-compatible containers that run inside lightweight VMs. From the outside, they look like Docker containers. On the inside, each container (or pod) runs in its own microVM with its own kernel. Combines container convenience with VM-level isolation.</p>
+        <p><strong>When it matters:</strong> Multi-tenant Kubernetes clusters serving untrusted workloads (public cloud functions, user-submitted code, academic computing). Financial services requiring hardware-level isolation between tenants. Any environment where kernel-level isolation between containers is a compliance requirement.</p>
+        <p><strong>Cost:</strong> 100-200ms higher startup time vs runc. Small memory overhead per VM. Worth it when isolation requirements demand it.</p>
+      </div>
+    </div>
+
+    <h2>Image Building Alternatives</h2>
+    <table class="compare-table">
+      <tr><th>Tool</th><th>Requires Docker</th><th>Rootless</th><th>Best For</th><th>Trade-off</th></tr>
+      <tr><td><strong>BuildKit / docker buildx</strong></td><td class="partial">Daemon</td><td class="partial">With setup</td><td>Most use cases, best caching</td><td>Docker dependency</td></tr>
+      <tr><td><strong>Kaniko</strong></td><td class="yes">No daemon</td><td class="yes">Yes</td><td>Kubernetes-native CI builds</td><td>Slower than BuildKit</td></tr>
+      <tr><td><strong>Buildah</strong></td><td class="yes">No daemon</td><td class="yes">Yes</td><td>RHEL/Podman environments</td><td>Less tooling ecosystem</td></tr>
+      <tr><td><strong>ko</strong></td><td class="yes">No daemon</td><td class="yes">Yes</td><td>Go binaries, K8s operators</td><td>Go only</td></tr>
+      <tr><td><strong>Jib</strong></td><td class="yes">No daemon</td><td class="yes">Yes</td><td>Java/JVM apps</td><td>JVM only, Maven/Gradle</td></tr>
+      <tr><td><strong>Paketo Buildpacks</strong></td><td class="partial">Via pack CLI</td><td class="partial">Depends</td><td>Multi-language, zero Dockerfile</td><td>Less control, larger images</td></tr>
+    </table>
+
+    <h2>Container Registries</h2>
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon">🌐</div>
+        <div class="card-title">Docker Hub</div>
+        <div class="card-desc">The original public registry. Home to 8M+ public images. Rate limited for anonymous pulls. Free tier limited. Best for OSS image distribution; not recommended as primary private registry.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🟠</div>
+        <div class="card-title">AWS ECR</div>
+        <div class="card-desc">Tight AWS IAM integration. Built-in vulnerability scanning. Cross-region replication. Pay per GB stored. Best choice if your workloads run on AWS.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">⚓</div>
+        <div class="card-title">Harbor</div>
+        <div class="card-desc">Open-source CNCF project. Self-hosted. Vulnerability scanning, replication, robot accounts, webhook support. Best for on-premises or air-gapped environments.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🦊</div>
+        <div class="card-title">GitLab Container Registry</div>
+        <div class="card-desc">Built into GitLab. Images automatically linked to their CI pipeline. Great for integrated dev workflow without separate registry management.</div>
+      </div>
+    </div>
+
+    <div class="pagination">
+      <a href="09-at-scale.html" class="page-btn">← At Scale</a>
+      <a href="11-pitfalls.html" class="page-btn primary">Pitfalls →</a>
+    </div>
+  </main>
+</div>
+<script src="js/components.js"></script>
+</body>
+</html>

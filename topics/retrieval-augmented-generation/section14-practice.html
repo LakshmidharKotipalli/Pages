@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practice Exercises - RAG Learning Journey</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="theme-dark">
+    <div class="container">
+        <header class="section-header">
+            <div class="breadcrumbs">
+                <a href="index.html">Home</a>
+                <span>/</span>
+                <span>Section 14: Practice Exercises</span>
+            </div>
+            <h1>Practice Exercises</h1>
+            <p class="section-subtitle">Test Your Knowledge: Warm-up to Expert Level Challenges</p>
+        </header>
+
+        <nav class="nav-buttons">
+            <a id="prevBtn" class="nav-btn" href="section13-eloquent.html">
+                ← Previous
+            </a>
+            <button id="completeBtn" class="nav-btn" data-section="section14-practice">
+                ✓ Mark Complete
+            </button>
+            <a id="nextBtn" class="nav-btn" href="section15-reference.html">
+                Next: Quick Reference →
+            </a>
+        </nav>
+
+        <main>
+            <section class="content-section">
+                <h2>Practice Makes Perfect</h2>
+
+                <div class="highlight info">
+                    <h4>💡 How to Use These Exercises</h4>
+                    <p><strong>Don't just read - do.</strong> These exercises test your understanding at different levels. Start where you're comfortable, work your way up.</p>
+
+                    <p><strong>Format:</strong> Questions followed by hidden answers. Try to answer before revealing.</p>
+                </div>
+            </section>
+
+            <!-- Warm-up Exercises -->
+            <section class="content-section">
+                <h2>🟢 Warm-up Exercises (Beginner)</h2>
+
+                <div class="accordion-group">
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Q1: What are the 5 stages of the RAG pipeline?</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Answer:</strong></p>
+                            <ol>
+                                <li><strong>Query Preprocessing:</strong> Clean, rewrite, expand queries</li>
+                                <li><strong>Retrieval:</strong> Search vector database for relevant documents</li>
+                                <li><strong>Reranking:</strong> Reorder results for precision</li>
+                                <li><strong>Prompt Assembly:</strong> Combine context with instructions and query</li>
+                                <li><strong>Generation:</strong> LLM produces grounded response</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Q2: What's the difference between vector search and keyword search?</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Answer:</strong></p>
+                            <p><strong>Vector search:</strong> Uses embeddings to find semantically similar content. Great for concepts and meaning. "Why am I tired?" finds relevant documents about fatigue, sleep, energy.</p>
+
+                            <p><strong>Keyword search (BM25):</strong> Finds exact term matches. Great for specific names, codes, technical terms. "Find document about API-1234" works better with keyword search.</p>
+
+                            <p><strong>Hybrid search:</strong> Combines both for best results.</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Q3: Why do we chunk documents before embedding?</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Answer:</strong></p>
+                            <ul>
+                                <li><strong>Context window limits:</strong> LLMs can't process entire documents at once</li>
+                                <li><strong>Precision:</strong> Smaller chunks allow more precise retrieval</li>
+                                <li><strong>Cost:</strong> Embedding smaller chunks is cheaper</li>
+                                <li><strong>Flexibility:</strong> Can retrieve multiple relevant sections from one document</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Q4: What is cosine similarity?</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Answer:</strong></p>
+                            <p><strong>Cosine similarity</strong> measures how similar two vectors are by calculating the cosine of the angle between them.</p>
+
+                            <p><strong>Range:</strong> -1 to 1</p>
+                            <ul>
+                                <li><strong>1:</strong> Identical (same direction)</li>
+                                <li><strong>0:</strong> Orthogonal (unrelated)</li>
+                                <li><strong>-1:</strong> Opposite (different meaning)</li>
+                            </ul>
+
+                            <p><strong>Used in RAG to:</strong> Find document chunks most similar to the query embedding.</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Q5: What's the main benefit of RAG over fine-tuning?</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Answer:</strong></p>
+                            <p><strong>RAG advantages:</strong></p>
+                            <ul>
+                                <li><strong>Timeliness:</strong> Can access current information (update vector DB in minutes)</li>
+                                <li><strong>Privacy:</strong> Keep data in your infrastructure</li>
+                                <li><strong>Attribution:</strong> Can cite sources</li>
+                                <li><strong>Cost:</strong> Much cheaper than retraining</li>
+                                <li><strong>Flexibility:</strong> Update knowledge without model changes</li>
+                            </ul>
+
+                            <p><strong>Fine-tuning is better for:</strong> Format, style, domain-specific language, behavior.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Core Exercises -->
+            <section class="content-section">
+                <h2>🟡 Core Exercises (Intermediate)</h2>
+
+                <div class="accordion-group">
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Q1: When would you use Adaptive RAG vs naive RAG?</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Answer:</strong></p>
+                            <p><strong>Use naive RAG when:</strong></p>
+                            <ul>
+                                <li>All queries are similar complexity</li>
+                                <li>Cost and latency aren't major concerns</li>
+                                <li>Simple use case or prototype</li>
+                            </ul>
+
+                            <p><strong>Use Adaptive RAG when:</strong></p>
+                            <ul>
+                                <li>Query complexity varies widely</li>
+                                <li>Cost optimization is important</li>
+                                <li>Need to optimize both simple and complex queries</li>
+                                <li>Production system at scale</li>
+                            </ul>
+
+                            <p><strong>Example:</strong> Simple factual questions get direct LLM response. Moderate questions get single-step retrieval. Complex questions get multi-step retrieval with reranking.</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Q2: What are the trade-offs between smaller and larger chunk sizes?</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Answer:</strong></p>
+                            <p><strong>Smaller chunks (100-300 tokens):</strong></p>
+                            <ul>
+                                <li>✅ More precise retrieval</li>
+                                <li>✅ Better for specific information</li>
+                                <li>❌ May miss broader context</li>
+                                <li>❌ More chunks to store and search</li>
+                                <li>❌ More embedding API calls</li>
+                            </ul>
+
+                            <p><strong>Larger chunks (500-1000 tokens):</strong></p>
+                            <ul>
+                                <li>✅ More context per chunk</li>
+                                <li>✅ Fewer chunks to manage</li>
+                                <li>✅ Fewer API calls</li>
+                                <li>❌ Less precise retrieval</li>
+                                <li>❌ May include irrelevant information</li>
+                            </ul>
+
+                            <p><strong>Sweet spot:</strong> 500 tokens with 50-100 token overlap for many use cases.</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Q3: How does parent-child retrieval work and when is it useful?</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Answer:</strong></p>
+                            <p><strong>How it works:</strong></p>
+                            <ol>
+                                <li>Chunk documents into small pieces (children)</li>
+                                <li>Link each chunk to its parent (larger section or document)</li>
+                                <li>Search on small chunks for precision</li>
+                                <li>Return parent chunks for generation (more context)</li>
+                            </ol>
+
+                            <p><strong>When to use:</strong></p>
+                            <ul>
+                                <li>Documents have complex structure</li>
+                                <li>Context matters for answer quality</li>
+                                <li>Need precise retrieval but surrounding information</li>
+                                <li>Legal documents, contracts, academic papers</li>
+                            </ul>
+
+                            <p><strong>Benefit:</strong> Best of both worlds - precise retrieval with full context.</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Q4: What are the key metrics for evaluating RAG systems?</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Answer:</strong></p>
+                            <p><strong>Retrieval metrics:</strong></p>
+                            <ul>
+                                <li><strong>Precision@K:</strong> How many retrieved docs are relevant?</li>
+                                <li><strong>Recall@K:</strong> How many relevant docs did we retrieve?</li>
+                                <li><strong>MRR:</strong> Mean Reciprocal Rank - is the first result relevant?</li>
+                            </ul>
+
+                            <p><strong>Generation metrics:</strong></p>
+                            <ul>
+                                <li><strong>Faithfulness:</strong> Does answer match retrieved context?</li>
+                                <li><strong>Answer Relevance:</strong> Does it answer the question?</li>
+                                <li><strong>Citation Accuracy:</strong> Are sources correctly cited?</li>
+                            </ul>
+
+                            <p><strong>System metrics:</strong> Latency (P50, P95, P99), throughput, cost per query</p>
+
+                            <p><strong>Business metrics:</strong> User satisfaction, adoption, task completion</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Q5: How does caching work in RAG and what are the trade-offs?</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Answer:</strong></p>
+                            <p><strong>How it works:</strong> Store query-response pairs. On subsequent similar queries, return cached response instead of processing through full pipeline.</p>
+
+                            <p><strong>Benefits:</strong></p>
+                            <ul>
+                                <li>60-80% reduction in latency for cached queries</li>
+                                <li>50-70% reduction in costs (fewer API calls)</li>
+                                <li>Better user experience for common queries</li>
+                            </ul>
+
+                            <p><strong>Trade-offs:</strong></p>
+                            <ul>
+                                <li><strong>Stale data risk:</strong> Cached responses may be outdated</li>
+                                <li><strong>Cache invalidation:</strong> Need strategy for when to update</li>
+                                <li><strong>Memory/storage:</strong> Cache storage costs</li>
+                                <li><strong>Complexity:</strong> Added infrastructure (Redis, etc.)</li>
+                            </ul>
+
+                            <p><strong>Best practice:</strong> Shorter TTLs for time-sensitive data, longer for static content.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Advanced Exercises -->
+            <section class="content-section">
+                <h2>🟠 Advanced Exercises (Advanced)</h2>
+
+                <div class="accordion-group">
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Q1: Design a RAG system for a legal document analysis use case</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Key considerations:</strong></p>
+                            <ul>
+                                <li><strong>Accuracy is critical:</strong> Use best available components (GPT-4, reranking)</li>
+                                <li><strong>Chunking:</strong> Semantic chunking to preserve legal clauses, parent-child retrieval</li>
+                                <li><strong>Citations:</strong> Mandatory citation requirements for verification</li>
+                                <li><strong>Evaluation:</strong> Comprehensive evaluation with legal experts</li>
+                                <li><strong>Fallback:</strong> "I don't know" for low-confidence queries</li>
+                                <li><strong>Security:</strong> On-prem deployment, strict access controls</li>
+                            </ul>
+
+                            <p><strong>Architecture:</strong></p>
+                            <ol>
+                                <li>Semantic chunking (clause-level)</li>
+                                <li>Parent-child retrieval (small chunks, large context)</li>
+                                <li>Hybrid search (vector + keyword for case names, citations)</li>
+                                <li>Reranking (domain-specific if available)</li>
+                                <li>GPT-4 with mandatory citations</li>
+                                <li>Faithfulness checks before returning</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Q2: How would you optimize RAG for cost at scale (1M+ queries/day)?</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Cost optimization strategies:</strong></p>
+                            <ol>
+                                <li><strong>Aggressive caching:</strong> 60% hit rate saves 60% of costs</li>
+                                <li><strong>Adaptive routing:</strong> Use GPT-3.5 for 70% of queries, GPT-4 for 30%</li>
+                                <li><strong>Self-host embeddings:</strong> Eliminate embedding API costs</li>
+                                <li><strong>Self-host LLMs:</strong> Use Llama for simple queries</li>
+                                <li><strong>Reduced retrieval:</strong> Optimize chunk size and k values</li>
+                                <li><strong>Skip reranking:</strong> For low-stakes queries where precision less critical</li>
+                                <li><strong>Queue and batch:</strong> Process non-real-time queries in batches</li>
+                            </ol>
+
+                            <p><strong>Expected savings:</strong> 70-80% cost reduction while maintaining 90%+ quality.</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Q3: How would you debug a RAG system that's producing hallucinations?</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Systematic debugging approach:</strong></p>
+                            <ol>
+                                <li><strong>Check retrieval:</strong> Are retrieved documents relevant? If not → fix retrieval</li>
+                                <li><strong>Check context:</strong> Does retrieved context contain the answer? If not → improve retrieval</li>
+                                <li><strong>Check prompt:</strong> Does prompt emphasize using retrieved context? If not → strengthen prompt</li>
+                                <li><strong>Check temperature:</strong> Is it too high? Lower to 0-0.3 for factual</li>
+                                <li><strong>Check model:</strong> Try different LLM (some are better at grounding)</li>
+                                <li><strong>Add citations:</strong> Require source references for all claims</li>
+                                <li><strong>Implement "I don't know":</strong> When confidence is low</li>
+                            </ol>
+
+                            <p><strong>Most common cause:</strong> Retrieved documents are irrelevant or don't contain the answer. Fix retrieval first.</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Q4: Compare and contrast Graph RAG vs traditional RAG</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Traditional RAG:</strong></p>
+                            <ul>
+                                <li>Documents → chunks → vector embeddings</li>
+                                <li>Retrieval based on semantic similarity</li>
+                                <li>Great for straightforward Q&A</li>
+                                <li>Limited for complex relationships</li>
+                            </ul>
+
+                            <p><strong>Graph RAG:</strong></p>
+                            <ul>
+                                <li>Documents → knowledge graph (entities and relationships)</li>
+                                <li>Retrieval based on graph traversal</li>
+                                <li>Excellent for complex, multi-hop reasoning</li>
+                                <li>Captures relationships between entities</li>
+                            </ul>
+
+                            <p><strong>When to use Graph RAG:</strong></p>
+                            <ul>
+                                <li>Questions requiring multiple connected pieces of information</li>
+                                <li>Relationship-heavy domains (supply chains, org charts, networks)</li>
+                                <li>"How does X relate to Y?" type questions</li>
+                            </ul>
+
+                            <p><strong>Trade-off:</strong> More complex to build and maintain. Use when relationships matter.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Expert Exercises -->
+            <section class="content-section">
+                <h2>🔴 Expert Exercises (Expert)</h2>
+
+                <div class="accordion-group">
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Q1: Design a multi-tenant RAG system where each tenant has isolated data but shared infrastructure</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Key challenges:</strong></p>
+                            <ul>
+                                <li><strong>Data isolation:</strong> Tenant A can't access Tenant B's documents</li>
+                                <li><strong>Performance:</strong> Can't sacrifice latency for isolation</li>
+                                <li><strong>Scalability:</strong> Support thousands of tenants</li>
+                                <li><strong>Cost:</strong> Shared infrastructure to remain economical</li>
+                            </ul>
+
+                            <p><strong>Architecture:</strong></p>
+                            <ol>
+                                <li><strong>Vector DB:</strong> Tenant metadata filtering, separate collections per tenant</li>
+                                <li><strong>Application:</strong> Tenant-aware routing, per-tenant caching</li>
+                                <li><strong>Access control:</strong> Enforce at application layer (user permissions)</li>
+                                <li><strong>Evaluation:</strong> Per-tenant metrics, fair resource allocation</li>
+                                <li><strong>Billing:</strong> Per-tenant cost tracking</li>
+                            </ol>
+
+                            <p><strong>Best practice:</strong> Tenant ID in all queries, enforced at database level for security.</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Q2: How would you design a RAG system that handles real-time data (news, finance)?</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Key challenges:</strong></p>
+                            <ul>
+                                <li><strong>Freshness:</strong> Data becomes stale in minutes</li>
+                                <li><strong>Volume:</strong> Continuous stream of new documents</li>
+                                <li><strong>Caching:</strong> Can't cache for long periods</li>
+                            </ul>
+
+                            <p><strong>Architecture:</strong></p>
+                            <ol>
+                                <li><strong>Streaming ingestion:</strong> Real-time document processing pipeline</li>
+                                <li><strong>Smart invalidation:</strong> Cache invalidation triggered by data updates</li>
+                                <li><strong>Time-based filtering:</strong> Metadata filtering for recency</li>
+                                <li><strong>Short TTLs:</strong> Cache TTL of 1-5 minutes for time-sensitive data</li>
+                                <li><strong>Hybrid approach:</strong> Combine real-time RAG with periodic snapshots</li>
+                            </ol>
+
+                            <p><strong>Trade-off:</strong> Accept higher costs for freshness. Optimize through aggressive caching of stable data.</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Q3: Design an evaluation strategy for a RAG system where ground truth doesn't exist</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>When no ground truth exists:</strong></p>
+
+                            <ol>
+                                <li><strong>Synthetic test set:</strong> Generate questions from documents, have LLM answer, use as baseline</li>
+                                <li><strong>Human evaluation:</strong> Sample queries, domain experts rate answers</li>
+                                <li><strong>LLM-as-judge:</strong> Use GPT-4 to evaluate faithfulness and relevance</li>
+                                <li><strong>Consistency checks:</strong> Same query should give consistent answers</li>
+                                <li><strong>Citation analysis:</strong> Are citations present and accurate?</li>
+                                <li><strong>User feedback:</strong> Thumbs up/down, satisfaction ratings</li>
+                                <li><strong>A/B testing:</strong> Compare changes against baseline</li>
+                            </ol>
+
+                            <p><strong>Best approach:</strong> Combine multiple methods. LLM-as-judge for continuous evaluation, human evaluation for periodic validation, user feedback for real-world assessment.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Scenarios -->
+            <section class="content-section">
+                <h2>🎯 Scenario-Based Challenges</h2>
+
+                <div class="highlight warning">
+                    <h4>Real-World Scenarios</h4>
+                    <p>Apply your knowledge to realistic situations. Think through these before revealing the answers.</p>
+                </div>
+
+                <div class="accordion-group">
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Scenario 1: Your RAG system worked great in testing but fails in production. What do you do?</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Immediate actions:</strong></p>
+                            <ol>
+                                <li>Check logs for error patterns or anomalies</li>
+                                <li>Review sample failed queries - what's different?</li>
+                                <li>Compare test data vs production data - any differences?</li>
+                                <li>Check resource utilization - are you hitting limits?</li>
+                                <li>Verify external dependencies (APIs, DBs) - are they failing?</li>
+                            </ol>
+
+                            <p><strong>Common causes:</strong></p>
+                            <ul>
+                                <li>Production queries are more complex/different than test queries</li>
+                                <li>Volume is higher, exposing bottlenecks</li>
+                                <li>Real data is messier than synthetic test data</li>
+                                <li>External dependencies failing under load</li>
+                            </ul>
+
+                            <p><strong>Fix:</strong> Improve testing to match production conditions. Add load testing. Test on real data samples.</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Scenario 2: Stakeholders want to cut RAG costs by 50% without sacrificing quality. What's your plan?</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Cost optimization plan (in priority order):</strong></p>
+                            <ol>
+                                <li><strong>Implement aggressive caching:</strong> Target 60% hit rate (saves ~50% of costs)</li>
+                                <li><strong>Adaptive routing:</strong> GPT-3.5 for 70%, GPT-4 for 30% (saves ~60% of LLM costs)</li>
+                                <li><strong>Self-host embeddings:</strong> Use open-source models (saves ~20% of total)</li>
+                                <li><strong>Reduce retrieval:</strong> Optimize k values, skip reranking for some queries (saves ~10%)</li>
+                                <li><strong>Negotiate pricing:</strong> Volume discounts with providers</li>
+                            </ol>
+
+                            <p><strong>Expected outcome:</strong> 70-80% cost reduction while maintaining 90%+ quality. Monitor quality metrics throughout.</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion">
+                        <div class="accordion-header">
+                            <span>Scenario 3: Your team can't agree on chunking strategy. How do you decide?</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Decision framework:</strong></p>
+                            <ol>
+                                <li><strong>Define success criteria:</strong> What metrics matter? (Accuracy, latency, cost)</li>
+                                <li><strong>Run A/B tests:</strong> Test multiple chunking strategies on real data</li>
+                                <li><strong>Measure impact:</strong> Evaluate retrieval precision, answer quality, latency</li>
+                                <li><strong>Analyze by query type:</strong> Different strategies may work for different queries</li>
+                                <li><strong>Make data-driven decision:</strong> Choose based on actual performance</li>
+                            </ol>
+
+                            <p><strong>Likely outcome:</strong> No single strategy is best. Consider adaptive chunking - different strategies for different document types or query types.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2>Key Takeaways</h2>
+
+                <div class="highlight success">
+                    <h4>✓ Practice Principles</h4>
+                    <ul>
+                        <li><strong>Start where you are:</strong> Don't jump to expert exercises if you're new to RAG</li>
+                        <li><strong>Try before revealing:</strong> Attempt answers before checking solutions</li>
+                        <li><strong>Apply to real problems:</strong> Use these concepts in your actual work</li>
+                        <li><strong>Discuss with others:</strong> Explaining concepts solidifies understanding</li>
+                        <li><strong>Come back regularly:</strong> Your answers will evolve as you gain experience</li>
+                    </ul>
+                </div>
+
+                <p><strong>Next step:</strong> Section 15 provides quick reference materials for daily use.</p>
+            </section>
+        </main>
+
+        <footer class="main-footer">
+            <p>Continue to <a href="section15-reference.html">Section 15: Quick Reference</a></p>
+        </footer>
+    </div>
+
+    <script src="js/components.js"></script>
+</body>
+</html>

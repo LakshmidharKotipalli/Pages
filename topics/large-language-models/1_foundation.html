@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Foundation & Context — Large Language Models Learning Journey">
+    <title>Foundation & Context | LLM Learning Journey</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <a href="index.html" class="sidebar-brand">Large Language Models</a>
+            <span class="sidebar-subtitle">A Complete Learning Journey</span>
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="1_foundation.html" class="nav-link active"><span class="nav-num">01</span> Foundation & Context</a>
+            <a href="2_living_analogy.html" class="nav-link"><span class="nav-num">02</span> Living Analogy</a>
+            <a href="3a_learning_journey.html" class="nav-link"><span class="nav-num">3a</span> Learning Journey</a>
+            <a href="3b_interview_conversations.html" class="nav-link"><span class="nav-num">3b</span> Interview Conversations</a>
+            <a href="4_system_design.html" class="nav-link"><span class="nav-num">04</span> System Design Integration</a>
+            <a href="5_ripple_effects.html" class="nav-link"><span class="nav-num">05</span> Ripple Effects Map</a>
+            <a href="6_evolution.html" class="nav-link"><span class="nav-num">06</span> Evolution Story</a>
+            <a href="7_patterns.html" class="nav-link"><span class="nav-num">07</span> Patterns & Anti-Patterns</a>
+            <a href="8_tradeoffs.html" class="nav-link"><span class="nav-num">08</span> Trade-offs Analysis</a>
+            <a href="9_at_scale.html" class="nav-link"><span class="nav-num">09</span> At Scale</a>
+            <a href="10_landscape.html" class="nav-link"><span class="nav-num">10</span> Technology Landscape</a>
+            <a href="11_pitfalls.html" class="nav-link"><span class="nav-num">11</span> Pitfalls & War Stories</a>
+            <a href="12_debugging.html" class="nav-link"><span class="nav-num">12</span> Debugging Process</a>
+            <a href="13_eloquent.html" class="nav-link"><span class="nav-num">13</span> Eloquent Conversation</a>
+            <a href="14_exercises.html" class="nav-link"><span class="nav-num">14</span> Practice Exercises</a>
+            <a href="15_quick_ref.html" class="nav-link"><span class="nav-num">15</span> Quick Reference</a>
+            <a href="16_whats_next.html" class="nav-link"><span class="nav-num">16</span> What's Next</a>
+
+        </aside>
+        <main class="main-content">
+
+            <h4>Section One</h4>
+            <h1>Foundation & Context</h1>
+            <div class="highlight-box">
+                An LLM is a lossy compression algorithm that has memorised the statistical structure of human thought
+                expressed as text — and when you prompt it, it decompresses a plausible continuation.
+            </div>
+
+            <div class="diagram-container">
+                <h3>Transformer Architecture — The Core Loop</h3>
+                <svg viewBox="0 0 700 320" width="100%" style="max-width:700px;">
+                    <defs>
+                        <marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#C6922A"/></marker>
+                    </defs>
+                    <!-- Input -->
+                    <rect x="20" y="130" width="110" height="55" rx="2" fill="none" stroke="#0A1628" stroke-width="2"/>
+                    <text x="75" y="162" text-anchor="middle" fill="#0A1628" font-family="General Sans" font-size="13" font-weight="600">Input Tokens</text>
+                    <!-- Embedding -->
+                    <rect x="165" y="130" width="110" height="55" rx="2" fill="#FAF7F2" stroke="#C6922A" stroke-width="2"/>
+                    <text x="220" y="155" text-anchor="middle" fill="#C6922A" font-family="General Sans" font-size="12" font-weight="600">Embedding</text>
+                    <text x="220" y="172" text-anchor="middle" fill="#5A5A5A" font-family="General Sans" font-size="10">+ Pos Encoding</text>
+                    <!-- Attention -->
+                    <rect x="310" y="100" width="130" height="115" rx="2" fill="#0A1628" stroke="#0A1628" stroke-width="2"/>
+                    <text x="375" y="130" text-anchor="middle" fill="#E8C76D" font-family="Playfair Display" font-size="14" font-weight="700">Self-Attention</text>
+                    <text x="375" y="152" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-family="General Sans" font-size="10">Q × Kᵀ / √d → V</text>
+                    <text x="375" y="172" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-family="General Sans" font-size="10">Multi-Head</text>
+                    <text x="375" y="192" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-family="General Sans" font-size="10">+ Causal Mask</text>
+                    <!-- FFN -->
+                    <rect x="475" y="130" width="100" height="55" rx="2" fill="none" stroke="#6B8F71" stroke-width="2"/>
+                    <text x="525" y="155" text-anchor="middle" fill="#6B8F71" font-family="General Sans" font-size="12" font-weight="600">Feed-Forward</text>
+                    <text x="525" y="172" text-anchor="middle" fill="#5A5A5A" font-family="General Sans" font-size="10">MLP + ReLU/SwiGLU</text>
+                    <!-- Output -->
+                    <rect x="610" y="130" width="75" height="55" rx="2" fill="none" stroke="#C45B52" stroke-width="2"/>
+                    <text x="647" y="155" text-anchor="middle" fill="#C45B52" font-family="General Sans" font-size="12" font-weight="600">Logits</text>
+                    <text x="647" y="172" text-anchor="middle" fill="#5A5A5A" font-family="General Sans" font-size="10">→ Softmax</text>
+                    <!-- Arrows -->
+                    <line x1="130" y1="157" x2="165" y2="157" stroke="#C6922A" stroke-width="2" marker-end="url(#arr)"/>
+                    <line x1="275" y1="157" x2="310" y2="157" stroke="#C6922A" stroke-width="2" marker-end="url(#arr)"/>
+                    <line x1="440" y1="157" x2="475" y2="157" stroke="#C6922A" stroke-width="2" marker-end="url(#arr)"/>
+                    <line x1="575" y1="157" x2="610" y2="157" stroke="#C6922A" stroke-width="2" marker-end="url(#arr)"/>
+                    <!-- Loop arrow -->
+                    <path d="M 440 100 C 440 50, 310 50, 310 100" stroke="#C6922A" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#arr)"/>
+                    <text x="375" y="42" text-anchor="middle" fill="#C6922A" font-family="General Sans" font-size="10" font-style="italic">× N layers</text>
+                    <!-- Labels -->
+                    <text x="75" y="275" text-anchor="middle" fill="#8A8A8A" font-family="General Sans" font-size="10">"The cat sat"</text>
+                    <text x="647" y="275" text-anchor="middle" fill="#8A8A8A" font-family="General Sans" font-size="10">P("on") = 0.72</text>
+                </svg>
+            </div>
+
+            <div class="section-divider"></div>
+
+            <div class="card card--accent">
+                <h3>Why It Exists — First Principles</h3>
+                <p>Before transformers, sequence models (RNNs, LSTMs) processed tokens one-by-one. They had a fundamental bottleneck: information had to travel through a chain of hidden states. By token 500, the memory of token 1 was a faded whisper. The transformer's self-attention mechanism solved this by allowing <strong>every token to directly attend to every other token</strong> in a single parallel computation step. This is the single architectural insight that changed everything.</p>
+                <p>The second insight was <strong>scale</strong>. Scaling laws (Kaplan et al., 2020) showed that LLM loss decreases as a smooth power law with more parameters, more data, and more compute. This meant that making models larger was not just incrementally better — it was predictably, reliably better in a way that justified billion-dollar compute investments.</p>
+            </div>
+
+            <div class="card">
+                <h3>Essential Abbreviations</h3>
+                <table>
+                    <tr><th>Term</th><th>What It Really Means</th></tr>
+                    <tr><td><strong>BPE</strong></td><td>Byte-Pair Encoding — the tokenizer splits text into subword chunks. "unhappiness" → ["un", "happiness"]. Vocabulary is typically 32K-128K tokens.</td></tr>
+                    <tr><td><strong>KV Cache</strong></td><td>Key-Value Cache — during autoregressive generation, previously computed attention keys and values are stored so they don't need to be recomputed for every new token. This is the primary GPU memory bottleneck during inference.</td></tr>
+                    <tr><td><strong>RLHF</strong></td><td>Reinforcement Learning from Human Feedback — the process that turns a raw pre-trained model (which just predicts text) into a helpful assistant that follows instructions and refuses harmful requests.</td></tr>
+                    <tr><td><strong>MoE</strong></td><td>Mixture of Experts — instead of activating all parameters, the model routes each token to a subset of specialized "expert" sub-networks. Mixtral 8x7B has 47B total params but only activates 13B per token.</td></tr>
+                    <tr><td><strong>RoPE</strong></td><td>Rotary Position Embeddings — the modern method for encoding token positions. Enables context window extension (from 4K to 128K+) without retraining from scratch.</td></tr>
+                    <tr><td><strong>SFT</strong></td><td>Supervised Fine-Tuning — training the model on curated (instruction, response) pairs before RLHF.</td></tr>
+                </table>
+            </div>
+
+            <div class="card card--sage">
+                <h3>Historical Context</h3>
+                <p><strong>2017</strong>: "Attention Is All You Need" paper introduces the Transformer. Originally designed for machine translation, not general intelligence.</p>
+                <p><strong>2018-2019</strong>: GPT-1 (117M params) → GPT-2 (1.5B). The community realizes auto-regressive language models can do zero-shot tasks. OpenAI briefly withholds GPT-2 citing misuse concerns.</p>
+                <p><strong>2020</strong>: GPT-3 (175B). Few-shot learning emerges. You don't need to fine-tune anymore — just describe the task in the prompt. The era of prompt engineering begins.</p>
+                <p><strong>2022-2023</strong>: ChatGPT + RLHF breaks into the mainstream. Open-source community responds: LLaMA, Mistral, Qwen. DeepSeek demonstrates you can match frontier performance with clever engineering at lower cost.</p>
+                <p><strong>2024-2026</strong>: Reasoning models (o1, o3, DeepSeek-R1), agentic frameworks, natively multimodal models. The LLM becomes the orchestrator of complex tool-use pipelines.</p>
+            </div>
+
+        </main>
+    </div>
+    <script src="js/components.js"></script>
+</body>
+</html>

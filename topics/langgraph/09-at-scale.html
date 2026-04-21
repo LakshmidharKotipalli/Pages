@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Section 9 — LangGraph at Scale | LangGraph Learning Journey</title>
+    <meta name="description" content="LangGraph production scaling guide: scale milestones from 1 to 100,000+ runs/day, what breaks first and why, bottleneck anatomy with timing data, monitoring checklist, and operational playbook.">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* ── Progress bar ── */
+        #progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: var(--primary);
+            z-index: 9999;
+            transition: width 0.1s;
+        }
+
+        /* ── Section hero ── */
+        .section-hero {
+            background: linear-gradient(135deg, #0D1117 0%, #0a1520 50%, #0D1117 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 64px 0 48px;
+            position: relative;
+            overflow: hidden;
+        }
+        .section-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 600px 300px at 5% 70%, rgba(88,166,255,0.07) 0%, transparent 70%),
+                radial-gradient(ellipse 500px 300px at 95% 25%, rgba(63,185,80,0.06) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .section-hero .container { position: relative; }
+        .section-label {
+            display: inline-block;
+            background: rgba(139,92,246,0.15);
+            border: 1px solid rgba(139,92,246,0.4);
+            color: var(--primary);
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 5px 16px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+        }
+        .section-hero h1 {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 800;
+            color: #fff;
+            border: none;
+            margin: 0 0 16px;
+            line-height: 1.2;
+        }
+        .section-hero h1 span { color: var(--info); }
+        .section-hero p {
+            max-width: 700px;
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            line-height: 1.8;
+            margin: 0;
+        }
+
+        /* ── Analogy box ── */
+        .analogy-box {
+            background: rgba(88,166,255,0.06);
+            border-left: 4px solid var(--info);
+            border-radius: 0 10px 10px 0;
+            padding: 20px 24px;
+            margin: 28px 0;
+        }
+        .analogy-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--info);
+            margin-bottom: 8px;
+        }
+        .analogy-box p { margin: 0; font-size: 0.97rem; color: var(--text); line-height: 1.7; }
+
+        /* ── Scale milestones ── */
+        .milestones-container { margin: 40px 0; }
+
+        .milestone-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            margin-bottom: 32px;
+            overflow: hidden;
+            transition: box-shadow 0.3s;
+        }
+        .milestone-card:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+
+        .milestone-header {
+            padding: 22px 28px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .milestone-badge {
+            flex-shrink: 0;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            white-space: nowrap;
+        }
+        .tier-1 { background: rgba(63,185,80,0.15); border: 1px solid rgba(63,185,80,0.4); color: #3FB950; }
+        .tier-2 { background: rgba(88,166,255,0.15); border: 1px solid rgba(88,166,255,0.4); color: #58A6FF; }
+        .tier-3 { background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.4); color: #F59E0B; }
+        .tier-4 { background: rgba(248,81,73,0.15); border: 1px solid rgba(248,81,73,0.4); color: #F85149; }
+        .tier-5 { background: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.4); color: #8B5CF6; }
+
+        .milestone-header-text { flex: 1; }
+        .milestone-header-text h3 { margin: 0 0 4px; font-size: 1.2rem; font-weight: 700; color: #fff; }
+        .milestone-header-text .subtitle { font-size: 0.88rem; color: var(--text-muted); }
+
+        .milestone-body { padding: 24px 28px; }
+
+        /* Milestone info grid */
+        .milestone-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 14px;
+            margin: 16px 0;
+        }
+        .mbox {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px 18px;
+        }
+        .mbox h4 {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin: 0 0 10px;
+        }
+        .mbox ul { padding-left: 14px; margin: 0; }
+        .mbox li { font-size: 0.88rem; margin: 6px 0; color: var(--text); line-height: 1.5; }
+        .mbox p { margin: 0; font-size: 0.88rem; color: var(--text); line-height: 1.6; }
+
+        .mbox.needs h4 { color: var(--success); }
+        .mbox.changes h4 { color: var(--info); }
+        .mbox.breaks h4 { color: var(--danger); }
+        .mbox.infra h4 { color: var(--warning); }
+
+        .breaks-box {
+            background: rgba(248,81,73,0.06);
+            border: 1px solid rgba(248,81,73,0.25);
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin: 14px 0;
+        }
+        .breaks-box .bl-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--danger);
+            margin-bottom: 8px;
+        }
+        .breaks-box p { margin: 0; font-size: 0.9rem; color: var(--text); line-height: 1.6; }
+
+        .change-highlight {
+            background: rgba(88,166,255,0.06);
+            border: 1px solid rgba(88,166,255,0.25);
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin: 14px 0;
+        }
+        .change-highlight .ch-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--info);
+            margin-bottom: 8px;
+        }
+        .change-highlight p { margin: 0; font-size: 0.9rem; color: var(--text); line-height: 1.6; }
+
+        code.inline {
+            background: rgba(139,92,246,0.15);
+            color: var(--primary);
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+        }
+
+        /* ── What Breaks First section ── */
+        .breaks-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            margin: 48px 0;
+        }
+        .breaks-section h2 { margin-top: 0; color: var(--danger); font-size: 1.5rem; }
+        .breaks-section > p { color: var(--text-muted); margin-bottom: 28px; }
+
+        .break-item {
+            display: flex;
+            gap: 18px;
+            align-items: flex-start;
+            padding: 18px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            transition: border-color 0.2s;
+        }
+        .break-item:hover { border-color: rgba(248,81,73,0.4); }
+
+        .break-rank {
+            flex-shrink: 0;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #7f1d1d, #F85149);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: white;
+        }
+        .break-content { flex: 1; }
+        .break-content h4 { margin: 0 0 6px; font-size: 1rem; color: #fff; font-weight: 700; }
+        .break-content .solution {
+            font-size: 0.88rem;
+            color: var(--success);
+            margin-top: 6px;
+        }
+        .break-content .solution strong { color: var(--success); }
+        .break-content p { margin: 0; font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; }
+
+        /* ── Bottleneck anatomy ── */
+        .bottleneck-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            margin: 48px 0;
+        }
+        .bottleneck-section h2 { margin-top: 0; color: var(--warning); font-size: 1.5rem; }
+        .bottleneck-section > p { color: var(--text-muted); margin-bottom: 28px; }
+
+        .bottleneck-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        .bottleneck-table th {
+            background: rgba(210,153,34,0.1);
+            color: var(--warning);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 2px solid rgba(210,153,34,0.3);
+        }
+        .bottleneck-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+            line-height: 1.55;
+        }
+        .bottleneck-table tr:last-child td { border-bottom: none; }
+        .bottleneck-table tr:hover td { background: rgba(210,153,34,0.03); }
+        .bottleneck-table td:first-child { color: #fff; font-weight: 600; }
+
+        .timing-bar-wrap { display: flex; align-items: center; gap: 10px; }
+        .timing-bar {
+            height: 10px;
+            border-radius: 5px;
+            background: linear-gradient(90deg, var(--info), rgba(88,166,255,0.3));
+        }
+        .timing-bar.high { background: linear-gradient(90deg, #F85149, rgba(248,81,73,0.3)); }
+        .timing-bar.medium { background: linear-gradient(90deg, #F59E0B, rgba(245,158,11,0.3)); }
+        .timing-bar.low { background: linear-gradient(90deg, #3FB950, rgba(63,185,80,0.3)); }
+
+        /* ── Monitoring checklist ── */
+        .monitoring-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            margin: 48px 0;
+        }
+        .monitoring-section h2 { margin-top: 0; color: var(--success); font-size: 1.5rem; }
+        .monitoring-section > p { color: var(--text-muted); margin-bottom: 28px; }
+
+        .monitoring-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+        }
+        .monitoring-category {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .monitoring-category h4 {
+            margin: 0 0 14px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        .monitoring-category.infra h4 { color: var(--info); }
+        .monitoring-category.langgraph h4 { color: var(--primary); }
+        .monitoring-category.business h4 { color: var(--warning); }
+        .monitoring-category.cost h4 { color: var(--success); }
+
+        .check-item {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            margin: 8px 0;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            color: var(--text);
+        }
+        .check-icon {
+            flex-shrink: 0;
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            background: var(--bg-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            transition: all 0.15s;
+            user-select: none;
+            margin-top: 1px;
+            color: white;
+        }
+        .check-icon.checked {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        /* ── Operational playbook ── */
+        .playbook-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            margin: 48px 0;
+        }
+        .playbook-section h2 { margin-top: 0; color: var(--primary); font-size: 1.5rem; }
+        .playbook-section > p { color: var(--text-muted); margin-bottom: 28px; }
+
+        .playbook-timeline { position: relative; padding-left: 28px; }
+        .playbook-timeline::before {
+            content: '';
+            position: absolute;
+            left: 9px;
+            top: 10px;
+            bottom: 10px;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--primary), rgba(139,92,246,0.1));
+        }
+        .play-item {
+            position: relative;
+            margin-bottom: 24px;
+            padding-left: 20px;
+        }
+        .play-dot {
+            position: absolute;
+            left: -19px;
+            top: 6px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            border: 3px solid var(--bg-secondary);
+        }
+        .play-item .content {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .play-item .content h4 {
+            margin: 0 0 6px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .play-item .content p { margin: 0; font-size: 0.9rem; color: var(--text); line-height: 1.6; }
+        .play-item .content .time-tag {
+            display: inline-block;
+            background: rgba(139,92,246,0.12);
+            border: 1px solid rgba(139,92,246,0.3);
+            color: var(--primary);
+            font-size: 0.73rem;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+
+        /* ── Navigation footer ── */
+        .nav-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 60px 0 40px;
+            padding: 24px 0;
+            border-top: 1px solid var(--border);
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .nav-footer a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            padding: 12px 22px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--bg-secondary);
+            color: var(--text);
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+        .nav-footer a:hover { border-color: var(--primary); color: var(--primary); }
+        .nav-footer a .nav-dir { font-size: 0.75rem; color: var(--text-muted); display: block; font-weight: 400; }
+
+        @media (max-width: 768px) {
+            .milestone-grid { grid-template-columns: 1fr; }
+            .monitoring-grid { grid-template-columns: 1fr; }
+            .milestone-header { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+<div id="progress-bar"></div>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="container">
+        <div class="logo">LangGraph</div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="08-tradeoffs.html">Section 8</a>
+            <a href="10-landscape.html">Section 10</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero -->
+<div class="section-hero">
+    <div class="container">
+        <div class="breadcrumbs">
+            <a href="index.html">LangGraph</a>
+            <span class="separator">/</span>
+            <span>Section 9</span>
+        </div>
+        <span class="section-label">Section 9 of 10</span>
+        <h1>LangGraph <span>at Scale</span></h1>
+        <p>Everything works in development. Production is where you find out what actually matters. This section maps what changes — and what breaks — as your agent fleet grows from 1 to 100,000+ runs per day.</p>
+    </div>
+</div>
+
+<main id="main-content">
+<div class="container">
+
+    <div class="analogy-box" style="margin-top:40px;">
+        <div class="analogy-label">Air Traffic Control Analogy</div>
+        <p>A small regional airport with 20 flights per day can operate with a single controller using voice communication and paper strips. Scale that to JFK with 1,300 daily operations and everything changes: radar is mandatory, separate departure/approach/ground controllers, automated conflict detection, detailed logs for every handoff, and redundant communication channels. The underlying rules of flight do not change — but the operational infrastructure required to maintain safety at scale is completely different. LangGraph scales the same way: the programming model stays the same, but the infrastructure strategy must evolve with traffic volume.</p>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════
+         SCALE MILESTONES
+    ══════════════════════════════════════════════════════ -->
+    <div class="milestones-container">
+
+        <h2 style="color: var(--text); margin-bottom: 8px;">Scale Milestones</h2>
+        <p style="color: var(--text-muted); margin-bottom: 32px;">Each tier introduces new requirements. Read through every tier above where you currently operate — your next problems are already visible.</p>
+
+        <!-- TIER 1 -->
+        <div class="milestone-card">
+            <div class="milestone-header">
+                <span class="milestone-badge tier-1">1 — 100 Runs/Day</span>
+                <div class="milestone-header-text">
+                    <h3>The Development Tier</h3>
+                    <div class="subtitle">Everything works. Focus entirely on agent quality.</div>
+                </div>
+            </div>
+            <div class="milestone-body">
+                <div class="milestone-grid">
+                    <div class="mbox needs">
+                        <h4>What You Need</h4>
+                        <ul>
+                            <li>Basic LangGraph setup</li>
+                            <li><code class="inline">MemorySaver</code> is fine</li>
+                            <li>LangSmith for trace visibility</li>
+                            <li>A single server or your laptop</li>
+                        </ul>
+                    </div>
+                    <div class="mbox changes">
+                        <h4>What Works Fine</h4>
+                        <ul>
+                            <li>Anything — no meaningful scale pressure</li>
+                            <li>SQLite, in-memory, or any store</li>
+                            <li>Synchronous execution</li>
+                            <li>Simple retry logic is enough</li>
+                        </ul>
+                    </div>
+                    <div class="mbox infra">
+                        <h4>Main Concern</h4>
+                        <ul>
+                            <li>Agent quality, not infrastructure</li>
+                            <li>Is the agent doing what you intended?</li>
+                            <li>Correctness of tool calls and routing</li>
+                            <li>Trace coverage in LangSmith</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="change-highlight">
+                    <div class="ch-label">Key Principle at This Tier</div>
+                    <p>Do not over-engineer. The instinct to immediately set up PostgreSQL and Redis at 50 runs/day is a trap. Spend your time on agent correctness, prompt quality, and tool reliability. Infrastructure problems will announce themselves loudly when they arrive.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TIER 2 -->
+        <div class="milestone-card">
+            <div class="milestone-header">
+                <span class="milestone-badge tier-2">100 — 1,000 Runs/Day</span>
+                <div class="milestone-header-text">
+                    <h3>The Early Production Tier</h3>
+                    <div class="subtitle">Users exist. Reliability starts to matter. MemorySaver becomes a liability.</div>
+                </div>
+            </div>
+            <div class="milestone-body">
+                <div class="change-highlight">
+                    <div class="ch-label">What Changes</div>
+                    <p><code class="inline">MemorySaver</code> stores state in-process. A server restart — which happens during deployments — loses all active sessions. Switch to <code class="inline">SqliteSaver</code> to get file-based persistence that survives restarts without needing a separate database server.</p>
+                </div>
+
+                <div class="milestone-grid">
+                    <div class="mbox changes">
+                        <h4>New Concerns</h4>
+                        <ul>
+                            <li>Latency: users notice agents that take 30s</li>
+                            <li>Add streaming output — instant UX improvement</li>
+                            <li>Log p50/p99 latency in LangSmith</li>
+                            <li>LLM API rate limits becoming visible</li>
+                        </ul>
+                    </div>
+                    <div class="mbox breaks">
+                        <h4>What Breaks First</h4>
+                        <ul>
+                            <li>LLM API rate limits if traffic spikes</li>
+                            <li>Memory usage from state accumulation</li>
+                            <li>Missing retry logic on transient LLM errors</li>
+                        </ul>
+                    </div>
+                    <div class="mbox infra">
+                        <h4>Infrastructure</h4>
+                        <ul>
+                            <li>Single server is still fine</li>
+                            <li><code class="inline">SqliteSaver</code> for persistence</li>
+                            <li>Monitor server memory usage</li>
+                            <li>Implement exponential backoff on LLM calls</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="breaks-box">
+                    <div class="bl-label">Operational Action</div>
+                    <p>Implement exponential backoff with jitter on all LLM calls. If you are on a single LLM provider, one API outage takes down your entire agent fleet. Consider adding a fallback provider (for example, OpenAI primary, Anthropic fallback) with automatic switching on rate limit errors.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TIER 3 -->
+        <div class="milestone-card">
+            <div class="milestone-header">
+                <span class="milestone-badge tier-3">1,000 — 10,000 Runs/Day</span>
+                <div class="milestone-header-text">
+                    <h3>The Growth Tier</h3>
+                    <div class="subtitle">SQLite becomes a bottleneck. Horizontal scaling enters the picture.</div>
+                </div>
+            </div>
+            <div class="milestone-body">
+                <div class="change-highlight">
+                    <div class="ch-label">What Changes</div>
+                    <p>Move from <code class="inline">SqliteSaver</code> to <code class="inline">PostgresSaver</code>. SQLite is a single file with single-writer semantics — under concurrent load from multiple pods it will become a bottleneck. PostgreSQL supports concurrent connections and is the standard production choice for LangGraph checkpointing.</p>
+                </div>
+
+                <div class="milestone-grid">
+                    <div class="mbox changes">
+                        <h4>New Concerns</h4>
+                        <ul>
+                            <li>Thread accumulation: thousands of stale threads</li>
+                            <li>Implement TTL and archival policies</li>
+                            <li>LangSmith trace volume costs rise — set sampling</li>
+                            <li>State size monitoring per thread</li>
+                        </ul>
+                    </div>
+                    <div class="mbox breaks">
+                        <h4>What Breaks First</h4>
+                        <ul>
+                            <li>Unindexed PostgreSQL checkpoint queries</li>
+                            <li>Missing index on <code class="inline">(thread_id, checkpoint_id)</code></li>
+                            <li>Missing index on <code class="inline">(user_id)</code> if partitioned by user</li>
+                            <li>Slow queries scanning full checkpoint table</li>
+                        </ul>
+                    </div>
+                    <div class="mbox infra">
+                        <h4>Infrastructure</h4>
+                        <ul>
+                            <li>Multiple pods + PostgreSQL</li>
+                            <li>PgBouncer for connection pooling</li>
+                            <li>LangSmith team plan</li>
+                            <li>Add DB indexes on day 1 of PostgreSQL</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="breaks-box">
+                    <div class="bl-label">The Index Problem — Add These Immediately</div>
+                    <p>When you set up PostgresSaver, immediately add: <code class="inline">CREATE INDEX ON checkpoints (thread_id, checkpoint_id DESC);</code> and if you query by user: <code class="inline">CREATE INDEX ON checkpoints (user_id, created_at DESC);</code>. Without these, a full table scan at 10,000 threads will produce query times measured in seconds, not milliseconds.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TIER 4 -->
+        <div class="milestone-card">
+            <div class="milestone-header">
+                <span class="milestone-badge tier-4">10,000 — 100,000 Runs/Day</span>
+                <div class="milestone-header-text">
+                    <h3>The Serious Production Tier</h3>
+                    <div class="subtitle">PostgreSQL write throughput becomes the constraint. Async checkpointing becomes mandatory.</div>
+                </div>
+            </div>
+            <div class="milestone-body">
+                <div class="change-highlight">
+                    <div class="ch-label">What Changes</div>
+                    <p>Synchronous PostgreSQL checkpoint writes — 50ms each — now add up to meaningful latency at high throughput. Move to async checkpointing: write to Redis first (5ms, non-blocking), then asynchronously sync to PostgreSQL in the background. Redis becomes the hot state layer; PostgreSQL becomes the durable archive.</p>
+                </div>
+
+                <div class="milestone-grid">
+                    <div class="mbox changes">
+                        <h4>New Concerns</h4>
+                        <ul>
+                            <li>State size: long-running threads accumulate megabytes</li>
+                            <li>Context window overflow on long conversations</li>
+                            <li>Implement message sliding window</li>
+                            <li>Implement summarization nodes for old context</li>
+                            <li>Archive raw history to S3 for compliance</li>
+                        </ul>
+                    </div>
+                    <div class="mbox breaks">
+                        <h4>What Breaks First</h4>
+                        <ul>
+                            <li>Context window limits on long conversations</li>
+                            <li>PostgreSQL write throughput under spike load</li>
+                            <li>State serialization time for large states</li>
+                            <li>Missing state compression leading to memory growth</li>
+                        </ul>
+                    </div>
+                    <div class="mbox infra">
+                        <h4>Infrastructure</h4>
+                        <ul>
+                            <li>Redis for async checkpointing + hot state</li>
+                            <li>PostgreSQL for persistence + cold state</li>
+                            <li>Multiple regions for latency SLAs</li>
+                            <li>State compression pipeline</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="breaks-box">
+                    <div class="bl-label">The State Compression Imperative</div>
+                    <p>At this tier, threads from long-running agents accumulate megabytes of message history. Implement a summarization node that triggers when the message count exceeds a threshold: compress the oldest messages into a single summary message, archive the raw history to S3, and continue with a bounded state. Without this, state serialization times grow unbounded and context window overflows become routine failures.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TIER 5 -->
+        <div class="milestone-card">
+            <div class="milestone-header">
+                <span class="milestone-badge tier-5">100,000+ Runs/Day</span>
+                <div class="milestone-header-text">
+                    <h3>The Fleet Tier</h3>
+                    <div class="subtitle">You are running an agent fleet, not an agent. Fleet-level concerns dominate.</div>
+                </div>
+            </div>
+            <div class="milestone-body">
+                <div class="change-highlight">
+                    <div class="ch-label">What Changes</div>
+                    <p>You are now operating an agent fleet. Individual agent quality matters less than fleet behavior: cost attribution, quality drift over time, multi-tenancy isolation, and provider routing. The primary concerns shift from infrastructure reliability (largely solved by this point) to cost management and observability at fleet scale.</p>
+                </div>
+
+                <div class="milestone-grid">
+                    <div class="mbox changes">
+                        <h4>Fleet-Level Concerns</h4>
+                        <ul>
+                            <li>LLM cost multiplies — optimize model routing</li>
+                            <li>Agent quality drift over time</li>
+                            <li>Multi-tenancy isolation between customers</li>
+                            <li>Per-use-case cost attribution</li>
+                            <li>Automated quality regression detection</li>
+                        </ul>
+                    </div>
+                    <div class="mbox breaks">
+                        <h4>What Breaks First</h4>
+                        <ul>
+                            <li>Weakest LLM provider hits rate limits first</li>
+                            <li>Single-provider dependency becomes critical risk</li>
+                            <li>Missing multi-provider routing with fallback</li>
+                            <li>Observability gaps make quality drift invisible</li>
+                        </ul>
+                    </div>
+                    <div class="mbox infra">
+                        <h4>Infrastructure</h4>
+                        <ul>
+                            <li>LangGraph Cloud OR Kubernetes with auto-scaling</li>
+                            <li>Global Redis Cluster</li>
+                            <li>Multi-region PostgreSQL with read replicas</li>
+                            <li>Multi-provider LLM routing layer</li>
+                            <li>Custom evaluation pipeline for quality metrics</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="breaks-box">
+                    <div class="bl-label">Multi-Provider Routing is Non-Negotiable</div>
+                    <p>At 100,000+ runs/day, a single LLM provider rate limit does not slow you down — it stops you completely. Implement multi-provider routing: primary provider for all traffic, automatic failover to secondary on 429/503 errors, circuit breaker pattern per provider, and per-provider error rate monitoring. The engineering cost is 1–2 weeks; the operational insurance is priceless.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════
+         WHAT BREAKS FIRST
+    ══════════════════════════════════════════════════════ -->
+    <div class="breaks-section">
+        <h2>What Breaks First — In Order</h2>
+        <p>This is the failure sequence observed across real production LangGraph deployments. The rank is the approximate order in which these issues manifest as you scale up.</p>
+
+        <div class="break-item">
+            <div class="break-rank">1</div>
+            <div class="break-content">
+                <h4>LLM API Rate Limits</h4>
+                <p>Almost always the first failure. LLM APIs have per-minute token and request limits. A traffic spike that looks modest on your end can easily hit provider limits.</p>
+                <div class="solution"><strong>Solution:</strong> Implement exponential backoff with jitter. Use multiple providers with automatic failover. Cache responses for deterministic inputs. Add per-provider rate limit tracking.</div>
+            </div>
+        </div>
+
+        <div class="break-item">
+            <div class="break-rank">2</div>
+            <div class="break-content">
+                <h4>Unindexed Database Queries</h4>
+                <p>Checkpoint lookups by thread_id without an index scan the full table. At 10,000+ threads, this degrades from milliseconds to seconds per lookup.</p>
+                <div class="solution"><strong>Solution:</strong> Add indexes on checkpoint table lookups on day 1 of PostgreSQL setup. Monitor slow query logs weekly. Add query time alerts for any checkpoint query exceeding 100ms.</div>
+            </div>
+        </div>
+
+        <div class="break-item">
+            <div class="break-rank">3</div>
+            <div class="break-content">
+                <h4>State Accumulation Memory Growth</h4>
+                <p>Threads from long-running agents accumulate state indefinitely. Message lists grow without bound. At scale, this translates to growing database storage and slower serialization.</p>
+                <div class="solution"><strong>Solution:</strong> Implement TTL on inactive threads. Add max message count triggers for summarization. Archive old thread data to cold storage. Monitor average and p99 state size per thread.</div>
+            </div>
+        </div>
+
+        <div class="break-item">
+            <div class="break-rank">4</div>
+            <div class="break-content">
+                <h4>Context Window Overflow</h4>
+                <p>Long conversations eventually exceed the LLM's context window. The error is typically non-obvious — the LLM raises a token limit error, which surfaces as an unhandled exception in the agent node.</p>
+                <div class="solution"><strong>Solution:</strong> Implement message trimming (keep last N messages). Add a summarization node that triggers before the window fills. Track token count in State and add a pre-flight check in each agent node before invoking the LLM.</div>
+            </div>
+        </div>
+
+        <div class="break-item">
+            <div class="break-rank">5</div>
+            <div class="break-content">
+                <h4>Single Checkpointer Bottleneck</h4>
+                <p>Synchronous checkpoint writes block graph execution at each node. Under high concurrent load, the checkpointer becomes a serialization point limiting throughput.</p>
+                <div class="solution"><strong>Solution:</strong> Switch to async checkpointing with Redis as the hot layer. Move to <code class="inline">AsyncPostgresSaver</code> for non-blocking writes in async graph execution. Batch checkpoint writes where consistency allows.</div>
+            </div>
+        </div>
+
+        <div class="break-item">
+            <div class="break-rank">6</div>
+            <div class="break-content">
+                <h4>Missing Observability</h4>
+                <p>Without tracing from the start, debugging production issues becomes archaeological work — reconstructing what happened from logs instead of observing it directly in traces.</p>
+                <div class="solution"><strong>Solution:</strong> Set up LangSmith from day 1, not day 100. Configure trace sampling rates before volume makes it expensive. Add custom metadata to traces (user_id, use_case, agent_version) from the first deployment.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════
+         BOTTLENECK ANATOMY
+    ══════════════════════════════════════════════════════ -->
+    <div class="bottleneck-section">
+        <h2>Bottleneck Anatomy</h2>
+        <p>Understanding where time actually goes in an agent run. These timings are observed averages — your specific values depend on model, tool complexity, and infrastructure. Use these as benchmarks, not guarantees.</p>
+
+        <div style="overflow-x:auto;">
+            <table class="bottleneck-table">
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Typical Timing</th>
+                        <th>Relative Impact</th>
+                        <th>Optimization</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>LLM Call</td>
+                        <td><span style="color:#F85149;font-weight:700;">500ms – 5,000ms</span></td>
+                        <td>
+                            <div class="timing-bar-wrap">
+                                <div class="timing-bar high" style="width:92%;"></div>
+                                <span style="font-size:0.8rem;color:var(--text-muted);">Dominant</span>
+                            </div>
+                        </td>
+                        <td style="color:var(--text-muted);font-size:0.88rem;">Parallelize where possible. Use streaming to reduce perceived latency. Choose fastest model that meets quality bar.</td>
+                    </tr>
+                    <tr>
+                        <td>Tool Call (external API)</td>
+                        <td><span style="color:#F59E0B;font-weight:700;">50ms – 2,000ms</span></td>
+                        <td>
+                            <div class="timing-bar-wrap">
+                                <div class="timing-bar medium" style="width:60%;"></div>
+                                <span style="font-size:0.8rem;color:var(--text-muted);">High</span>
+                            </div>
+                        </td>
+                        <td style="color:var(--text-muted);font-size:0.88rem;">Parallel tool calls are the single biggest latency win. Use <code class="inline">ToolNode</code> with parallel tool calls enabled. Cache deterministic tool results.</td>
+                    </tr>
+                    <tr>
+                        <td>Checkpoint Write (async Redis)</td>
+                        <td><span style="color:#3FB950;font-weight:700;">~5ms</span></td>
+                        <td>
+                            <div class="timing-bar-wrap">
+                                <div class="timing-bar low" style="width:8%;"></div>
+                                <span style="font-size:0.8rem;color:var(--text-muted);">Negligible</span>
+                            </div>
+                        </td>
+                        <td style="color:var(--text-muted);font-size:0.88rem;">Redis async writes are essentially free. This is the target architecture for high-throughput systems.</td>
+                    </tr>
+                    <tr>
+                        <td>Checkpoint Write (sync PostgreSQL)</td>
+                        <td><span style="color:#F59E0B;font-weight:700;">20ms – 50ms</span></td>
+                        <td>
+                            <div class="timing-bar-wrap">
+                                <div class="timing-bar medium" style="width:20%;"></div>
+                                <span style="font-size:0.8rem;color:var(--text-muted);">Moderate</span>
+                            </div>
+                        </td>
+                        <td style="color:var(--text-muted);font-size:0.88rem;">Acceptable for low-throughput. Use <code class="inline">AsyncPostgresSaver</code> for non-blocking writes. Add PgBouncer for connection pooling.</td>
+                    </tr>
+                    <tr>
+                        <td>Checkpoint Write (sync SQLite under load)</td>
+                        <td><span style="color:#F85149;font-weight:700;">50ms – 200ms</span></td>
+                        <td>
+                            <div class="timing-bar-wrap">
+                                <div class="timing-bar high" style="width:35%;"></div>
+                                <span style="font-size:0.8rem;color:var(--text-muted);">Problematic</span>
+                            </div>
+                        </td>
+                        <td style="color:var(--text-muted);font-size:0.88rem;">SQLite degrades significantly under concurrent writes. Migrate to PostgreSQL as soon as you have multiple pods or 1,000+ runs/day.</td>
+                    </tr>
+                    <tr>
+                        <td>State Serialization (typical)</td>
+                        <td><span style="color:#3FB950;font-weight:700;">1ms – 10ms</span></td>
+                        <td>
+                            <div class="timing-bar-wrap">
+                                <div class="timing-bar low" style="width:5%;"></div>
+                                <span style="font-size:0.8rem;color:var(--text-muted);">Negligible</span>
+                            </div>
+                        </td>
+                        <td style="color:var(--text-muted);font-size:0.88rem;">Not a concern for normal state sizes. Watch for states with large message histories or binary blobs.</td>
+                    </tr>
+                    <tr>
+                        <td>State Serialization (large state)</td>
+                        <td><span style="color:#F59E0B;font-weight:700;">50ms – 200ms</span></td>
+                        <td>
+                            <div class="timing-bar-wrap">
+                                <div class="timing-bar medium" style="width:18%;"></div>
+                                <span style="font-size:0.8rem;color:var(--text-muted);">Moderate</span>
+                            </div>
+                        </td>
+                        <td style="color:var(--text-muted);font-size:0.88rem;">Large message histories cause this. Implement summarization and store large artifacts by reference (S3 URL), not by value in state.</td>
+                    </tr>
+                    <tr>
+                        <td>Graph Routing Logic</td>
+                        <td><span style="color:#3FB950;font-weight:700;">&lt; 1ms</span></td>
+                        <td>
+                            <div class="timing-bar-wrap">
+                                <div class="timing-bar low" style="width:1%;"></div>
+                                <span style="font-size:0.8rem;color:var(--text-muted);">None</span>
+                            </div>
+                        </td>
+                        <td style="color:var(--text-muted);font-size:0.88rem;">Python function execution. Never a bottleneck. Do not optimize here — your time is better spent on LLM call parallelism.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════
+         MONITORING CHECKLIST
+    ══════════════════════════════════════════════════════ -->
+    <div class="monitoring-section">
+        <h2>Monitoring Checklist</h2>
+        <p>An agent that is not monitored is an agent you do not understand. Click items to mark them as covered in your deployment.</p>
+
+        <div class="monitoring-grid">
+            <div class="monitoring-category infra">
+                <h4>Infrastructure</h4>
+                <label class="check-item">
+                    <input type="checkbox" class="check-native" style="display:none;">
+                    <div class="check-icon" tabindex="0" role="checkbox" aria-checked="false" aria-label="CPU utilization per pod"></div>
+                    <span>CPU utilization per pod (alert &gt;80%)</span>
+                </label>
+                <label class="check-item">
+                    <input type="checkbox" class="check-native" style="display:none;">
+                    <div class="check-icon" tabindex="0" role="checkbox" aria-checked="false" aria-label="Memory usage"></div>
+                    <span>Memory usage and growth rate</span>
+                </label>
+                <label class="check-item">
+                    <input type="checkbox" class="check-native" style="display:none;">
+                    <div class="check-icon" tabindex="0" role="checkbox" aria-checked="false" aria-label="Pod count"></div>
+                    <span>Pod count and auto-scaling events</span>
+                </label>
+                <label class="check-item">
+                    <input type="checkbox" class="check-native" style="display:none;">
+                    <div class="check-icon" tabindex="0" role="checkbox" aria-checked="false" aria-label="Database connections"></div>
+                    <span>Database connection pool utilization</span>
+                </label>
+                <label class="check-item">
+                    <input type="checkbox" class="check-native" style="display:none;">
+                    <div class="check-icon" tabindex="0" role="checkbox" aria-checked="false" aria-label="Redis memory"></div>
+                    <span>Redis memory usage and eviction rate</span>
+                </label>
+                <label class="check-item">
+                    <input type="checkbox" class="check-native" style="display:none;">
+                    <div class="check-icon" tabindex="0" role="checkbox" aria-checked="false" aria-label="Slow query log"></div>
+                    <span>PostgreSQL slow query log (threshold: 100ms)</span>
+                </label>
+            </div>
+
+            <div class="monitoring-category langgraph">
+                <h4>LangGraph-Specific</h4>
+                <label class="check-item">
+                    <input type="checkbox" class="check-native" style="display:none;">
+                    <div class="check-icon" tabindex="0" role="checkbox" aria-checked="false" aria-label="Active thread count"></div>
+                    <span>Active thread count and growth rate</span>
+                </label>
+                <label class="check-item">
+                    <input type="checkbox" class="check-native" style="display:none;">
+                    <div class="check-icon" tabindex="0" role="checkbox" aria-checked="false" aria-label="Checkpoint write latency"></div>
+                    <span>Checkpoint write latency (p50 and p99)</span>
+                </label>
+                <label class="check-item">
+                    <input type="checkbox" class="check-native" style="display:none;">
+                    <div class="check-icon" tabindex="0" role="checkbox" aria-checked="false" aria-label="Node execution time"></div>
+                    <span>Node execution time per node type (LangSmith)</span>
+                </label>
+                <label class="check-item">
+                    <input type="checkbox" class="check-native" style="display:none;">
+                    <div class="check-icon" tabindex="0" role="checkbox" aria-checked="false" aria-label="State size per thread"></div>
+                    <span>State size per thread (average and p99)</span>
+                </label>
+                <label class="check-item">
+                    <input type="checkbox" class="check-native" style="display:none;">
+                    <div class="check-icon" tabindex="0" role="checkbox" aria-checked="false" aria-label="Iteration count"></div>
+                    <span>Graph iteration count per run (detect infinite loops)</span>
+                </label>
+                <label class="check-item">
+                    <input type="checkbox" class="check-native" style="display:none;">
+                    <div class="check-icon" tabindex="0" role="checkbox" aria-checked="false" aria-label="Trace sampling rate"></div>
+                    <span>LangSmith trace sampling rate configured</span>
+                </label>
+            </div>
+
+            <div class="monitoring-category business">
+                <h4>Business Metrics</h4>
+                <label class="check-item">
+                    <input type="checkbox" class="check-native" style="display:none;">
+                    <div class="check-icon" tabindex="0" role="checkbox" aria-checked="false" aria-label="Agent completion rate"></div>
+                    <span>Agent completion rate (% reaching <code class="inline">__end__</code>)</span>
+                </label>
+                <label class="check-item">
+                    <input type="checkbox" class="check-native" style="display:none;">
+                    <div class="check-icon" tabindex="0" role="checkbox" aria-checked="false" aria-label="Human intervention rate"></div>
+                    <span>Human intervention rate (HITL triggers)</span>
+                </label>
+                <label class="check-item">
+                    <input type="checkbox" class="check-native" style="display:none;">
+                    <div class="check-icon" tabindex="0" role="checkbox" aria-checked="false" aria-label="Task success rate"></div>
+                    <span>Task success rate (custom evaluation)</span>
+                </label>
+                <label class="check-item">
+                    <input type="checkbox" class="check-native" style="display:none;">
+                    <div class="check-icon" tabindex="0" role="checkbox" aria-checked="false" aria-label="Error rate"></div>
+                    <span>Error rate by error type and node</span>
+                </label>
+                <label class="check-item">
+                    <input type="checkbox" class="check-native" style="display:none;">
+                    <div class="check-icon" tabindex="0" role="checkbox" aria-checked="false" aria-label="End-to-end latency"></div>
+                    <span>P50/P99 end-to-end agent run time</span>
+                </label>
+                <label class="check-item">
+                    <input type="checkbox" class="check-native" style="display:none;">
+                    <div class="check-icon" tabindex="0" role="checkbox" aria-checked="false" aria-label="LLM API error rate"></div>
+                    <span>LLM API error rate by provider</span>
+                </label>
+            </div>
+
+            <div class="monitoring-category cost">
+                <h4>Cost</h4>
+                <label class="check-item">
+                    <input type="checkbox" class="check-native" style="display:none;">
+                    <div class="check-icon" tabindex="0" role="checkbox" aria-checked="false" aria-label="Tokens per run"></div>
+                    <span>Tokens per agent run (input + output)</span>
+                </label>
+                <label class="check-item">
+                    <input type="checkbox" class="check-native" style="display:none;">
+                    <div class="check-icon" tabindex="0" role="checkbox" aria-checked="false" aria-label="Cost per run"></div>
+                    <span>Cost per run (by model and use case)</span>
+                </label>
+                <label class="check-item">
+                    <input type="checkbox" class="check-native" style="display:none;">
+                    <div class="check-icon" tabindex="0" role="checkbox" aria-checked="false" aria-label="Cost per successful run"></div>
+                    <span>Cost per successful run (efficiency metric)</span>
+                </label>
+                <label class="check-item">
+                    <input type="checkbox" class="check-native" style="display:none;">
+                    <div class="check-icon" tabindex="0" role="checkbox" aria-checked="false" aria-label="Cost trend"></div>
+                    <span>Daily/weekly cost trend with anomaly alert</span>
+                </label>
+                <label class="check-item">
+                    <input type="checkbox" class="check-native" style="display:none;">
+                    <div class="check-icon" tabindex="0" role="checkbox" aria-checked="false" aria-label="Model distribution"></div>
+                    <span>Model distribution — are expensive models overused?</span>
+                </label>
+                <label class="check-item">
+                    <input type="checkbox" class="check-native" style="display:none;">
+                    <div class="check-icon" tabindex="0" role="checkbox" aria-checked="false" aria-label="Budget alerts"></div>
+                    <span>Budget alerts at 50%, 80%, 100% of monthly cap</span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════
+         OPERATIONAL PLAYBOOK
+    ══════════════════════════════════════════════════════ -->
+    <div class="playbook-section">
+        <h2>The Operational Playbook</h2>
+        <p>What to do and when — a timeline of the decisions that separate teams that scale gracefully from teams that firefight constantly.</p>
+
+        <div class="playbook-timeline">
+            <div class="play-item">
+                <div class="play-dot"></div>
+                <div class="content">
+                    <span class="time-tag">Day 1</span>
+                    <h4>Set Up LangSmith Tracing</h4>
+                    <p>Add LangSmith before you write your first agent node. Set <code class="inline">LANGCHAIN_TRACING_V2=true</code> and <code class="inline">LANGCHAIN_PROJECT=your-project</code>. You need observability from the start — retrofitting it later means missing the historical data that would have made debugging easier. Every production failure will be investigated using LangSmith traces.</p>
+                </div>
+            </div>
+
+            <div class="play-item">
+                <div class="play-dot"></div>
+                <div class="content">
+                    <span class="time-tag">Week 1</span>
+                    <h4>PostgresSaver in Staging</h4>
+                    <p>Even if you are not in production yet, test your persistence story with <code class="inline">PostgresSaver</code> in staging. Finding out that your state schema does not serialize cleanly, or that your thread IDs are not unique across pods, is much cheaper in week 1 than after launch. Add the DB indexes on thread_id and checkpoint_id immediately.</p>
+                </div>
+            </div>
+
+            <div class="play-item">
+                <div class="play-dot"></div>
+                <div class="content">
+                    <span class="time-tag">Month 1</span>
+                    <h4>Implement TTL and max_iterations Everywhere</h4>
+                    <p>Add <code class="inline">recursion_limit</code> to every graph compile. Add TTL cleanup for threads older than your retention policy. Set <code class="inline">max_iterations</code> as a State field and check it in every conditional edge. These are your circuit breakers — agents that run forever cost money and consume resources from healthy runs.</p>
+                </div>
+            </div>
+
+            <div class="play-item">
+                <div class="play-dot"></div>
+                <div class="content">
+                    <span class="time-tag">Month 3</span>
+                    <h4>State Compression for Long Conversations</h4>
+                    <p>If any of your agents run long multi-turn conversations, implement state compression now — before it becomes a crisis. Add a summarization node that triggers at a message count threshold. Archive raw message history to S3. Track average state size in your monitoring dashboard. The longer you wait, the more threads you have to migrate.</p>
+                </div>
+            </div>
+
+            <div class="play-item">
+                <div class="play-dot"></div>
+                <div class="content">
+                    <span class="time-tag">Month 6</span>
+                    <h4>Cost Attribution and Model Routing Review</h4>
+                    <p>By month 6 you have real usage data. Review: which use cases are using the most expensive models? Which tasks could use a smaller model with no quality loss? Implement model routing — route simple classification and extraction tasks to smaller/cheaper models; reserve frontier models for complex reasoning. This review typically yields 30–60% cost reduction without quality regression.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav-footer">
+        <a href="08-tradeoffs.html">
+            <span>&#8592;</span>
+            <span>
+                <span class="nav-dir">Previous Section</span>
+                Section 8: Trade-offs Analysis
+            </span>
+        </a>
+        <a href="10-landscape.html">
+            <span>
+                <span class="nav-dir">Next Section</span>
+                Section 10: Technology Landscape
+            </span>
+            <span>&#8594;</span>
+        </a>
+    </div>
+
+</div>
+</main>
+
+<script src="js/components.js"></script>
+<script>
+    // Progress bar
+    window.addEventListener('scroll', function() {
+        const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+        document.getElementById('progress-bar').style.width = progress + '%';
+    });
+
+    // Checklist toggle — uses textContent only, no innerHTML
+    document.querySelectorAll('.check-icon').forEach(function(icon) {
+        icon.addEventListener('click', function() {
+            var checked = this.getAttribute('aria-checked') === 'true';
+            if (checked) {
+                this.setAttribute('aria-checked', 'false');
+                this.classList.remove('checked');
+                this.textContent = '';
+            } else {
+                this.setAttribute('aria-checked', 'true');
+                this.classList.add('checked');
+                this.textContent = '\u2713';
+            }
+        });
+        icon.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                this.click();
+            }
+        });
+    });
+</script>
+</body>
+</html>

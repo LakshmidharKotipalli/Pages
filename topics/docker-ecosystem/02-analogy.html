@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Living Analogy — Docker</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+.analogy-hero {
+  background: linear-gradient(135deg, #0a1628, #1a2744);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 2rem; margin: 1.5rem 0; text-align: center;
+}
+.analogy-hero .big-icon { font-size: 4rem; margin-bottom: 0.5rem; }
+.analogy-hero h2 { font-size: 1.6rem; color: var(--docker-blue); margin-bottom: 0.5rem; }
+.mapping-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; }
+.mapping-table th { background: var(--bg3); padding: 10px 16px; text-align: left; font-size: 0.85rem; font-weight: 700; border-bottom: 2px solid var(--docker-blue); }
+.mapping-table td { padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 0.88rem; vertical-align: top; }
+.mapping-table td:first-child { color: var(--docker-blue); font-weight: 600; width: 30%; }
+.mapping-table td:nth-child(2) { color: var(--yellow); width: 30%; }
+.mapping-table td:last-child { color: var(--text2); }
+.mapping-table tr:hover td { background: var(--bg2); }
+</style>
+</head>
+<body>
+<nav class="topnav">
+  <a class="topnav-brand" href="index.html">🐳 Docker & Ecosystem</a>
+  <div class="topnav-links">
+    <a href="01-foundation.html">Foundation</a>
+    <a href="02-analogy.html" class="active">Analogy</a>
+    <a href="03a-journey.html">Journey</a>
+    <a href="03b-interview.html">Interview</a>
+    <a href="08-tradeoffs.html">Trade-offs</a>
+    <a href="15-reference.html">Quick Ref</a>
+  </div>
+</nav>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Core Sections</div>
+      <a href="index.html"><span class="num">00</span> Overview</a>
+      <a href="01-foundation.html"><span class="num">01</span> Foundation</a>
+      <a href="02-analogy.html" class="active"><span class="num">02</span> Analogy</a>
+      <a href="03a-journey.html"><span class="num">03A</span> Journey</a>
+      <a href="03b-interview.html"><span class="num">03B</span> Interview</a>
+      <a href="04-system-design.html"><span class="num">04</span> System Design</a>
+      <a href="05-ripple.html"><span class="num">05</span> Ripple Effects</a>
+      <a href="06-evolution.html"><span class="num">06</span> Evolution</a>
+      <a href="07-patterns.html"><span class="num">07</span> Patterns</a>
+      <a href="08-tradeoffs.html"><span class="num">08</span> Trade-offs</a>
+      <a href="09-at-scale.html"><span class="num">09</span> At Scale</a>
+      <a href="10-landscape.html"><span class="num">10</span> Landscape</a>
+      <a href="11-pitfalls.html"><span class="num">11</span> Pitfalls</a>
+      <a href="12-debugging.html"><span class="num">12</span> Debugging</a>
+      <a href="13-conversation.html"><span class="num">13</span> Conversation</a>
+      <a href="14-exercises.html"><span class="num">14</span> Exercises</a>
+      <a href="15-reference.html"><span class="num">15</span> Quick Ref</a>
+      <a href="16-whats-next.html"><span class="num">16</span> What's Next</a>
+    </div>
+  </aside>
+  <main class="main">
+    <div class="page-header">
+      <div class="badge">Section 02 · Analogy</div>
+      <h1>The Shipping Container Revolution</h1>
+      <p class="subtitle">In 1956, Malcolm McLean invented the standardized shipping container. Before that, moving goods between ships, trains, and trucks was a labor-intensive nightmare of custom crates and re-packing. Docker did the same thing for software.</p>
+    </div>
+
+    <div class="analogy-hero">
+      <div class="big-icon">🚢</div>
+      <h2>Shipping Containers : Global Trade = Docker Containers : Software Deployment</h2>
+      <p style="color:var(--text2);max-width:580px;margin:0 auto">Before standard shipping containers, moving cargo between ship, train, and truck required custom handling at every interface. Before Docker, deploying software between dev, staging, and prod required custom configuration at every environment.</p>
+    </div>
+
+    <h2>Layer by Layer: Building the Analogy</h2>
+
+    <h3>Layer 1 — The Simple Version</h3>
+    <p>A shipping container is a <strong>standardized steel box</strong>. It doesn't care if it contains electronics, bananas, or machine parts. The port, ship, train, and truck don't care either — they all work with the same standard dimensions and coupling mechanisms.</p>
+    <p>A Docker container is a <strong>standardized software box</strong>. It doesn't care if it contains a Python web server, a Node.js API, or a Java microservice. The CI server, cloud provider, and developer laptop don't care either — they all work with the same OCI-standard format.</p>
+
+    <h3>Layer 2 — Images Are the Blueprints</h3>
+    <p>Before filling a container, you have a <strong>manifest</strong> — a document describing exactly what goes inside and how it should be arranged. You can copy this manifest and fill 1,000 identical containers.</p>
+    <p>A Docker image is this manifest-plus-contents. The <strong>Dockerfile</strong> is the specification for building that image. Once built, you can instantiate thousands of identical containers from a single image. The image itself never changes — containers are its instances.</p>
+
+    <h3>Layer 3 — Layers Are Intermodal Standardization</h3>
+    <p>Shipping containers standardized the <em>interface</em> — the corner castings, dimensions, and locking mechanisms. Inside, goods can be arranged however needed. The standardized interface (OCI) is what allows any crane (Kubernetes, Docker Swarm, containerd) to lift any container.</p>
+    <p>Docker's image layers work similarly. Every image layer is a content-addressed blob. Layer 3 (your app code) sits on top of Layer 2 (Node.js runtime) which sits on top of Layer 1 (Alpine Linux). Ten different apps can share that Alpine layer — one copy on disk, referenced by all. Like containers sharing a chassis design while carrying different cargo.</p>
+
+    <h3>Layer 4 — The Registry Is the Shipping Depot</h3>
+    <p>In global shipping, goods flow through <strong>container depots</strong> — warehouses where containers are stored, tracked, and dispatched. You push a container to the depot; a ship pulls it when needed.</p>
+    <p>Docker Hub, ECR, and GCR are the depots. You <code>docker push</code> an image from your CI pipeline to the registry; your Kubernetes cluster <code>pull</code>s it when deploying. The registry stores, versions, and distributes images globally.</p>
+
+    <h3>Layer 5 — Orchestration Is the Shipping Company</h3>
+    <p>Maersk doesn't personally load every container. They operate a logistics system that decides: which ship, which port, which schedule, how to handle failures (a delayed ship doesn't cancel your order — they re-route). They manage hundreds of thousands of containers worldwide.</p>
+    <p>Kubernetes is Maersk. It decides which node runs which container, how many replicas to run, what to do when a container dies, how to roll out new versions without downtime. Individual containers are interchangeable — Kubernetes manages the fleet.</p>
+
+    <h2>The Full Mapping</h2>
+    <table class="mapping-table">
+      <tr><th>Shipping World</th><th>Docker World</th><th>Why It Matters</th></tr>
+      <tr><td>Shipping Container</td><td>Docker Container</td><td>Standardized, portable, self-contained unit that works everywhere</td></tr>
+      <tr><td>Container Blueprint / Manifest</td><td>Dockerfile + Image</td><td>Reproducible recipe for the exact same container every time</td></tr>
+      <tr><td>Container Depot / Port</td><td>Container Registry</td><td>Central store for pushing, versioning, and pulling images</td></tr>
+      <tr><td>Ship / Train / Truck</td><td>Host OS / Cloud VM</td><td>The carrier doesn't care what's inside — only the interface matters</td></tr>
+      <tr><td>ISO Standard (20ft/40ft)</td><td>OCI Spec</td><td>Interoperability across all vendors and tools</td></tr>
+      <tr><td>Crane</td><td>Container Runtime (runc)</td><td>The thing that actually lifts/starts a container</td></tr>
+      <tr><td>Shipping Company (Maersk)</td><td>Kubernetes / Docker Swarm</td><td>Orchestrates fleet of containers across multiple carriers</td></tr>
+      <tr><td>Manifest of Cargo</td><td>Container metadata / labels</td><td>Describes what's inside without opening the container</td></tr>
+      <tr><td>Refrigerated Container</td><td>Container with resource limits</td><td>Specialized environment constraints for specific cargo/workloads</td></tr>
+      <tr><td>Same goods, different packages</td><td>Same image, different containers</td><td>Multiple running instances from one image template</td></tr>
+    </table>
+
+    <h2>Where the Analogy Breaks Down</h2>
+    <div class="callout callout-warn">
+      <div class="callout-title">Analogy Limits — Don't Over-Extend</div>
+      <ul>
+        <li><strong>Containers share a kernel</strong>. Physical containers are fully isolated. Docker containers share the host OS kernel — a kernel vulnerability can affect all containers on that host. Shipping containers don't share a hull. (This is why Kata Containers and Firecracker exist for stronger isolation.)</li>
+        <li><strong>Containers can talk to each other</strong>. Containers on the same Docker network can communicate freely by service name. Physical containers in a depot don't have a private phone network between them.</li>
+        <li><strong>Containers are ephemeral by design</strong>. Shipping containers hold physical goods that must be preserved. Docker containers are disposable — the filesystem is thrown away when they stop. Data must be externalized to volumes.</li>
+        <li><strong>Startup is nearly instant</strong>. A container starts in milliseconds. Loading a physical shipping container takes hours. This speed fundamentally changes how you architect systems (short-lived batch jobs, function-as-a-service).</li>
+      </ul>
+    </div>
+
+    <h2>Apply the Analogy as You Learn</h2>
+    <p>Throughout this learning journey, when you encounter a new Docker concept, ask yourself: <em>"What's the shipping equivalent?"</em></p>
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon">🏷️</div>
+        <div class="card-title">Image Tags → Container Versions</div>
+        <div class="card-desc">Like product serial numbers. nginx:1.25-alpine is a specific container spec, not just "nginx". Always pin tags in production.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔌</div>
+        <div class="card-title">Port Mapping → Dock Connection</div>
+        <div class="card-desc">A container's internal port 8080 is like an internal loading door. Port mapping (-p 80:8080) is connecting the external dock to that specific door.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🗄️</div>
+        <div class="card-title">Volumes → Bonded Warehouse</div>
+        <div class="card-desc">Goods (data) stored outside the container in a secure facility, retrieved when the next container arrives. The container is interchangeable; the data persists.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🌐</div>
+        <div class="card-title">Docker Networks → Private Shipping Lanes</div>
+        <div class="card-desc">Containers on the same network can find each other by name. Isolated from external traffic. Custom lanes between trusted partners.</div>
+      </div>
+    </div>
+
+    <div class="pagination">
+      <a href="01-foundation.html" class="page-btn">← Foundation</a>
+      <a href="03a-journey.html" class="page-btn primary">Learning Journey →</a>
+    </div>
+  </main>
+</div>
+<script src="js/components.js"></script>
+</body>
+</html>

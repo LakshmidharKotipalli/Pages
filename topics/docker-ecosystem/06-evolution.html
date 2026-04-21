@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evolution Story — Docker</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<nav class="topnav">
+  <a class="topnav-brand" href="index.html">🐳 Docker & Ecosystem</a>
+  <div class="topnav-links">
+    <a href="01-foundation.html">Foundation</a>
+    <a href="03b-interview.html">Interview</a>
+    <a href="06-evolution.html" class="active">Evolution</a>
+    <a href="08-tradeoffs.html">Trade-offs</a>
+    <a href="15-reference.html">Quick Ref</a>
+  </div>
+</nav>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Core Sections</div>
+      <a href="index.html"><span class="num">00</span> Overview</a>
+      <a href="01-foundation.html"><span class="num">01</span> Foundation</a>
+      <a href="02-analogy.html"><span class="num">02</span> Analogy</a>
+      <a href="03a-journey.html"><span class="num">03A</span> Journey</a>
+      <a href="03b-interview.html"><span class="num">03B</span> Interview</a>
+      <a href="04-system-design.html"><span class="num">04</span> System Design</a>
+      <a href="05-ripple.html"><span class="num">05</span> Ripple Effects</a>
+      <a href="06-evolution.html" class="active"><span class="num">06</span> Evolution</a>
+      <a href="07-patterns.html"><span class="num">07</span> Patterns</a>
+      <a href="08-tradeoffs.html"><span class="num">08</span> Trade-offs</a>
+      <a href="09-at-scale.html"><span class="num">09</span> At Scale</a>
+      <a href="10-landscape.html"><span class="num">10</span> Landscape</a>
+      <a href="11-pitfalls.html"><span class="num">11</span> Pitfalls</a>
+      <a href="12-debugging.html"><span class="num">12</span> Debugging</a>
+      <a href="13-conversation.html"><span class="num">13</span> Conversation</a>
+      <a href="14-exercises.html"><span class="num">14</span> Exercises</a>
+      <a href="15-reference.html"><span class="num">15</span> Quick Ref</a>
+      <a href="16-whats-next.html"><span class="num">16</span> What's Next</a>
+    </div>
+  </aside>
+  <main class="main">
+    <div class="page-header">
+      <div class="badge">Section 06 · Evolution</div>
+      <h1>The Evolution Story</h1>
+      <p class="subtitle">2013 to 2028: How Docker changed software delivery, sparked an ecosystem, lost the orchestration war, and became indispensable infrastructure. The story of how we got here — and where we're going.</p>
+    </div>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-year">2013 — Year 0: The Demo Heard Round the Dev World</div>
+        <div class="timeline-title">Docker 0.1 Launches at PyCon</div>
+        <div class="timeline-desc">
+          <p>Solomon Hykes' 5-minute demo: a Python application running in a container, built from a Dockerfile, and shipped as an image. The audience reaction was immediate — this solved a problem everyone had but couldn't articulate.</p>
+          <p><strong>State of the industry:</strong> Puppet, Chef, and Ansible were the state of the art for configuration management. Vagrant gave developers VMs. Heroku had pioneered 12-factor apps. AWS was dominant but deployments were still heavily manual.</p>
+          <p><strong>What Docker changed:</strong> It packaged the application AND its environment. Not "install our app on your environment" but "here is the environment, your app included."</p>
+          <p><strong>Technical foundation:</strong> Wrapped LXC (Linux Containers) with a simpler API and layered Union Filesystems. Introduced the concept of a Dockerfile as a reproducible build recipe. Open-sourced on GitHub immediately.</p>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-year">2014–2015 — The Cambrian Explosion</div>
+        <div class="timeline-title">Docker Inc. Raises $40M, Ecosystem Explodes</div>
+        <div class="timeline-desc">
+          <p>Every major cloud provider and tool vendor announced Docker support within 18 months. Amazon Container Service, Google Container Engine, Microsoft Azure Containers all launched. Docker Hub went from 0 to millions of images.</p>
+          <p><strong>Docker abandons LXC:</strong> Docker 0.9 shipped libcontainer, a native Go library for container runtime, removing the LXC dependency. This was crucial for portability and gave Docker full control of the runtime.</p>
+          <p><strong>The orchestration problem emerges:</strong> Running one container is easy. Running 100 containers across 10 servers — deciding where each runs, restarting failures, networking them together — required new tooling. Docker Swarm, Google Kubernetes (June 2014), Mesosphere Marathon, and CoreOS Fleet all launched to compete.</p>
+          <p><strong>Fig becomes Docker Compose:</strong> Docker acquires Fig, the multi-container compose tool. Local development with multiple services becomes standardized.</p>
+          <p><strong>Security concerns emerge early:</strong> Docker's privileged mode, the Docker socket as root equivalent, and running containers as root-by-default drew scrutiny from security researchers. The NIST published early container security guidance.</p>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-year">2016–2017 — The Orchestration Wars</div>
+        <div class="timeline-title">Docker vs Kubernetes vs Mesos — and the Winner Emerges</div>
+        <div class="timeline-desc">
+          <p>Three serious contenders: Docker Swarm (simplest, Docker-native), Kubernetes (backed by Google, most powerful), Apache Mesos with Marathon (best for mixed workloads, popular at Twitter/Airbnb). Companies placed bets.</p>
+          <p><strong>Kubernetes' secret weapon:</strong> It was based on Google's decade of experience running Borg — their internal cluster manager. Every design decision had been tested at billion-container scale. The design was complex but battle-proven.</p>
+          <p><strong>The CNCF formation (2016):</strong> Cloud Native Computing Foundation formed with Kubernetes as the first project. Google, IBM, Red Hat, and others donated massive engineering resources. Docker contributed containerd.</p>
+          <p><strong>Docker's strategic mistake:</strong> Docker Inc. tried to compete with Kubernetes rather than integrate it. The result: Kubernetes got all the enterprise attention. Docker eventually bundled Kubernetes in Docker Desktop but the perception had shifted.</p>
+          <p><strong>OCI standardization (2015-2017):</strong> The Open Container Initiative standardized image format and runtime spec. This was momentous: it decoupled the image format from any single vendor. Docker, rkt, Mesos could now run the same images.</p>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-year">2018–2019 — Kubernetes Wins, Runtime Decouples</div>
+        <div class="timeline-title">Containerd Graduates, BuildKit Arrives, Docker Inc. Struggles</div>
+        <div class="timeline-desc">
+          <p>Kubernetes became the de-facto standard. Every major cloud offered managed Kubernetes. Docker Swarm adoption stalled. Docker Inc. laid off engineers and pivoted focus to developer tooling.</p>
+          <p><strong>containerd becomes independent:</strong> Docker donated containerd to CNCF. It became the reference container runtime for Kubernetes — the real runtime underneath, now independent of Docker. This was the beginning of Docker's decoupling from the runtime layer.</p>
+          <p><strong>BuildKit ships (Docker 18.09):</strong> A completely rebuilt build engine with parallel execution, improved caching, secret mounts, and SSH forwarding. Dramatically faster builds. Changed the Dockerfile development experience.</p>
+          <p><strong>Docker Desktop growth:</strong> Even as Docker Inc. struggled commercially, Docker Desktop became the dominant developer tool. VSCode's Remote Containers extension (2019) made developing-in-containers mainstream.</p>
+          <p><strong>The Mirantis acquisition (2019):</strong> Mirantis acquired Docker's Enterprise product line. Docker Inc. refocused on Docker Desktop and Docker Hub as developer tools.</p>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-year">2020–2022 — Kubernetes Removes Docker, Podman Rises</div>
+        <div class="timeline-title">Dockershim Deprecated — The "Docker is Dead" Non-Event</div>
+        <div class="timeline-desc">
+          <p>Kubernetes 1.20 (December 2020) announced dockershim deprecation. The industry briefly panicked. Most infrastructure engineers realized: nothing in their workflow actually changed for end-users.</p>
+          <p><strong>What actually changed:</strong> Kubernetes nodes no longer ran Docker daemon. They ran containerd (or CRI-O) directly. You couldn't SSH into a node and run <code>docker ps</code> to see pods. You needed <code>crictl</code> instead. CI pipelines didn't change.</p>
+          <p><strong>Podman emerges seriously:</strong> Red Hat's daemonless, rootless container tool gained enterprise adoption. Podman is Docker-compatible (same CLI, same Dockerfiles) but doesn't require a running daemon. Better security story for servers.</p>
+          <p><strong>Docker Desktop licensing change (2022):</strong> Docker Desktop became paid for larger companies. This accelerated Podman, Lima, and Rancher Desktop adoption as alternatives on developer machines.</p>
+          <p><strong>Supply chain security spotlight:</strong> Log4Shell (December 2021) showed how transitive dependencies in container images could compromise thousands of services. SBOM (Software Bill of Materials) generation became a compliance requirement. Sigstore and cosign for image signing went mainstream.</p>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-year">2023–2025 — Maturity, Security, and New Frontiers</div>
+        <div class="timeline-title">BuildKit as Default, Docker Scout, and WASM Containers</div>
+        <div class="timeline-desc">
+          <p>The container ecosystem reached maturity. The tools stopped changing quarterly and stabilized into supported, versioned products with clear support windows.</p>
+          <p><strong>Docker Scout (2023):</strong> Integrated vulnerability and software composition analysis. Developers see CVEs at build time in Docker Desktop. The shift-left security vision finally became practical.</p>
+          <p><strong>WASM containers (2023-2024):</strong> Docker announced WebAssembly container support. WASM modules can run as containers via the WasmEdge runtime, enabling near-native performance, language portability, and a security sandbox stronger than Linux namespaces. Still experimental but directionally important.</p>
+          <p><strong>AI/ML containerization:</strong> Every ML framework (PyTorch, TensorFlow, JAX) ships official Docker images. GPU-accelerated containers became standard. Large model serving (LLMs) drove requirements for specialized container runtimes with GPU passthrough.</p>
+          <p><strong>eBPF changes the game:</strong> Cilium (eBPF-based CNI) replaces iptables for Kubernetes networking, offering dramatically better performance and observability. Container networking is being reimplemented using eBPF programs loaded directly into the kernel.</p>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-year">2026–2028 — Where We're Heading</div>
+        <div class="timeline-title">Platform Engineering, Function-Scale Containers, AI-Assisted Dockerfiles</div>
+        <div class="timeline-desc">
+          <p><strong>Platform Engineering:</strong> Large organizations are building Internal Developer Platforms (IDPs) that abstract Docker/Kubernetes entirely. Developers write code; the platform produces OCI images, deploys them, and manages the lifecycle. Backstage, Port.io, and similar tools define the developer interface.</p>
+          <p><strong>Function-granularity containers:</strong> Firecracker microVMs, WASM, and optimized cold-start runtimes are enabling container-per-request workloads. AWS Lambda runs your code in a microVM that starts in <100ms. The line between containers and functions is blurring.</p>
+          <p><strong>AI-generated Dockerfiles:</strong> LLMs generate surprisingly good Dockerfiles. The Dockerfile may eventually be an implementation detail — you describe your application, the platform produces the container artifact. The important knowledge becomes understanding what a good container looks like, not memorizing syntax.</p>
+          <p><strong>Confidential containers:</strong> Intel TDX, AMD SEV-SNP enabling encrypted containers where even the cloud provider can't read the workload memory. Critical for healthcare, finance, and AI model protection.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="pagination">
+      <a href="05-ripple.html" class="page-btn">← Ripple Effects</a>
+      <a href="07-patterns.html" class="page-btn primary">Patterns →</a>
+    </div>
+  </main>
+</div>
+<script src="js/components.js"></script>
+</body>
+</html>

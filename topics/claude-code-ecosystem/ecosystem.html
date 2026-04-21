@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Full Ecosystem - Learn Claude Code Ecosystem</title>
+    <link rel="stylesheet" href="../../css/styles.css">
+    <link rel="stylesheet" href="theme.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <a href="index.html" class="nav-back">Back to Overview</a>
+        <span class="current-section">The Full Ecosystem</span>
+        <div class="nav-links">
+            <a href="reference.html">Previous</a>
+            <a href="next.html">Next</a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <h1>The Full Ecosystem</h1>
+            <p class="powerful-sentence">Claude Code is not a tool — it is the center of gravity for an ecosystem of platforms, marketplaces, frameworks, and integrations that has grown from zero to tens of thousands of components in under two years.</p>
+            <p class="explanation">Understanding where each component lives in the ecosystem — and how they connect to each other — is the difference between using Claude Code and mastering it. This is the constellation map.</p>
+        </section>
+
+        <section>
+            <h2>Ecosystem Constellation Map</h2>
+            <p>The diagram below shows the full ecosystem organized by relationship to Claude Code. Read it from the center outward: core platform first, then the three extension rings (skills, MCP, plugins), then the orchestration frameworks and IDE integrations, and finally the community layer that holds all knowledge about the ecosystem together.</p>
+
+            <div class="diagram-container">
+                <svg class="architecture-diagram" viewBox="0 0 900 700" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Claude Code ecosystem constellation mindmap showing all tools and services organized by relationship">
+                    <defs>
+                        <marker id="eco-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                            <polygon points="0 0, 8 3, 0 6" fill="#9ca3af"/>
+                        </marker>
+                    </defs>
+
+                    <!-- Center: Claude Code Core -->
+                    <ellipse cx="450" cy="350" rx="75" ry="50" fill="#3b82f6" stroke="#1d4ed8" stroke-width="3"/>
+                    <text x="450" y="344" font-family="system-ui,sans-serif" font-size="13" font-weight="700" fill="white" text-anchor="middle">CLAUDE CODE</text>
+                    <text x="450" y="362" font-family="system-ui,sans-serif" font-size="10" fill="#bfdbfe" text-anchor="middle">Core Platform</text>
+
+                    <!-- Ring 1: Sibling Platforms (top) -->
+                    <!-- Agent SDK -->
+                    <ellipse cx="450" cy="215" rx="58" ry="30" fill="#1d4ed8" stroke="#1e3a8a" stroke-width="2"/>
+                    <text x="450" y="210" font-family="system-ui,sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle">Agent SDK</text>
+                    <text x="450" y="226" font-family="system-ui,sans-serif" font-size="9" fill="#bfdbfe" text-anchor="middle">Build custom agents</text>
+                    <line x1="450" y1="300" x2="450" y2="245" stroke="#3b82f6" stroke-width="2" marker-end="url(#eco-arrow)"/>
+
+                    <!-- Claude Desktop (top-left) -->
+                    <ellipse cx="270" cy="230" rx="60" ry="30" fill="#4338ca" stroke="#312e81" stroke-width="2"/>
+                    <text x="270" y="225" font-family="system-ui,sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle">Claude Desktop</text>
+                    <text x="270" y="241" font-family="system-ui,sans-serif" font-size="9" fill="#c7d2fe" text-anchor="middle">GUI wrapper</text>
+                    <line x1="375" y1="320" x2="325" y2="248" stroke="#6366f1" stroke-width="1.5" marker-end="url(#eco-arrow)"/>
+
+                    <!-- Claude in Chrome (top-right) -->
+                    <ellipse cx="630" cy="230" rx="65" ry="30" fill="#7c3aed" stroke="#5b21b6" stroke-width="2"/>
+                    <text x="630" y="225" font-family="system-ui,sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle">Claude in Chrome</text>
+                    <text x="630" y="241" font-family="system-ui,sans-serif" font-size="9" fill="#ddd6fe" text-anchor="middle">Browser automation</text>
+                    <line x1="525" y1="320" x2="573" y2="248" stroke="#8b5cf6" stroke-width="1.5" marker-end="url(#eco-arrow)"/>
+
+                    <!-- Claude API (far top-right) -->
+                    <ellipse cx="790" cy="200" rx="60" ry="28" fill="#1e3a8a" stroke="#172554" stroke-width="2"/>
+                    <text x="790" y="196" font-family="system-ui,sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle">Claude API</text>
+                    <text x="790" y="212" font-family="system-ui,sans-serif" font-size="9" fill="#93c5fd" text-anchor="middle">Underlying model API</text>
+                    <line x1="525" y1="330" x2="733" y2="215" stroke="#3b82f6" stroke-width="1.5" marker-end="url(#eco-arrow)" stroke-dasharray="4,3"/>
+
+                    <!-- Skills Ecosystem (left) -->
+                    <!-- skills.sh -->
+                    <ellipse cx="130" cy="320" rx="62" ry="28" fill="#059669" stroke="#047857" stroke-width="2"/>
+                    <text x="130" y="315" font-family="system-ui,sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle">skills.sh</text>
+                    <text x="130" y="331" font-family="system-ui,sans-serif" font-size="9" fill="#a7f3d0" text-anchor="middle">Anthropic hub</text>
+                    <line x1="375" y1="345" x2="192" y2="325" stroke="#10b981" stroke-width="1.5" marker-end="url(#eco-arrow)"/>
+
+                    <!-- skillhub.club -->
+                    <ellipse cx="100" cy="400" rx="68" ry="28" fill="#065f46" stroke="#064e3b" stroke-width="2"/>
+                    <text x="100" y="395" font-family="system-ui,sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle">skillhub.club</text>
+                    <text x="100" y="411" font-family="system-ui,sans-serif" font-size="9" fill="#6ee7b7" text-anchor="middle">20K+ skills</text>
+                    <line x1="375" y1="360" x2="168" y2="402" stroke="#10b981" stroke-width="1.5" marker-end="url(#eco-arrow)"/>
+
+                    <!-- skillsmp.com -->
+                    <ellipse cx="145" cy="470" rx="65" ry="28" fill="#047857" stroke="#065f46" stroke-width="2"/>
+                    <text x="145" y="465" font-family="system-ui,sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle">skillsmp.com</text>
+                    <text x="145" y="481" font-family="system-ui,sans-serif" font-size="9" fill="#a7f3d0" text-anchor="middle">Independent marketplace</text>
+                    <line x1="385" y1="383" x2="210" y2="467" stroke="#10b981" stroke-width="1" marker-end="url(#eco-arrow)"/>
+
+                    <!-- Custom Skills -->
+                    <ellipse cx="220" cy="540" rx="65" ry="28" fill="#134e4a" stroke="#0f766e" stroke-width="2"/>
+                    <text x="220" y="534" font-family="system-ui,sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle">Custom Skills</text>
+                    <text x="220" y="550" font-family="system-ui,sans-serif" font-size="9" fill="#5eead4" text-anchor="middle">.claude/skills/</text>
+                    <line x1="400" y1="395" x2="265" y2="530" stroke="#10b981" stroke-width="1" marker-end="url(#eco-arrow)" stroke-dasharray="4,3"/>
+
+                    <!-- MCP Ecosystem (right) -->
+                    <!-- Official MCP Servers -->
+                    <ellipse cx="770" cy="310" rx="78" ry="28" fill="#b45309" stroke="#92400e" stroke-width="2"/>
+                    <text x="770" y="305" font-family="system-ui,sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle">Official MCP Servers</text>
+                    <text x="770" y="321" font-family="system-ui,sans-serif" font-size="9" fill="#fde68a" text-anchor="middle">GitHub, DB, web search</text>
+                    <line x1="525" y1="345" x2="694" y2="315" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#eco-arrow)"/>
+
+                    <!-- Community MCP -->
+                    <ellipse cx="790" cy="390" rx="72" ry="28" fill="#78350f" stroke="#92400e" stroke-width="2"/>
+                    <text x="790" y="385" font-family="system-ui,sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle">Community MCP</text>
+                    <text x="790" y="401" font-family="system-ui,sans-serif" font-size="9" fill="#fde68a" text-anchor="middle">50+ API connectors</text>
+                    <line x1="525" y1="360" x2="720" y2="385" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#eco-arrow)"/>
+
+                    <!-- Custom MCP -->
+                    <ellipse cx="760" cy="465" rx="70" ry="28" fill="#92400e" stroke="#78350f" stroke-width="2"/>
+                    <text x="760" y="460" font-family="system-ui,sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle">Custom MCP Servers</text>
+                    <text x="760" y="476" font-family="system-ui,sans-serif" font-size="9" fill="#fed7aa" text-anchor="middle">Internal tool bridges</text>
+                    <line x1="515" y1="383" x2="693" y2="458" stroke="#f59e0b" stroke-width="1" marker-end="url(#eco-arrow)"/>
+
+                    <!-- Orchestration Ecosystem (bottom-left) -->
+                    <!-- Plugin Hub -->
+                    <ellipse cx="270" cy="600" rx="72" ry="28" fill="#9d174d" stroke="#831843" stroke-width="2"/>
+                    <text x="270" y="595" font-family="system-ui,sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle">Plugin Hub</text>
+                    <text x="270" y="611" font-family="system-ui,sans-serif" font-size="9" fill="#fbcfe8" text-anchor="middle">9,000+ bundles</text>
+                    <line x1="415" y1="398" x2="295" y2="580" stroke="#ec4899" stroke-width="1" marker-end="url(#eco-arrow)"/>
+
+                    <!-- claude-flow -->
+                    <ellipse cx="440" cy="580" rx="65" ry="28" fill="#7e22ce" stroke="#6b21a8" stroke-width="2"/>
+                    <text x="440" y="575" font-family="system-ui,sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle">claude-flow</text>
+                    <text x="440" y="591" font-family="system-ui,sans-serif" font-size="9" fill="#e9d5ff" text-anchor="middle">Swarm orchestration</text>
+                    <line x1="440" y1="400" x2="440" y2="552" stroke="#a855f7" stroke-width="1" marker-end="url(#eco-arrow)"/>
+
+                    <!-- ccpm -->
+                    <ellipse cx="600" cy="580" rx="60" ry="28" fill="#5b21b6" stroke="#4c1d95" stroke-width="2"/>
+                    <text x="600" y="575" font-family="system-ui,sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle">ccpm</text>
+                    <text x="600" y="591" font-family="system-ui,sans-serif" font-size="9" fill="#ddd6fe" text-anchor="middle">Issues + worktrees PM</text>
+                    <line x1="465" y1="398" x2="576" y2="559" stroke="#a855f7" stroke-width="1" marker-end="url(#eco-arrow)"/>
+
+                    <!-- IDE Integrations (top area, wider) -->
+                    <!-- VS Code -->
+                    <ellipse cx="110" cy="150" rx="60" ry="26" fill="#0369a1" stroke="#075985" stroke-width="2"/>
+                    <text x="110" y="145" font-family="system-ui,sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle">VS Code Ext.</text>
+                    <text x="110" y="161" font-family="system-ui,sans-serif" font-size="9" fill="#bae6fd" text-anchor="middle">Multi-agent support</text>
+                    <line x1="380" y1="308" x2="165" y2="162" stroke="#0ea5e9" stroke-width="1" marker-end="url(#eco-arrow)" stroke-dasharray="4,3"/>
+
+                    <!-- JetBrains -->
+                    <ellipse cx="300" cy="110" rx="65" ry="26" fill="#be123c" stroke="#9f1239" stroke-width="2"/>
+                    <text x="300" y="105" font-family="system-ui,sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle">JetBrains Plugin</text>
+                    <text x="300" y="121" font-family="system-ui,sans-serif" font-size="9" fill="#fecdd3" text-anchor="middle">IntelliJ, PyCharm</text>
+                    <line x1="410" y1="302" x2="340" y2="130" stroke="#f43f5e" stroke-width="1" marker-end="url(#eco-arrow)" stroke-dasharray="4,3"/>
+
+                    <!-- Legend -->
+                    <rect x="18" y="15" width="240" height="135" rx="8" fill="none" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="3,3"/>
+                    <text x="30" y="35" font-family="system-ui,sans-serif" font-size="11" font-weight="700" fill="#6b7280">LEGEND</text>
+                    <rect x="30" y="45" width="14" height="14" rx="3" fill="#3b82f6"/>
+                    <text x="52" y="57" font-family="system-ui,sans-serif" font-size="10" fill="#374151">Core Platform</text>
+                    <rect x="30" y="68" width="14" height="14" rx="3" fill="#059669"/>
+                    <text x="52" y="80" font-family="system-ui,sans-serif" font-size="10" fill="#374151">Skills Ecosystem</text>
+                    <rect x="30" y="91" width="14" height="14" rx="3" fill="#b45309"/>
+                    <text x="52" y="103" font-family="system-ui,sans-serif" font-size="10" fill="#374151">MCP Ecosystem</text>
+                    <rect x="30" y="114" width="14" height="14" rx="3" fill="#7e22ce"/>
+                    <text x="52" y="126" font-family="system-ui,sans-serif" font-size="10" fill="#374151">Orchestration</text>
+                    <line x1="30" y1="138" x2="44" y2="138" stroke="#6b7280" stroke-width="1.5" stroke-dasharray="4,2"/>
+                    <text x="52" y="142" font-family="system-ui,sans-serif" font-size="10" fill="#374151">Optional/indirect link</text>
+                </svg>
+                <p class="diagram-caption">The Claude Code ecosystem as of February 2026. Center: core platform. Left ring: skills ecosystem. Right ring: MCP ecosystem. Bottom: orchestration frameworks. Top: IDE integrations and sibling platforms.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Core Platform</h2>
+            <p>The core platform is everything that comes directly from Anthropic. These are the foundational components that everything else builds on.</p>
+
+            <div class="component-explanation">
+                <div class="component-item">
+                    <div class="component-name">Claude Code CLI</div>
+                    <p>The terminal agent — the primary interface for agentic development. Runs in any terminal, integrates with any shell, and serves as the orchestrator for all other components. The director who calls the shots on the production floor.</p>
+                    <p><strong>Key properties:</strong> Agentic (multi-step autonomous execution), tool-equipped (Bash, Read, Write, Edit, Glob, Grep, Task), context-managed (finite window with explicit management commands), extensible (skills, MCP, plugins, hooks).</p>
+                </div>
+                <div class="component-item">
+                    <div class="component-name">Agent SDK</div>
+                    <p>The toolkit for building custom agents that embed Claude's capabilities in your own applications and pipelines. While Claude Code CLI is Anthropic's reference implementation of an agentic AI development environment, the Agent SDK lets you build your own. Think of Claude Code as a finished film; the Agent SDK is access to the studio's entire production infrastructure.</p>
+                    <p><strong>Key properties:</strong> Same orchestration primitives as Claude Code CLI, configurable tool access, embeddable in CI/CD pipelines, supports custom sub-agent types.</p>
+                </div>
+                <div class="component-item">
+                    <div class="component-name">Claude API</div>
+                    <p>The underlying model API that powers everything in the ecosystem. Claude Code CLI, Claude Desktop, the Agent SDK, and all third-party integrations call the Claude API. Understanding the API helps you reason about context windows, model selection, and cost — because everything ultimately passes through it.</p>
+                </div>
+                <div class="component-item">
+                    <div class="component-name">Claude Desktop + Claude in Chrome</div>
+                    <p>GUI and browser-native alternatives to the terminal. Claude Desktop provides a conversational interface with project awareness. Claude in Chrome extends Claude Code's capabilities into the browser — taking screenshots, interacting with web UIs, debugging visual rendering issues that the terminal-based CLI cannot observe directly.</p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Skills Ecosystem</h2>
+            <p>The skills ecosystem has grown into a genuine open standard with multiple competing distribution channels. Understanding the landscape helps you find the right skills quickly and decide when to build versus install.</p>
+
+            <div class="comparison-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Platform</th>
+                            <th>Scale</th>
+                            <th>Quality Signal</th>
+                            <th>Best For</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>skills.sh</strong></td>
+                            <td>Anthropic's official distribution hub</td>
+                            <td>Anthropic-curated; highest trust baseline</td>
+                            <td>Starting point for any skills search; official integrations</td>
+                        </tr>
+                        <tr>
+                            <td><strong>skillhub.club</strong></td>
+                            <td>20,000+ skills (Feb 2026)</td>
+                            <td>AI-evaluated quality ratings + community votes</td>
+                            <td>Finding specialized skills for specific domains; discovering patterns you had not considered</td>
+                        </tr>
+                        <tr>
+                            <td><strong>skillsmp.com</strong></td>
+                            <td>Independent marketplace</td>
+                            <td>Community-driven; commercial skills available</td>
+                            <td>Paid/premium skills for enterprise workflows; niche domain coverage</td>
+                        </tr>
+                        <tr>
+                            <td><strong>GitHub (awesome-agent-skills)</strong></td>
+                            <td>380+ curated</td>
+                            <td>Manual curation; open source; auditable</td>
+                            <td>Security-sensitive environments where you need to audit the skill source</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Custom (.claude/skills/)</strong></td>
+                            <td>Project-specific</td>
+                            <td>Your own; reflects your project's actual requirements</td>
+                            <td>Anything that touches your business logic, deployment pipeline, or team-specific conventions</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card info">
+                <strong>The open standard advantage:</strong> A skill written in SKILL.md format works across Claude Code, OpenAI Codex, Cursor, Gemini CLI, and other compatible runtimes. Skills you build for Claude Code today can be used by teammates who work in different tools tomorrow. This cross-tool compatibility is why the skills ecosystem has grown so rapidly — investment in a skill is not vendor-locked.
+            </div>
+        </section>
+
+        <section>
+            <h2>MCP Ecosystem</h2>
+            <p>The Model Context Protocol is the nervous system that connects Claude Code to the outside world. Without MCP, Claude Code can only work with files on the local machine. With MCP, it can query databases, call APIs, interact with CI/CD pipelines, and manage any external service.</p>
+
+            <div class="safe-zones">
+                <div class="zone-card">
+                    <div class="component-name">Official</div>
+                    <h4>Anthropic-provided MCP Servers</h4>
+                    <p>GitHub (read/write repos, issues, PRs), filesystem (extended local file operations), database (SQL queries), web search. These are the most stable and best-documented starting points.</p>
+                </div>
+                <div class="zone-card">
+                    <div class="component-name">Community</div>
+                    <h4>50+ Community Servers</h4>
+                    <p>Slack, Jira, Linear, Notion, AWS, GCP, Kubernetes, monitoring platforms, and more. Quality varies — test in a non-production environment before trusting in CI/CD.</p>
+                </div>
+                <div class="zone-card">
+                    <div class="component-name">Custom</div>
+                    <h4>Build Your Own</h4>
+                    <p>Any internal tool, proprietary API, or business-specific data source can be wrapped in an MCP server. The MCP protocol is well-documented and the overhead to build a simple server is hours, not days.</p>
+                </div>
+            </div>
+
+            <div class="card success">
+                <strong>MCP Lazy Loading — the 95% context reduction:</strong>
+                <p>Without lazy loading, every connected MCP server's full tool manifest loads at session start. Five MCP servers can consume 20-40K tokens before you have typed a single prompt. With the Tool Search lazy loading feature, only the tools actually invoked in the session load their descriptions. For most sessions, this means 1-3 tools load instead of 50+, saving 90-95% of the per-session MCP context overhead.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Plugin Ecosystem</h2>
+            <p>Plugins are the distribution mechanism that bundles skills, MCP configurations, hooks, and commands into installable packages. They are how extensibility travels across teams and organizations.</p>
+
+            <div class="card info">
+                <strong>What a plugin contains:</strong>
+                <p>A plugin is not a single thing — it is a bundle. A well-designed plugin for, say, a CI/CD workflow might include: a skill that defines the deployment procedure, an MCP server configuration that connects to the CI system, hooks that log deployment events, and commands that expose the deployment workflow as slash commands. Install the plugin and all four components are available immediately.</p>
+            </div>
+
+            <div class="comparison-grid">
+                <div class="docker-concept">
+                    <div class="concept-card">
+                        <div class="concept-name">Plugin Hub Scale</div>
+                        <p>9,000+ plugins as of February 2026, growing rapidly. The Plugin Hub has a public beta period that has driven rapid community contribution. Categories include: language-specific development (Rust, Go, Python, TypeScript), framework-specific (React, Next.js, Django, FastAPI), platform-specific (AWS, GCP, Azure), and workflow-specific (code review, security scanning, documentation generation).</p>
+                    </div>
+                    <div class="concept-card">
+                        <div class="concept-name">Team Plugin Distribution</div>
+                        <p>Organizations can create private plugins for internal distribution. A team plugin packages the company's CLAUDE.md structure, approved MCP servers with pre-configured authentication, compliance hooks, and internal skills. New engineers onboard by installing one plugin and inheriting the full team configuration in minutes rather than hours of manual setup.</p>
+                    </div>
+                </div>
+                <div class="analogy-concept">
+                    <div class="analogy-card">
+                        <div class="analogy-name">Installing Plugins</div>
+                        <p>Plugins install via the /plugin command directly in Claude Code. Public plugins from the Plugin Hub can be installed by name. Private team plugins install from a URL or local path. Installation is transactional — if a plugin installation fails, no partial state is applied. Installed plugins are recorded in .claude/settings.json and version-lockable.</p>
+                    </div>
+                    <div class="analogy-card">
+                        <div class="analogy-name">Plugin Composition</div>
+                        <p>Multiple plugins can be active simultaneously. Composition conflicts (two plugins defining skills with the same invocation trigger) are resolved in installation order — later-installed plugins override earlier ones for the same trigger. Team governance should define which plugins are required versus optional and in what installation order to ensure deterministic composition.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Agent Orchestration Ecosystem</h2>
+            <p>Beyond the built-in sub-agent and agent team primitives, a community ecosystem has grown around orchestration patterns and frameworks for more complex multi-agent scenarios.</p>
+
+            <div class="accordion">
+                <div class="accordion-item">
+                    <div class="accordion-header" role="button" aria-expanded="false" tabindex="0">
+                        <span>claude-flow: Community Orchestration Framework</span>
+                        <span class="severity medium">Community</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>claude-flow implements swarm intelligence patterns on top of Claude Code's agent primitives. Where built-in agent teams use a team lead and teammates with shared task lists, claude-flow supports emergent coordination where agents dynamically form and dissolve working groups around problems.</p>
+                        <p><strong>When to consider it:</strong> Research-heavy tasks where the problem structure is not known in advance. Exploration tasks where the best decomposition strategy emerges from initial investigation. Tasks where the coordination pattern should adapt based on what agents discover rather than being pre-defined by a human.</p>
+                        <p><strong>Caution:</strong> Emergent coordination is harder to audit, debug, and cost-manage than structured agent teams. For production workflows, the built-in agent team structure provides better predictability and easier debugging.</p>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header" role="button" aria-expanded="false" tabindex="0">
+                        <span>ccpm: Claude Code Project Management</span>
+                        <span class="severity medium">Community</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>ccpm bridges Claude Code agent teams with GitHub Issues and git worktrees to create a full project management workflow. GitHub Issues become the persistent task ledger (surviving session boundaries, unlike the in-session shared task list). Worktrees are automatically provisioned per issue. Agents pick up issues from the board, create worktrees, implement, and submit PRs — all driven by the GitHub Issues state.</p>
+                        <p><strong>When to consider it:</strong> Teams running agent teams on multi-day or multi-sprint workloads. Scenarios where you want the task ledger to survive between sessions and be visible to human team members in GitHub. CI/CD agent workflows where GitHub Actions trigger ccpm-managed agent sessions.</p>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header" role="button" aria-expanded="false" tabindex="0">
+                        <span>Agentrooms: Multi-Agent Workspaces</span>
+                        <span class="severity medium">Community</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Agentrooms provides a persistent workspace abstraction for multi-agent development. Where a standard Claude Code session is ephemeral (tied to a terminal window), an Agentroom is a named, persistent workspace that agents can join and leave, with a shared memory space and tool access profile defined for the room.</p>
+                        <p><strong>When to consider it:</strong> Long-running development workstreams that span multiple sessions and multiple agents. Environments where you want different humans and agents to be able to collaborate in the same shared context. Teams exploring AI-native development workflows where the development environment itself becomes more persistent than any individual session.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>IDE Integration Ecosystem</h2>
+            <p>Claude Code began as a terminal-native tool. IDE integrations bring its capabilities into the development environments where most engineers spend their time, without requiring terminal context switching.</p>
+
+            <div class="comparison-grid">
+                <div class="docker-concept">
+                    <div class="concept-card">
+                        <div class="concept-name">VS Code Extension</div>
+                        <p>The most mature IDE integration. As of the February 2026 update, the VS Code extension supports multi-agent development workflows directly in the editor — spawning sub-agents from the editor, viewing agent output inline with code, and triggering agent teams from the editor's source control panel. The extension shares configuration with the CLI — the same CLAUDE.md and .claude/settings.json apply.</p>
+                    </div>
+                    <div class="concept-card">
+                        <div class="concept-name">JetBrains Plugin</div>
+                        <p>Available for IntelliJ IDEA, PyCharm, GoLand, and the full JetBrains suite. Provides in-editor Claude Code access with project-aware context. The JetBrains plugin is particularly valuable for teams using Java, Kotlin, or Python in JetBrains IDEs, where the IDE's own code intelligence combines with Claude Code's agentic capabilities.</p>
+                    </div>
+                </div>
+                <div class="analogy-concept">
+                    <div class="analogy-card">
+                        <div class="analogy-name">Neovim Integration</div>
+                        <p>For terminal-native engineers, the Neovim integration provides Claude Code access without leaving the terminal. Configuration is managed through standard Neovim plugin infrastructure. Ideal for engineers who already work entirely in the terminal and want Claude Code accessible without context switching.</p>
+                    </div>
+                    <div class="analogy-card">
+                        <div class="analogy-name">IDE vs. CLI: Which to Use?</div>
+                        <p>Use the IDE integration for tasks that are tightly coupled to the code you are looking at — inline code review, targeted refactoring, immediate explanations. Use the CLI for tasks that span the full project context — architecture reviews, complex multi-file refactors, agent teams. Both share the same configuration, so switching between them mid-session is seamless.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Community and Knowledge Ecosystem</h2>
+            <p>The community layer is where collective knowledge about the ecosystem accumulates. These resources are as important as the tools themselves — they encode the patterns, anti-patterns, and hard-won lessons of early adopters.</p>
+
+            <div class="terminology-grid">
+                <div class="term-card">
+                    <div class="term">awesome-claude-code</div>
+                    <p>Curated resource list: tools, tutorials, example configurations, and community projects. The starting point for discovering what the community has built.</p>
+                </div>
+                <div class="term-card">
+                    <div class="term">everything-claude-code</div>
+                    <p>Complete configuration collection: real-world CLAUDE.md examples, settings.json templates, hook configurations, and plugin setups from production projects.</p>
+                </div>
+                <div class="term-card">
+                    <div class="term">Claude Code Showcase</div>
+                    <p>Annotated example projects showing how teams configure Claude Code for specific domains and workflows. Readable in full — not just code, but the reasoning behind each configuration choice.</p>
+                </div>
+                <div class="term-card">
+                    <div class="term">SFEIR Institute</div>
+                    <p>Structured learning tutorials for Claude Code ecosystem concepts. From beginner orientation through advanced agent team patterns. Used as onboarding material by several engineering teams.</p>
+                </div>
+                <div class="term-card">
+                    <div class="term">DeepWiki Guides</div>
+                    <p>Community-maintained documentation covering gaps in official documentation. Particularly strong on MCP server setup, skill authoring patterns, and troubleshooting complex configurations.</p>
+                </div>
+                <div class="term-card">
+                    <div class="term">awesome-agent-skills (GitHub)</div>
+                    <p>380+ manually curated skills with quality ratings, use-case descriptions, and cross-compatibility notes. Preferred by security-conscious teams who want to audit skills before deployment.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="section-footer">
+        <a href="reference.html" class="btn">Previous: Quick Reference</a>
+        <a href="next.html" class="btn">Next: What's Next</a>
+    </footer>
+
+    <script src="../../js/components.js"></script>
+</body>
+</html>

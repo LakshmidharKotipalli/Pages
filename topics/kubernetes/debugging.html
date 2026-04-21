@@ -1,0 +1,1561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debugging Kubernetes - Kubernetes Learning Journey</title>
+    <link rel="stylesheet" href="../../css/styles.css">
+    <link rel="stylesheet" href="theme.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Kubernetes Learning Journey</h1>
+            <nav>
+                <a href="index.html">Overview</a>
+                <a href="architecture.html">Architecture</a>
+                <a href="deployment.html">Deployment</a>
+                <a href="services.html">Services</a>
+                <a href="storage.html">Storage</a>
+                <a href="config.html">Configuration</a>
+                <a href="security.html">Security</a>
+                <a href="monitoring.html">Monitoring</a>
+                <a href="landscape.html">Landscape</a>
+                <a href="debugging.html" class="active">Debugging</a>
+                <a href="eloquent.html">Eloquent</a>
+                <a href="practice.html">Practice</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="intro">
+            <h2>Debugging Kubernetes Systems</h2>
+            <p class="lead">Systematic approaches to diagnosing and resolving production issues in containerized environments.</p>
+            <div class="key-points">
+                <div class="point">
+                    <h3>Debugging Mindset</h3>
+                    <p>Kubernetes adds layers of abstraction, making debugging harder. You need systematic approaches to peel back those layers and find root causes.</p>
+                </div>
+                <div class="point">
+                    <h3>Information Sources</h3>
+                    <p>Learn what to check, in what order, and how to interpret the signals K8s gives you. Events, logs, metrics, and resource status are your clues.</p>
+                </div>
+                <div class="point">
+                    <h3>Production Realities</h3>
+                    <p>Production debugging is different from tutorials. You need quick, safe techniques that work under pressure without causing more problems.</p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>1. The Debugging Framework: Symptom → Diagnosis</h2>
+
+            <div class="debugging-framework">
+                <div class="flow-diagram">
+                    <div class="flow-step">
+                        <h3>Step 1: Identify the Symptom</h3>
+                        <p>What's actually broken? Be precise.</p>
+                        <div class="examples">
+                            <p><strong>Bad:</strong> "The system is slow"</p>
+                            <p><strong>Good:</strong> "API pod takes 8 seconds to respond, normally 200ms"</p>
+                            <p><strong>Bad:</strong> "Users can't access the app"</p>
+                            <p><strong>Good:</strong> "Ingress returns 502 when accessing /api/users endpoint"</p>
+                        </div>
+                    </div>
+
+                    <div class="arrow">→</div>
+
+                    <div class="flow-step">
+                        <h3>Step 2: Check Object Status</h3>
+                        <p>What does K8s tell you about the broken component?</p>
+                        <div class="commands">
+                            <code class="block">kubectl get pods -n &lt;namespace&gt;</code>
+                            <code class="block">kubectl get svc -n &lt;namespace&gt;</code>
+                            <code class="block">kubectl get ingress -n &lt;namespace&gt;</code>
+                            <code class="block">kubectl get nodes</code>
+                    </div>
+                    </div>
+
+                    <div class="arrow">→</div>
+
+                    <div class="flow-step">
+                        <h3>Step 3: Describe the Object</h3>
+                        <p>Get detailed status and recent events.</p>
+                        <div class="commands">
+                            <code class="block">kubectl describe pod/&lt;pod-name&gt; -n &lt;namespace&gt;</code>
+                            <code class="block">kubectl describe svc/&lt;service-name&gt; -n &lt;namespace&gt;</code>
+                            <code class="block">kubectl describe node/&lt;node-name&gt;</code>
+                        </div>
+                    </div>
+
+                    <div class="arrow">→</div>
+
+                    <div class="flow-step">
+                        <h3>Step 4: Check Logs</h3>
+                        <p>What are the containers saying?</p>
+                        <div class="commands">
+                            <code class="block">kubectl logs &lt;pod-name&gt; -n &lt;namespace&gt;</code>
+                            <code class="block">kubectl logs &lt;pod-name&gt; -c &lt;container-name&gt; -n &lt;namespace&gt;</code>
+                            <code class="block">kubectl logs -f &lt;pod-name&gt; -n &lt;namespace&gt;  # stream</code>
+                            <code class="block">kubectl logs --previous &lt;pod-name&gt;  # crashed container</code>
+                        </div>
+                    </div>
+
+                    <div class="arrow">→</div>
+
+                    <div class="flow-step">
+                        <h3>Step 5: Events Timeline</h3>
+                        <p>What happened, when?</p>
+                        <div class="commands">
+                            <code class="block">kubectl get events -n &lt;namespace&gt; --sort-by=.metadata.creationTimestamp</code>
+                            <code class="block">kubectl get events --all-namespaces --sort-by=.metadata.creationTimestamp</code>
+                        </div>
+                    </div>
+
+                    <div class="arrow">→</div>
+
+                    <div class="flow-step">
+                        <h3>Step 6: Deep Dive (If Needed)</h3>
+                        <p>Exec into containers, check networking, resource usage</p>
+                        <div class="commands">
+                            <code class="block">kubectl exec -it &lt;pod-name&gt; -- /bin/sh</code>
+                            <code class="block">kubectl top pods -n &lt;namespace&gt;</code>
+                            <code class="block">kubectl top nodes</code>
+                        </div>
+                    </div>
+
+                    <div class="arrow">→</div>
+
+                    <div class="flow-step success">
+                        <h3>Step 7: Fix and Verify</h3>
+                        <p>Apply fix, monitor recovery, document root cause.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>2. Common Error Patterns and Solutions</h2>
+
+            <div class="error-patterns">
+                <div class="error-pattern">
+                    <h3>CrashLoopBackOff</h3>
+                    <div class="error-meaning">
+                        <p><strong>What It Means:</strong> Container starts, crashes, K8s restarts it, crashes again, repeats. K8s backs off between retries.</p>
+                    </div>
+
+                    <div class="diagnosis-steps">
+                        <h4>What I Check First, Second, Third</h4>
+                        <ol>
+                            <li><strong>First:</strong> <code>kubectl logs &lt;pod&gt;</code> - See why it's crashing</li>
+                            <li><strong>Second:</strong> <code>kubectl logs --previous &lt;pod&gt;</code> - Check previous crash logs</li>
+                            <li><strong>Third:</strong> <code>kubectl describe pod &lt;pod&gt;</code> - Check events, look for "Back-off restarting failed container"</li>
+                        </ol>
+                    </div>
+
+                    <div class="common-causes">
+                        <h4>Common Causes (90% of cases)</h4>
+
+                        <div class="cause">
+                            <h5>1. Application Error (40%)</h5>
+                            <p><strong>Symptom:</strong> Logs show application exceptions, errors, or panic</p>
+                            <p><strong>Examples:</strong></p>
+                            <ul>
+                                <li>Unhandled exceptions in code</li>
+                                <li>Missing environment variables causing app to fail startup</li>
+                                <li>Database connection failures</li>
+                                <li>Missing required config files</li>
+                            </ul>
+                            <p><strong>Fix:</strong> Fix application code or configuration</p>
+                        </div>
+
+                        <div class="cause">
+                            <h5>2. Missing Dependencies (25%)</h5>
+                            <p><strong>Symptom:</strong> "command not found", "cannot open shared object file"</p>
+                            <p><strong>Examples:</strong></p>
+                            <ul>
+                                <li>Required binaries not in image</li>
+                                <li>Missing shared libraries</li>
+                                <li>Wrong base image (e.g., alpine vs debian)</li>
+                            </ul>
+                            <p><strong>Fix:</strong> Rebuild image with dependencies, use correct base image</p>
+                        </div>
+
+                        <div class="cause">
+                            <h5>3. Liveness Probe Failures (15%)</h5>
+                            <p><strong>Symptom:</strong> Container starts but liveness probe fails repeatedly</p>
+                            <p><strong>Examples:</strong></p>
+                            <ul>
+                                <li>Probe endpoint doesn't exist or returns wrong status code</li>
+                                <li>Probe timeout too short (app needs more time)</li>
+                                <li>App runs but isn't actually ready (still initializing)</li>
+                            </ul>
+                            <p><strong>Fix:</strong> Fix probe configuration, add readiness/liveness endpoints</p>
+                            <pre><code>livenessProbe:
+  httpGet:
+    path: /healthz
+    port: 8080
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  failureThreshold: 3</code></pre>
+                        </div>
+
+                        <div class="cause">
+                            <h5>4. Configuration Errors (10%)</h5>
+                            <p><strong>Symptom:</strong> App fails to parse config or validate required settings</p>
+                            <p><strong>Examples:</strong></p>
+                            <ul>
+                                <li>Invalid ConfigMap data</li>
+                                <li>Missing required environment variables</li>
+                                <li>Malformed YAML in mounted config files</li>
+                            </ul>
+                            <p><strong>Fix:</strong> Validate ConfigMaps, Secrets, and environment variable references</p>
+                        </div>
+
+                        <div class="cause">
+                            <h5>5. Permission Issues (5%)</h5>
+                            <p><strong>Symptom:</strong> "Permission denied" errors in logs</p>
+                            <p><strong>Examples:</strong></p>
+                            <ul>
+                                <li>Container runs as non-root but needs root</li>
+                                <li>Volume mount permissions incorrect</li>
+                                <li>SecurityContext too restrictive</li>
+                            </ul>
+                            <p><strong>Fix:</strong> Adjust securityContext, runAsUser, fsGroup</p>
+                            <pre><code>securityContext:
+  runAsUser: 1000
+  fsGroup: 1000
+  runAsNonRoot: true</code></pre>
+                        </div>
+
+                        <div class="cause">
+                            <h5>6. Out of Memory (5%)</h5>
+                            <p><strong>Symptom:</strong> Pod killed, events show "OOMKilled" (see OOMKilled section below)</p>
+                            <p><strong>Fix:</strong> Increase memory limits, fix memory leaks</p>
+                        </div>
+                    </div>
+
+                    <div class="debugging-checklist">
+                        <h4>CrashLoopBackOff Debugging Checklist</h4>
+                        <ul>
+                            <li>✅ Checked container logs (current and previous)</li>
+                            <li>✅ Verified image exists and is accessible (ImagePullBackOff? check next)</li>
+                            <li>✅ Checked liveness/readiness probe configuration</li>
+                            <li>✅ Verified ConfigMaps and Secrets are mounted correctly</li>
+                            <li>✅ Validated environment variables are present</li>
+                            <li>✅ Checked resource limits (memory/CPU)</li>
+                            <li>✅ Tried running container locally (docker run) to isolate</li>
+                            <li>✅ Checked application dependencies and base image</li>
+                            <li>✅ Reviewed recent changes (deployment, code, config)</li>
+                        </ul>
+                    </div>
+
+                    <div class="production-tip">
+                        <h4>Production Debugging Strategy</h4>
+                        <p><strong>Quick Fix:</strong> If you can't find the root cause quickly and it's blocking production, you can temporarily disable the liveness probe to keep the pod running while you investigate:</p>
+                        <pre><code>livenessProbe:
+  enabled: false  # TEMPORARY ONLY!</code></pre>
+                        <p><strong>⚠️ Warning:</strong> This is emergency-only! The app might be dead but K8s won't restart it. Document in ticket, fix properly within hours.</p>
+                    </div>
+                </div>
+
+                <div class="error-pattern">
+                    <h3>ImagePullBackOff / ErrImagePull</h3>
+                    <div class="error-meaning">
+                        <p><strong>What It Means:</strong> K8s can't pull the container image from the registry.</p>
+                    </div>
+
+                    <div class="diagnosis-steps">
+                        <h4>What I Check First, Second, Third</h4>
+                        <ol>
+                            <li><strong>First:</strong> <code>kubectl describe pod &lt;pod&gt;</code> - Look for "Failed to pull image" message</li>
+                            <li><strong>Second:</strong> <code>kubectl get pod &lt;pod&gt; -o jsonpath='{.spec.containers[*].image}'</code> - Verify image name</li>
+                            <li><strong>Third:</strong> Check imagePullSecrets and registry access</li>
+                        </ol>
+                    </div>
+
+                    <div class="common-causes">
+                        <h4>Common Causes</h4>
+
+                        <div class="cause">
+                            <h5>1. Image Doesn't Exist (40%)</h5>
+                            <p><strong>Symptom:</strong> "manifest not found", "not found"</p>
+                            <p><strong>Examples:</strong></p>
+                            <ul>
+                                <li>Wrong image name or tag</li>
+                                <li>Typo in registry URL</li>
+                                <li>Tag was deleted or overridden</li>
+                            </ul>
+                            <p><strong>Fix:</strong> Verify image exists: <code>docker pull &lt;image&gt;</code> locally</p>
+                            <pre><code># Check image exists
+docker pull myregistry.com/myapp:v1.2.3
+
+# Verify tag
+kubectl get pod mypod -o jsonpath='{.spec.containers[0].image}'</code></pre>
+                        </div>
+
+                        <div class="cause">
+                            <h5>2. Authentication Issues (35%)</h5>
+                            <p><strong>Symptom:</strong> "unauthorized", "denied", "no basic creds"</p>
+                            <p><strong>Examples:</strong></p>
+                            <ul>
+                                <li>Missing imagePullSecret for private registry</li>
+                                <li>Secret has wrong credentials</li>
+                                <li>Secret expired</li>
+                                <li>Secret not attached to service account</li>
+                            </ul>
+                            <p><strong>Fix:</strong> Create/update imagePullSecret</p>
+                            <pre><code># Create secret
+kubectl create secret docker-registry my-registry-secret \
+  --docker-server=registry.example.com \
+  --docker-username=myuser \
+  --docker-password=mypassword \
+  --docker-email=myemail@example.com
+
+# Attach to pod/serviceaccount
+kubectl patch serviceaccount default -p '{"imagePullSecrets": [{"name": "my-registry-secret"}]}'</code></pre>
+                        </div>
+
+                        <div class="cause">
+                            <h5>3. Network Issues (15%)</h5>
+                            <p><strong>Symptom:</strong> "connection refused", "timeout", "no route to host"</p>
+                            <p><strong>Examples:</strong></p>
+                            <ul>
+                                <li>Network policies blocking registry access</li>
+                                <li>Firewall blocking registry</li>
+                                <li>DNS issues resolving registry hostname</li>
+                                <li>Cluster nodes can't reach external registry</li>
+                            </ul>
+                            <p><strong>Fix:</strong> Check network policies, firewall rules, DNS</p>
+                        </div>
+
+                        <div class="cause">
+                            <h5>4. Registry Rate Limiting (5%)</h5>
+                            <p><strong>Symptom:</strong> "rate limit exceeded", "too many requests"</p>
+                            <p><strong>Examples:</strong></p>
+                            <ul>
+                                <li>Docker Hub rate limits (100 pulls/6hr for anonymous)</li>
+                                <li>Private registry limits</li>
+                            </ul>
+                            <p><strong>Fix:</strong> Authenticate (higher limits), use mirror, cache images locally</p>
+                        </div>
+
+                        <div class="cause">
+                            <h5>5. TLS/Certificate Issues (5%)</h5>
+                            <p><strong>Symptom:</strong> "x509: certificate signed by unknown authority"</p>
+                            <p><strong>Examples:</strong></p>
+                            <ul>
+                                <li>Self-signed registry certificate</li>
+                            </ul>
+                            <p><strong>Fix:</strong> Add registry CA to containerd/Docker configuration on nodes</p>
+                        </div>
+                    </div>
+
+                    <div class="debugging-checklist">
+                        <h4>ImagePullBackOff Debugging Checklist</h4>
+                        <ul>
+                            <li>✅ Verified image name and tag are correct</li>
+                            <li>✅ Can pull image manually with docker/crictl</li>
+                            <li>✅ Checked imagePullSecret exists and has correct credentials</li>
+                            <li>✅ Verified secret is attached to pod's service account</li>
+                            <li>✅ Checked network policies allow registry access</li>
+                            <li>✅ Verified nodes can reach registry (run curl/wget from node)</li>
+                            <li>✅ Checked for rate limiting messages</li>
+                            <li>✅ Tried pulling from different registry as test</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="error-pattern">
+                    <h3>OOMKilled (Out of Memory)</h3>
+                    <div class="error-meaning">
+                        <p><strong>What It Means:</strong> Container exceeded its memory limit and was killed by the kernel.</p>
+                        <p><strong>Status:</strong> Pod shows "OOMKilled" in status, terminated with exit code 137</p>
+                    </div>
+
+                    <div class="diagnosis-steps">
+                        <h4>What I Check First, Second, Third</h4>
+                        <ol>
+                            <li><strong>First:</strong> <code>kubectl describe pod &lt;pod&gt;</code> - Look for "OOMKilled", "Last State: Terminated"</li>
+                            <li><strong>Second:</strong> <code>kubectl get pod &lt;pod&gt; -o jsonpath='{.spec.containers[*].resources}'</code> - Check limits</li>
+                            <li><strong>Third:</strong> <code>kubectl top pod &lt;pod&gt; --containers</code> - See current usage (if pod still running)</li>
+                        </ol>
+                    </div>
+
+                    <div class="common-causes">
+                        <h4>Common Causes</h4>
+
+                        <div class="cause">
+                            <h5>1. Memory Limit Too Low (50%)</h5>
+                            <p><strong>Symptom:</strong> App needs more memory than allocated</p>
+                            <p><strong>Examples:</strong></p>
+                            <ul>
+                                <li>App legitimately needs 2GB, limit is 512MB</li>
+                                <li>Unexpected user load or data size</li>
+                                <li>Concurrent task processing</li>
+                            </ul>
+                            <p><strong>Fix:</strong> Increase memory limit</p>
+                            <pre><code>resources:
+  requests:
+    memory: "512Mi"
+  limits:
+    memory: "2Gi"  # Increased from 512Mi</code></pre>
+                        </div>
+
+                        <div class="cause">
+                            <h5>2. Memory Leak (30%)</h5>
+                            <p><strong>Symptom:</strong> Memory usage grows over time until OOM</p>
+                            <p><strong>Examples:</strong></p>
+                            <ul>
+                                <li>Unreleased connections or buffers</li>
+                                <li>Cached data growing without bounds</li>
+                                <li>Background goroutines/threads not cleaned up</li>
+                                <li>Library bugs</li>
+                            </ul>
+                            <p><strong>Fix:</strong> Profile memory usage, find leak, fix code</p>
+                            <pre><code># Enable memory profiling
+kubectl exec -it &lt;pod&gt; -- go tool pprof http://localhost:6060/debug/pprof/heap
+
+# Or use heap profiler in your language</code></pre>
+                        </div>
+
+                        <div class="cause">
+                            <h5>3. No Memory Limit Set (10%)</h5>
+                            <p><strong>Symptom:</strong> Pod can use unlimited memory, causes node OOM</p>
+                            <p><strong>Why It Happens:</strong> When pods have no limits, they can consume all node memory, causing kernel to kill random processes</p>
+                            <p><strong>Fix:</strong> ALWAYS set memory limits in production</p>
+                            <pre><code>resources:
+  limits:
+    memory: "1Gi"
+  requests:
+    memory: "512Mi"</code></pre>
+                        </div>
+
+                        <div class="cause">
+                            <h5>4. Memory Spike (5%)</h5>
+                            <p><strong>Symptom:</strong> Normal operation, then sudden spike (processing large file, etc.)</p>
+                            <p><strong>Examples:</strong></p>
+                            <ul>
+                                <li>Processing large file/document</li>
+                                <li>Expensive operation loaded into memory</li>
+                                <li>Caching large dataset</li>
+                            </ul>
+                            <p><strong>Fix:</strong> Increase limits, or process in smaller chunks</p>
+                        </div>
+
+                        <div class="cause">
+                            <h5>5. Java/Golang/Python Memory Issues (5%)</h5>
+                            <p><strong>Language-Specific Issues:</strong></p>
+                            <ul>
+                                <li><strong>Java:</strong> Heap size vs container limit mismatch. JVM sees node memory, not container limit</li>
+                                <li><strong>Golang:</strong> GC not releasing memory fast enough, memory fragmentation</li>
+                                <li><strong>Python:</strong> Object accumulation, reference cycles</li>
+                            </ul>
+                            <p><strong>Fix:</strong> Tune runtime memory settings</p>
+                            <pre><code># Java: Set heap within container limit
+env:
+  - name: JAVA_OPTS
+    value: "-Xms512m -Xmx1g"  # Within container limit
+
+# Golang: Tune GOGC
+env:
+  - name: GOGC
+    value: "100"  # GC when heap grows 100%</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="production-tip">
+                        <h4>Production Strategy</h4>
+                        <p><strong>Immediate:</strong> Increase limit to get service running, investigate leak</p>
+                        <p><strong>Short-term:</strong> Add memory monitoring and alerting at 80% of limit</p>
+                        <p><strong>Long-term:</strong> Profile application, find root cause, optimize or fix leak</p>
+                    </div>
+
+                    <div class="debugging-checklist">
+                        <h4>OOMKilled Debugging Checklist</h4>
+                        <ul>
+                            <li>✅ Verified memory limit is appropriate for workload</li>
+                            <li>✅ Checked application logs for clues before OOM</li>
+                            <li>✅ Reviewed recent code changes for potential leaks</li>
+                            <li>✅ Checked if it's gradual (leak) or sudden (spike)</li>
+                            <li>✅ Compared memory usage across similar pods</li>
+                            <li>✅ Checked for Java/Go/Python-specific memory settings</li>
+                            <li>✅ Verified memory requests/limits ratio (typically 1:2)</li>
+                            <li>✅ Considered Vertical Pod Autoscaler for automatic tuning</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="error-pattern">
+                    <h3>Pending (Pod Stuck in Pending State)</h3>
+                    <div class="error-meaning">
+                        <p><strong>What It Means:</strong> Pod is scheduled but not running. K8s can't place it on any node.</p>
+                    </div>
+
+                    <div class="diagnosis-steps">
+                        <h4>What I Check First, Second, Third</h4>
+                        <ol>
+                            <li><strong>First:</strong> <code>kubectl describe pod &lt;pod&gt;</code> - Look at "Events" section (most important!)</li>
+                            <li><strong>Second:</strong> <code>kubectl get nodes</code> - Check if nodes are Ready and have capacity</li>
+                            <li><strong>Third:</strong> <code>kubectl describe node &lt;node&gt;</code> - Check node capacity, allocatable, taints</li>
+                        </ol>
+                    </div>
+
+                    <div class="common-causes">
+                        <h4>Common Causes</h4>
+
+                        <div class="cause">
+                            <h5>1. Insufficient Resources (40%)</h5>
+                            <p><strong>Symptom:</strong> Events show "0/3 nodes are available: insufficient CPU/Memory"</p>
+                            <p><strong>Examples:</strong></p>
+                            <ul>
+                                <li>Cluster doesn't have enough CPU/Memory</li>
+                                <li>Nodes are fully allocated</li>
+                                <li>Pod requests too much resource</li>
+                            </ul>
+                            <p><strong>Fix:</strong> Add nodes, reduce requests, delete unused pods</p>
+                            <pre><code># Check node capacity
+kubectl top nodes
+kubectl describe nodes | grep -A 5 "Allocated resources"
+
+# Check what's consuming resources
+kubectl top pods --all-namespaces --sort-by=memory</code></pre>
+                        </div>
+
+                        <div class="cause">
+                            <h5>2. Node Selector / Affinity Mismatch (25%)</h5>
+                            <p><strong>Symptom:</strong> Events show "0/3 nodes match pod node selector/affinity"</p>
+                            <p><strong>Examples:</strong></p>
+                            <ul>
+                                <li>Pod requires label "node=production" but no nodes have it</li>
+                                <li>Anti-affinity can't schedule (all nodes already have pod)</li>
+                                <li>Pod affinity requires specific pod that doesn't exist</li>
+                            </ul>
+                            <p><strong>Fix:</strong> Fix node labels, adjust affinity rules</p>
+                            <pre><code># Check node labels
+kubectl get nodes --show-labels
+
+# Check pod selector
+kubectl get pod mypod -o jsonpath='{.spec.nodeSelector}'
+kubectl get pod mypod -o jsonpath='{.spec.affinity}'</code></pre>
+                        </div>
+
+                        <div class="cause">
+                            <h5>3. Taints and Tolerations (15%)</h5>
+                            <p><strong>Symptom:</strong> Events show "node(s) had taint that pod didn't tolerate"</p>
+                            <p><strong>Examples:</strong></p>
+                            <ul>
+                                <li>Nodes tainted with "NoSchedule" for dedicated workloads</li>
+                                <li>Control plane nodes tainted, pod tries to schedule there</li>
+                                <li>Pod doesn't tolerate required taint</li>
+                            </ul>
+                            <p><strong>Fix:</strong> Add toleration to pod, or remove taint from node</p>
+                            <pre><code># Check node taints
+kubectl describe nodes | grep Taints
+
+# Add toleration to pod
+tolerations:
+- key: "dedicated"
+  operator: "Equal"
+  value: "production"
+  effect: "NoSchedule"</code></pre>
+                        </div>
+
+                        <div class="cause">
+                            <h5>4. Persistent Volume Issues (10%)</h5>
+                            <p><strong>Symptom:</strong> Events show "pod has unbound immediate PersistentVolumeClaims"</p>
+                            <p><strong>Examples:</strong></p>
+                            <ul>
+                                <li>PVC not bound to any PV</li>
+                                <li>Storage class doesn't exist</li>
+                                <li>No available PVs match PVC requirements</li>
+                            </ul>
+                            <p><strong>Fix:</strong> Check PVC status, create PV, fix storage class</p>
+                            <pre><code># Check PVC
+kubectl get pvc
+kubectl describe pvc myclaim
+
+# Check available PVs
+kubectl get pv
+kubectl describe pv</code></pre>
+                        </div>
+
+                        <div class="cause">
+                            <h5>5. Not Ready Nodes (5%)</h5>
+                            <p><strong>Symptom:</strong> Nodes are NotReady or Unknown</p>
+                            <p><strong>Examples:</strong></p>
+                            <ul>
+                                <li>Node problems (disk full, kubelet down)</li>
+                                <li>Network issues</li>
+                                <li>Node being drained</li>
+                            </ul>
+                            <p><strong>Fix:</strong> Fix node issues</p>
+                        </div>
+
+                        <div class="cause">
+                            <h5>6. Pod Disruption Budget (5%)</h5>
+                            <p><strong>Symptom:</strong> Can't evict pods during voluntary disruptions</p>
+                            <p><strong>Examples:</strong></p>
+                            <ul>
+                                <li>Node drain blocked by PDB</li>
+                                <li>Can't achieve required availability during update</li>
+                            </ul>
+                            <p><strong>Fix:</strong> Adjust PDB, or ensure enough replicas</p>
+                        </div>
+                    </div>
+
+                    <div class="debugging-checklist">
+                        <h4>Pending Pod Debugging Checklist</h4>
+                        <ul>
+                            <li>✅ Checked Events section of kubectl describe pod (CRITICAL!)</li>
+                            <li>✅ Verified all nodes are Ready</li>
+                            <li>✅ Checked cluster has sufficient CPU/memory</li>
+                            <li>✅ Verified node selector matches actual node labels</li>
+                            <li>✅ Checked affinity rules can be satisfied</li>
+                            <li>✅ Verified taints/tolerations match</li>
+                            <li>✅ Checked PVC status (if using volumes)</li>
+                            <li>✅ Verified pod doesn't exceed node capacity</li>
+                            <li>✅ Checked for scheduler errors (kubectl get events)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="error-pattern">
+                    <h3>Network Unreachable / Connection Refused</h3>
+                    <div class="error-meaning">
+                        <p><strong>What It Means:</strong> Can't reach pods, services, or external resources from within cluster.</p>
+                    </div>
+
+                    <div class="diagnosis-steps">
+                        <h4>What I Check First, Second, Third</h4>
+                        <ol>
+                            <li><strong>First:</strong> <code>kubectl get svc</code> - Verify service exists and has endpoints</li>
+                            <li><strong>Second:</strong> <code>kubectl get endpoints &lt;service&gt;</code> - Check if service has pod endpoints</li>
+                            <li><strong>Third:</strong> Test connectivity from pod: <code>kubectl exec -it &lt;pod&gt; -- curl &lt;service&gt;</code></li>
+                        </ol>
+                    </div>
+
+                    <div class="common-causes">
+                        <h4>Common Causes</h4>
+
+                        <div class="cause">
+                            <h5>1. Service Has No Endpoints (30%)</h5>
+                            <p><strong>Symptom:</strong> Service exists but endpoints list is empty</p>
+                            <p><strong>Examples:</strong></p>
+                            <ul>
+                                <li>Pod selector doesn't match pod labels</li>
+                                <li>Pods aren't Running (they're Pending/CrashLoopBackOff)</li>
+                                <li>Wrong port in service spec</li>
+                            </ul>
+                            <p><strong>Fix:</strong> Fix service selector or pod labels</p>
+                            <pre><code># Check service selector
+kubectl get svc myservice -o jsonpath='{.spec.selector}'
+
+# Check pod labels
+kubectl get pods --show-labels
+
+# They must match!</code></pre>
+                        </div>
+
+                        <div class="cause">
+                            <h5>2. Wrong Port (25%)</h5>
+                            <p><strong>Symptom:</strong> Connection refused, timeout</p>
+                            <p><strong>Examples:</strong></p>
+                            <ul>
+                                <li>Service targets port 8080, container listens on 80</li>
+                                <li>Container port name doesn't match service port name</li>
+                                <li>Wrong protocol (TCP vs UDP)</li>
+                            </ul>
+                            <p><strong>Fix:</strong> Match service port to container port</p>
+                            <pre><code># Service definition
+ports:
+- name: http
+  port: 80        # Service port
+  targetPort: 8080  # Container port (must match!)</code></pre>
+                        </div>
+
+                        <div class="cause">
+                            <h5>3. DNS Issues (20%)</h5>
+                            <p><strong>Symptom:</strong> Can't resolve service names</p>
+                            <p><strong>Examples:</strong></p>
+                            <ul>
+                                <li>CoreDNS not running</li>
+                                <li>Wrong service name (case-sensitive!)</li>
+                                <li>Wrong namespace (need FQDN for cross-namespace)</li>
+                                <li>Network policies blocking DNS</li>
+                            </ul>
+                            <p><strong>Fix:</strong> Check DNS resolution, use correct FQDN</p>
+                            <pre><code># Test DNS from pod
+kubectl exec -it mypod -- nslookup myservice
+kubectl exec -it mypod -- nslookup myservice.mynamespace.svc.cluster.local
+
+# Check CoreDNS
+kubectl get pods -n kube-system -l k8s-app=kube-dns</code></pre>
+                        </div>
+
+                        <div class="cause">
+                            <h5>4. Network Policies (10%)</h5>
+                            <p><strong>Symptom:</strong> Connections blocked, timeout, connection refused</p>
+                            <p><strong>Examples:</strong></p>
+                            <ul>
+                                <li>NetworkPolicy denies traffic between namespaces</li>
+                                <li>Pod can't reach service due to policy rules</li>
+                                <li>Ingress/egress rules too restrictive</li>
+                            </ul>
+                            <p><strong>Fix:</strong> Update network policies</p>
+                            <pre><code># Check network policies
+kubectl get networkpolicies --all-namespaces
+
+# Describe to see rules
+kubectl describe networkpolicy mypolicy</code></pre>
+                        </div>
+
+                        <div class="cause">
+                            <h5>5. Service Not Ready (10%)</h5>
+                            <p><strong>Symptom:</strong> Can reach service IP but not pods</p>
+                            <p><strong>Examples:</strong></p>
+                            <ul>
+                                <li>Pods not passing readiness probes</li>
+                                <li>Service has no ready endpoints</li>
+                            </ul>
+                            <p><strong>Fix:</strong> Check readiness probes, pod status</p>
+                        </div>
+
+                        <div class="cause">
+                            <h6>6. External Connectivity Issues (5%)</h6>
+                            <p><strong>Symptom:</strong> Pods can't reach external APIs/internet</p>
+                            <p><strong>Examples:</strong></p>
+                            <ul>
+                                <li>Nodes have no internet access</li>
+                                <li>Firewall blocks egress traffic</li>
+                                <li>Proxy configuration needed</li>
+                                <li>VPC/routing issues</li>
+                            </ul>
+                            <p><strong>Fix:</strong> Fix network routing, configure proxy</p>
+                            <pre><code># Test from node
+curl https://google.com
+
+# Check from pod
+kubectl exec -it mypod -- curl https://google.com
+
+# Check for proxy env vars
+kubectl exec mypod -- env | grep -i proxy</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="debugging-checklist">
+                        <h4>Network Debugging Checklist</h4>
+                        <ul>
+                            <li>✅ Checked service has endpoints</li>
+                            <li>✅ Verified service selector matches pod labels</li>
+                            <li>✅ Checked service port matches container port</li>
+                            <li>✅ Tested DNS resolution from pod</li>
+                            <li>✅ Checked network policies aren't blocking traffic</li>
+                            <li>✅ Verified pods are Ready (readiness probe passing)</li>
+                            <li>✅ Tested connectivity between pods directly (by IP)</li>
+                            <li>✅ Checked for CNI/networking plugin issues</li>
+                            <li>✅ Verified external connectivity (if needed)</li>
+                        </ul>
+                    </div>
+
+                    <div class="production-tip">
+                        <h4>Quick Network Tests</h4>
+                        <pre><code># Test service DNS
+kubectl exec -it mypod -- curl http://myservice.mynamespace.svc.cluster.local
+
+# Test service IP
+kubectl exec -it mypod -- curl http://10.96.0.10
+
+# Test pod IP directly
+kubectl get pods -o wide  # Get pod IP
+kubectl exec -it mypod -- curl http://10.244.1.5
+
+# Check if pod can reach itself
+kubectl exec -it mypod -- curl http://localhost:8080</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>3. Debugging by Component</h2>
+
+            <div class="component-debugging">
+                <div class="component">
+                    <h3>Pod Issues</h3>
+                    <div class="diagnosis-flow">
+                        <h4>Quick Diagnosis Flow</h4>
+                        <div class="flow">
+                            <p><strong>Step 1:</strong> <code>kubectl get pods</code> - Check pod phase/status</p>
+                            <p><strong>Step 2:</strong> Based on phase, check specific issues:</p>
+                            <ul>
+                                <li><strong>Pending:</strong> <code>kubectl describe pod</code> - Check Events, scheduler</li>
+                                <li><strong>CrashLoopBackOff:</strong> <code>kubectl logs</code> - Check app errors</li>
+                                <li><strong>ImagePullBackOff:</strong> <code>kubectl describe pod</code> - Check image issues</li>
+                                <li><strong>Running but not working:</strong> <code>kubectl logs</code> + <code>kubectl exec</code> - Check app behavior</li>
+                            </ul>
+                            <p><strong>Step 3:</strong> <code>kubectl describe pod</code> - Always check Events section!</p>
+                            <p><strong>Step 4:</strong> <code>kubectl get events --sort-by=.metadata.creationTimestamp</code> - See recent events</p>
+                        </div>
+                    </div>
+
+                    <div class="common-issues">
+                        <h4>Most Common Pod Issues (Frequency Order)</h4>
+                        <ol>
+                            <li>Application crash (logs show exception) - Fix app</li>
+                            <li>Out of memory (OOMKilled) - Increase limit or fix leak</li>
+                            <li>Image pull errors - Fix image name, credentials, network</li>
+                            <li>Missing environment variables/config - Add env vars, ConfigMaps</li>
+                            <li>Readiness/liveness probe failures - Fix probes or app</li>
+                            <li>Can't be scheduled (Pending) - Check resources, selectors, taints</li>
+                            <li>Volume mount issues - Check PVC, permissions</li>
+                        </ol>
+                    </div>
+
+                    <div class="tools">
+                        <h4>Essential Pod Debugging Commands</h4>
+                        <pre><code># Status overview
+kubectl get pods
+kubectl get pods -o wide  # Shows node and IP
+
+# Detailed info
+kubectl describe pod mypod
+kubectl get pod mypod -o yaml  # Full spec
+
+# Logs
+kubectl logs mypod
+kubectl logs mypod --previous  # If crashed
+kubectl logs mypod -c mycontainer  # Multi-container
+kubectl logs -f mypod  # Follow logs
+
+# Exec into pod
+kubectl exec -it mypod -- /bin/sh
+kubectl exec -it mypod -- /bin/bash
+
+# Check resources
+kubectl top pod mypod
+kubectl top pod mypod --containers
+
+# Get pod IP
+kubectl get pod mypod -o jsonpath='{.status.podIP}'
+
+# Check pod events
+kubectl get events --field-selector involvedObject.name=mypod</code></pre>
+                    </div>
+                </div>
+
+                <div class="component">
+                    <h3>Service Issues</h3>
+                    <div class="diagnosis-flow">
+                        <h4>Quick Diagnosis Flow</h4>
+                        <div class="flow">
+                            <p><strong>Step 1:</strong> <code>kubectl get svc</code> - Check service exists and type</p>
+                            <p><strong>Step 2:</strong> <code>kubectl get endpoints &lt;service&gt;</code> - CRITICAL! Check if endpoints exist</p>
+                            <p><strong>Step 3:</strong> If no endpoints:</p>
+                            <ul>
+                                <li>Check service selector: <code>kubectl get svc &lt;service&gt; -o jsonpath='{.spec.selector}'</code></li>
+                                <li>Check pod labels: <code>kubectl get pods --show-labels</code></li>
+                                <li>Verify they match!</li>
+                            </ul>
+                            <p><strong>Step 4:</strong> If endpoints exist but can't connect:</p>
+                            <ul>
+                                <li>Test pod IP directly: <code>curl &lt;pod-ip&gt;:&lt;port&gt;</code></li>
+                                <li>Test service IP: <code>curl &lt;service-ip&gt;:&lt;port&gt;</code></li>
+                                <li>Test service DNS: <code>curl &lt;service-name&gt;.&lt;namespace&gt;.svc.cluster.local</code></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="common-issues">
+                        <h4>Most Common Service Issues</h4>
+                        <ol>
+                            <li>Service has no endpoints (selector mismatch or pods not ready)</li>
+                            <li>Wrong port (service port doesn't match container port)</li>
+                            <li>Wrong selector (label typo, wrong namespace)</li>
+                            <li>DNS resolution fails (wrong service name/namespace)</li>
+                            <li>NetworkPolicy blocking traffic</li>
+                            <li>LoadBalancer not provisioned (cloud provider issues)</li>
+                        </ol>
+                    </div>
+
+                    <div class="tools">
+                        <h4>Essential Service Debugging Commands</h4>
+                        <pre><code># List services
+kubectl get svc
+kubectl get svc -o wide
+
+# Service details
+kubectl describe svc myservice
+kubectl get svc myservice -o yaml
+
+# Check endpoints (CRITICAL!)
+kubectl get endpoints myservice
+kubectl describe endpoints myservice
+
+# Get service IP
+kubectl get svc myservice -o jsonpath='{.spec.clusterIP}'
+
+# Get service ports
+kubectl get svc myservice -o jsonpath='{.spec.ports[*]}'
+
+# Test from pod
+kubectl exec -it mypod -- curl http://myservice.mynamespace.svc.cluster.local
+kubectl exec -it mypod -- curl http://&lt;service-ip&gt;:&lt;port&gt;</code></pre>
+                    </div>
+                </div>
+
+                <div class="component">
+                    <h3>Ingress Issues</h3>
+                    <div class="diagnosis-flow">
+                        <h4>Quick Diagnosis Flow</h4>
+                        <div class="flow">
+                            <p><strong>Step 1:</strong> <code>kubectl get ingress</code> - Check ingress exists and has address</p>
+                            <p><strong>Step 2:</strong> <code>kubectl describe ingress myingress</code> - Check backend services</p>
+                            <p><strong>Step 3:</strong> Check ingress controller logs:</p>
+                            <ul>
+                                <li>NGINX: <code>kubectl logs -n ingress-nginx &lt;controller-pod&gt;</code></li>
+                                <li>Traefik: <code>kubectl logs -n traefik &lt;controller-pod&gt;</code></li>
+                            </ul>
+                            <p><strong>Step 4:</strong> Verify service exists and is reachable (see Service debugging above)</p>
+                            <p><strong>Step 5:</strong> Test DNS: <code>nslookup myingress.example.com</code></p>
+                            <p><strong>Step 6:</strong> Test HTTP: <code>curl -v http://myingress.example.com</code></p>
+                        </div>
+                    </div>
+
+                    <div class="common-issues">
+                        <h4>Most Common Ingress Issues</h4>
+                        <ol>
+                            <li>Ingress has no address (controller not provisioned/ready)</li>
+                            <li>Backend service not found (wrong service name/namespace/port)</li>
+                            <li>Service has no endpoints (see service debugging)</li>
+                            <li>TLS/SSL certificate issues</li>
+                            <li>Path/rule mismatch (wrong path in ingress spec)</li>
+                            <li>DNS not pointing to ingress IP</li>
+                            <li>Annotations misconfigured (especially for specific controllers)</li>
+                        </ol>
+                    </div>
+
+                    <div class="tools">
+                        <h4>Essential Ingress Debugging Commands</h4>
+                        <pre><code># List ingresses
+kubectl get ingress
+kubectl get ingress -o wide
+
+# Ingress details
+kubectl describe ingress myingress
+kubectl get ingress myingress -o yaml
+
+# Get ingress address
+kubectl get ingress myingress -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+
+# Ingress controller logs (NGINX example)
+kubectl logs -n ingress-nginx -l app.kubernetes.io/name=ingress-nginx
+
+# Test DNS
+nslookup myapp.example.com
+dig myapp.example.com
+
+# Test HTTP
+curl -v http://myapp.example.com
+curl -v https://myapp.example.com
+curl -v http://myapp.example.com/api/users
+
+# Test with headers
+curl -v -H "Host: myapp.example.com" http://&lt;ingress-ip&gt;</code></pre>
+                    </div>
+
+                    <div class="production-tip">
+                        <h4>Quick Ingress Health Check</h4>
+                        <pre><code># 1. Check ingress has address
+kubectl get ingress myingress
+
+# 2. Check backend services exist
+kubectl get svc
+kubectl describe ingress myingress | grep -A 5 "Backend"
+
+# 3. Check service endpoints
+kubectl get endpoints &lt;backend-service&gt;
+
+# 4. Check ingress controller is running
+kubectl get pods -n ingress-nginx
+
+# 5. Check controller logs for errors
+kubectl logs -n ingress-nginx &lt;controller-pod&gt; --tail=50</code></pre>
+                    </div>
+                </div>
+
+                <div class="component">
+                    <h3>DNS Issues</h3>
+                    <div class="diagnosis-flow">
+                        <h4>Quick Diagnosis Flow</h4>
+                        <div class="flow">
+                            <p><strong>Step 1:</strong> Check CoreDNS is running: <code>kubectl get pods -n kube-system -l k8s-app=kube-dns</code></p>
+                            <p><strong>Step 2:</strong> Test DNS from pod: <code>kubectl exec -it mypod -- nslookup kubernetes.default</code></p>
+                            <p><strong>Step 3:</strong> Test service DNS: <code>kubectl exec -it mypod -- nslookup myservice.mynamespace.svc.cluster.local</code></p>
+                            <p><strong>Step 4:</strong> Check pod DNS config: <code>kubectl get pod mypod -o jsonpath='{.spec.dnsPolicy}'</code></p>
+                            <p><strong>Step 5:</strong> Check for NetworkPolicy blocking DNS (port 53 UDP/TCP)</p>
+                        </div>
+                    </div>
+
+                    <div class="common-issues">
+                        <h4>Most Common DNS Issues</h4>
+                        <ol>
+                            <li>CoreDNS not running (crashed, pending)</li>
+                            <li>Wrong service name (typo, case-sensitive)</li>
+                            <li>Wrong namespace (need FQDN for cross-namespace)</li>
+                            <li>NetworkPolicy blocking DNS traffic</li>
+                            <li>Custom DNSPolicy misconfigured</li>
+                            <li>DNS latency/timeout (slow DNS servers)</li>
+                        </ol>
+                    </div>
+
+                    <div class="tools">
+                        <h4>Essential DNS Debugging Commands</h4>
+                        <pre><code># Check CoreDNS pods
+kubectl get pods -n kube-system -l k8s-app=kube-dns
+
+# CoreDNS logs
+kubectl logs -n kube-system -l k8s-app=kube-dns --tail=50
+
+# Test DNS resolution
+kubectl exec -it mypod -- nslookup kubernetes.default
+kubectl exec -it mypod -- nslookup myservice
+kubectl exec -it mypod -- nslookup myservice.mynamespace.svc.cluster.local
+
+# Test with dig
+kubectl exec -it mypod -- dig myservice.mynamespace.svc.cluster.local
+
+# Check pod DNS config
+kubectl get pod mypod -o jsonpath='{.spec.dnsPolicy}'
+kubectl get pod mypod -o jsonpath='{.spec.dnsConfig}'
+
+# Check if /etc/resolv.conf is correct
+kubectl exec -it mypod -- cat /etc/resolv.conf</code></pre>
+                    </div>
+
+                    <div class="dns-fqdn">
+                        <h4>DNS Name Formats (Must Match Exactly!)</h4>
+                        <pre><code># Same namespace
+myservice
+
+# Different namespace
+myservice.mynamespace.svc.cluster.local
+
+# Full format (always works)
+&lt;service&gt;.&lt;namespace&gt;.svc.&lt;domain&gt;
+
+# Examples
+# - myservice.default.svc.cluster.local
+# - api.production.svc.cluster.local
+# - kube-dns.kube-system.svc.cluster.local</code></pre>
+                    </div>
+                </div>
+
+                <div class="component">
+                    <h3>NetworkPolicy Issues</h3>
+                    <div class="diagnosis-flow">
+                        <h4>Quick Diagnosis Flow</h4>
+                        <div class="flow">
+                            <p><strong>Step 1:</strong> Check if network policies exist: <code>kubectl get networkpolicies</code></p>
+                            <p><strong>Step 2:</strong> If no policies, traffic should flow (default allow)</p>
+                            <p><strong>Step 3:</strong> If policies exist, describe them: <code>kubectl describe networkpolicy &lt;policy&gt;</code></p>
+                            <p><strong>Step 4:</strong> Check if CNI supports NetworkPolicy (Calico, Cilium, Weave do, Flannel doesn't by default)</p>
+                            <p><strong>Step 5:</strong> Check if pod labels match policy podSelector</p>
+                            <p><strong>Step 6:</strong> Test connectivity directly (by pod IP) to bypass DNS/service issues</p>
+                        </div>
+                    </div>
+
+                    <div class="common-issues">
+                        <h4>Most Common NetworkPolicy Issues</h4>
+                        <ol>
+                            <li>Policy denies ingress traffic (too restrictive)</li>
+                            <li>Policy denies egress traffic (can't reach external APIs, DNS)</li>
+                            <li>Pod labels don't match policy selector</li>
+                            <li>Wrong namespace in policy</li>
+                            <li>IPBlock rules incorrect</li>
+                            <li>CNI doesn't support NetworkPolicy</li>
+                        </ol>
+                    </div>
+
+                    <div class="tools">
+                        <h4>Essential NetworkPolicy Debugging Commands</h4>
+                        <pre><code># List policies
+kubectl get networkpolicies --all-namespaces
+
+# Policy details
+kubectl describe networkpolicy mypolicy
+kubectl get networkpolicy mypolicy -o yaml
+
+# Check pod labels (for policy matching)
+kubectl get pods --show-labels
+
+# Check CNI
+kubectl get pods -n kube-system | grep -i cni
+
+# Test connectivity bypassing service (direct IP)
+kubectl get pods -o wide
+kubectl exec -it mypod -- curl http://&lt;target-pod-ip&gt;:&lt;port&gt;
+
+# Check if CNI supports NetworkPolicy
+# Common CNIs:
+# - Calico: Yes
+# - Cilium: Yes
+# - Weave Net: Yes
+# - Flannel: No (needs Calico add-on)</code></pre>
+                    </div>
+
+                    <div class="production-tip">
+                        <h4>Quick NetworkPolicy Test</h4>
+                        <p>Temporarily delete the NetworkPolicy to test if it's blocking traffic:</p>
+                        <pre><code># Backup first
+kubectl get networkpolicy mypolicy -o yaml > mypolicy-backup.yaml
+
+# Delete
+kubectl delete networkpolicy mypolicy
+
+# Test connectivity
+kubectl exec -it mypod -- curl http://target-service
+
+# If it works, policy was blocking. Restore and fix rules:
+kubectl apply -f mypolicy-backup.yaml</code></pre>
+                        <p><strong>⚠️ Use caution in production!</strong></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>4. Production Debugging Strategies</h2>
+
+            <div class="production-strategies">
+                <div class="strategy">
+                    <h3>Strategy 1: The Golden 5 Commands</h3>
+                    <p>These 5 commands diagnose 80% of issues. Memorize them.</p>
+                    <div class="golden-commands">
+                        <div class="command">
+                            <h4>1. Check Pod Status</h4>
+                            <code>kubectl get pods -n &lt;namespace&gt;</code>
+                            <p><strong>What It Shows:</strong> Pod health, restarts, age</p>
+                            <p><strong>Look For:</strong> CrashLoopBackOff, Pending, ImagePullBackOff, high restart counts</p>
+                        </div>
+                        <div class="command">
+                            <h4>2. Describe Pod (Events!)</h4>
+                            <code>kubectl describe pod &lt;pod-name&gt; -n &lt;namespace&gt;</code>
+                            <p><strong>What It Shows:</strong> Detailed state, recent events (MOST IMPORTANT!)</p>
+                            <p><strong>Look For:</strong> Events section at bottom - this tells you what happened</p>
+                        </div>
+                        <div class="command">
+                            <h4>3. Check Logs</h4>
+                            <code>kubectl logs &lt;pod-name&gt; -n &lt;namespace&gt;</code>
+                            <p><strong>What It Shows:</strong> Container stdout/stderr</p>
+                            <p><strong>Look For:</strong> Application errors, exceptions, crash messages</p>
+                        </div>
+                        <div class="command">
+                            <h4>4. Check Events</h4>
+                            <code>kubectl get events -n &lt;namespace&gt; --sort-by=.metadata.creationTimestamp</code>
+                            <p><strong>What It Shows:</strong> All recent events in namespace</p>
+                            <p><strong>Look For:</strong> Warnings, errors related to your resources</p>
+                        </div>
+                        <div class="command">
+                            <h4>5. Check Resources</h4>
+                            <code>kubectl top pods -n &lt;namespace&gt;</code>
+                            <p><strong>What It Shows:</strong> CPU/Memory usage</p>
+                            <p><strong>Look For:</strong> Pods hitting limits (throttling, OOM risk)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="strategy">
+                    <h3>Strategy 2: Production Safety First</h3>
+                    <p>Debugging in production requires caution. Don't make it worse.</p>
+                    <div class="safety-principles">
+                        <h4>Debugging Safety Principles</h4>
+                        <ul>
+                            <li><strong>Read-Only First:</strong> Use get, describe, logs commands. They don't change anything.</li>
+                            <li><strong>Exec Carefully:</strong> <code>kubectl exec</code> can impact pod performance. Don't run heavy commands.</li>
+                            <li><strong>Don't Delete Pods:</strong> Unless you're sure. Deleting triggers restart (downtime).</li>
+                            <li><strong>Test in Staging:</strong> If possible, reproduce issue in non-production environment.</li>
+                            <li><strong>Backup Before Changes:</strong> <code>kubectl get &lt;resource&gt; -o yaml > backup.yaml</code></li>
+                            <li><strong>Document Everything:</strong> Write down what you check, what you find, what you change.</li>
+                            <li><strong>Communicate:</strong> Let team know you're debugging production.</li>
+                            <li><strong>Monitor Impact:</strong> Watch metrics while debugging. Stop if things get worse.</li>
+                            <li><strong>Know Rollback:</strong> Have rollback plan before applying fixes.</li>
+                            <li><strong>Ask for Help:</strong> Don't be hero. Escalate if stuck or time-critical.</li>
+                        </ul>
+                    </div>
+
+                    <div class="dangerous-commands">
+                        <h4>⚠️ Dangerous Commands - Think Twice!</h4>
+                        <ul>
+                            <li><code>kubectl delete pod &lt;pod&gt;</code> - Causes downtime, restart</li>
+                            <li><code>kubectl delete deployment &lt;deployment&gt;</code> - Deletes all pods!</li>
+                            <li><code>kubectl delete svc &lt;service&gt;</code> - Breaks networking</li>
+                            <li><code>kubectl delete namespace &lt;namespace&gt;</code> - DELETES EVERYTHING in namespace!</li>
+                            <li><code>kubectl delete pv &lt;pv&gt;</code> - Can cause data loss!</li>
+                            <li><code>kubectl apply -f</code> with wrong file - Overwrites resources</li>
+                            <li><code>kubectl edit</code> - Easy to make mistakes, use apply instead</li>
+                        </ul>
+                        <p><strong>Pro Tip:</strong> Use <code>--dry-run=client</code> to see what would happen without doing it:</p>
+                        <pre><code>kubectl apply -f deployment.yaml --dry-run=client</code></pre>
+                    </div>
+                </div>
+
+                <div class="strategy">
+                    <h3>Strategy 3: Systematic Elimination</h3>
+                    <p>When stuck, work through layers systematically.</p>
+                    <div class="elimination-method">
+                        <h4>The OSI Model Approach to K8s Debugging</h4>
+
+                        <div class="layer">
+                            <h5>Layer 1: Is the Resource Running?</h5>
+                            <pre><code>kubectl get pods
+kubectl get deployments
+kubectl get services</code></pre>
+                            <p><strong>If NO:</strong> Fix why it's not starting (Pending, CrashLoopBackOff, etc.)</p>
+                            <p><strong>If YES:</strong> Go to Layer 2</p>
+                        </div>
+
+                        <div class="layer">
+                            <h5>Layer 2: Are Resources Healthy?</h5>
+                            <pre><code>kubectl describe pod &lt;pod&gt;  # Check events
+kubectl logs &lt;pod&gt;            # Check app logs
+kubectl get endpoints &lt;svc&gt;    # Check service has endpoints</code></pre>
+                            <p><strong>If NOT Healthy:</strong> Fix based on errors found</p>
+                            <p><strong>If Healthy:</strong> Go to Layer 3</p>
+                        </div>
+
+                        <div class="layer">
+                            <h5>Layer 3: Can Components Reach Each Other?</h5>
+                            <pre><code># Test pod to pod
+kubectl exec -it pod1 -- curl http://&lt;pod2-ip&gt;:&lt;port&gt;
+
+# Test pod to service
+kubectl exec -it pod1 -- curl http://&lt;service-name&gt;
+
+# Test DNS
+kubectl exec -it pod1 -- nslookup &lt;service-name&gt;</code></pre>
+                            <p><strong>If NO:</strong> Network issue (Service, NetworkPolicy, DNS)</p>
+                            <p><strong>If YES:</strong> Go to Layer 4</p>
+                        </div>
+
+                        <div class="layer">
+                            <h5>Layer 4: Can External Traffic Reach Ingress?</h5>
+                            <pre><code># Check ingress address
+kubectl get ingress
+
+# Check DNS
+nslookup myapp.example.com
+
+# Test HTTP
+curl -v http://myapp.example.com</code></pre>
+                            <p><strong>If NO:</strong> Ingress, DNS, or firewall issue</p>
+                            <p><strong>If YES:</strong> Issue might be application-level</p>
+                        </div>
+
+                        <div class="layer">
+                            <h5>Layer 5: Is the Application Working?</h5>
+                            <pre><code># Check application logs
+kubectl logs -f &lt;pod&gt;
+
+# Check application metrics (if exposed)
+kubectl exec -it &lt;pod&gt; -- curl http://localhost:8080/metrics
+
+# Check application health endpoint
+kubectl exec -it &lt;pod&gt; -- curl http://localhost:8080/health</code></pre>
+                            <p><strong>If NO:</strong> Application bug, configuration issue, dependency failure</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="strategy">
+                    <h3>Strategy 4: When to Escalate</h3>
+                    <p>Know when you're in over your head. Escalating early is better than breaking things further.</p>
+                    <div class="escalate-triggers">
+                        <h4>Escalate Immediately If:</h4>
+                        <ul>
+                            <li>☢️ <strong>Data Loss Risk:</strong> Issue might cause data loss (PVs, databases)</li>
+                            <li>🔥 <strong>Production Down:</strong> Critical service down and you can't fix quickly</li>
+                            <li>⏱️ <strong>Time Critical:</strong> Been debugging 30+ minutes without progress</li>
+                            <li>🤔 <strong>Don't Understand:</strong> Issue is outside your expertise area</li>
+                            <li>⚠️ <strong>Risky Fix:</strong> Only fix you can think of is risky/dangerous</li>
+                            <li>🔄 <strong>Recurring Issue:</strong> Same problem keeps happening, root cause unclear</li>
+                            <li>💥 <strong>Cascading Failure:</strong> Issue spreading to other services/nodes</li>
+                        </ul>
+
+                        <h4>Before Escalating, Gather This Info:</h4>
+                        <ul>
+                            <li>Exact symptom (what's broken, when did it start)</li>
+                            <li>What you've checked (commands run)</li>
+                            <li>What you found (errors, events, logs)</li>
+                            <li>Recent changes (deployments, config changes)</li>
+                            <li>Impact (how many users affected)</li>
+                            <li>Screenshots/output from commands</li>
+                        </ul>
+
+                        <h4>Escalation Path:</h4>
+                        <ol>
+                            <li><strong>Team Slack/Chat:</strong> "Hey, anyone seen this error? [details]"</li>
+                            <li><strong>Senior Engineer:</strong> Direct message with context</li>
+                            <li><strong>On-Call:</strong> If critical, page on-call engineer</li>
+                            <li><strong>Incident Response:</strong> If SEV1/SEV2, start incident process</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="strategy">
+                    <h3>Strategy 5: Debugging Time Management</h3>
+                    <p>Don't spend hours going in circles. Time-box your debugging.</p>
+                    <div class="time-boxes">
+                        <div class="time-box">
+                            <h4>5 Minutes: Quick Wins</h4>
+                            <ul>
+                                <li>Check pod status (kubectl get pods)</li>
+                                <li>Check logs for obvious errors</li>
+                                <li>Check recent events</li>
+                                <li>Verify resource exists</li>
+                            </ul>
+                            <p><strong>If not resolved:</strong> Move to 15-minute box</p>
+                        </div>
+
+                        <div class="time-box">
+                            <h4>15 Minutes: Deep Dive</h4>
+                            <ul>
+                                <li>Describe resource (check events thoroughly)</li>
+                                <li>Check related resources (services, endpoints, ingress)</li>
+                                <li>Test connectivity (curl, DNS checks)</li>
+                                <li>Compare with working similar resources</li>
+                            </ul>
+                            <p><strong>If not resolved:</strong> Move to 30-minute box</p>
+                        </div>
+
+                        <div class="time-box">
+                            <h4>30 Minutes: Call for Help</h4>
+                            <ul>
+                                <li>Post in team chat with details</li>
+                                <li>Ask senior engineer for pair debugging</li>
+                                <li>Search for similar issues online</li>
+                                <li>Consider reproducing in staging</li>
+                            </ul>
+                            <p><strong>If not resolved:</strong> Escalate formally</p>
+                        </div>
+
+                        <div class="time-box critical">
+                            <h4>60+ Minutes: Escalate</h4>
+                            <ul>
+                                <li>Formal escalation to senior/staff engineer</li>
+                                <li>Consider rollback if recent deployment</li>
+                                <li>If critical, start incident response process</li>
+                                <li>Document what you've tried</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>5. Debugging Checklist by Component</h2>
+
+            <div class="checklists">
+                <div class="checklist">
+                    <h3>📋 Pod Debugging Checklist</h3>
+                    <div class="checklist-items">
+                        <p><strong>Status:</strong> <code>kubectl get pods</code></p>
+                        <p><strong>Details:</strong> <code>kubectl describe pod &lt;pod&gt;</code></p>
+                        <p><strong>Logs:</strong> <code>kubectl logs &lt;pod&gt;</code></p>
+                        <p><strong>Previous Logs:</strong> <code>kubectl logs --previous &lt;pod&gt;</code></p>
+                        <p><strong>Events:</strong> <code>kubectl get events --field-selector involvedObject.name=&lt;pod&gt;</code></p>
+                        <p><strong>Resources:</strong> <code>kubectl top pod &lt;pod&gt;</code></p>
+                        <p><strong>Config:</strong> Check env vars, ConfigMaps, Secrets mounted</p>
+                        <p><strong>Probes:</strong> Check liveness/readiness probe configuration</p>
+                        <p><strong>Image:</strong> Can pull image manually</p>
+                        <p><strong>Network:</strong> <code>kubectl exec -it &lt;pod&gt; -- curl localhost:&lt;port&gt;</code></p>
+                    </div>
+                </div>
+
+                <div class="checklist">
+                    <h3>📋 Service Debugging Checklist</h3>
+                    <div class="checklist-items">
+                        <p><strong>Exists:</strong> <code>kubectl get svc</code></p>
+                        <p><strong>Endpoints:</strong> <code>kubectl get endpoints &lt;service&gt;</code> ⭐ CRITICAL!</p>
+                        <p><strong>Selector:</strong> <code>kubectl get svc &lt;service&gt; -o jsonpath='{.spec.selector}'</code></p>
+                        <p><strong>Pod Labels:</strong> <code>kubectl get pods --show-labels</code></p>
+                        <p><strong>Ports:</strong> Verify service port → container port mapping</p>
+                        <p><strong>Type:</strong> Check ClusterIP, NodePort, LoadBalancer</p>
+                        <p><strong>DNS:</strong> <code>kubectl exec -it &lt;pod&gt; -- nslookup &lt;service&gt;</code></p>
+                        <p><strong>Direct IP:</strong> <code>kubectl exec -it &lt;pod&gt; -- curl http://&lt;service-ip&gt;:&lt;port&gt;</code></p>
+                        <p><strong>Pod IPs:</strong> <code>kubectl exec -it &lt;pod&gt; -- curl http://&lt;pod-ip&gt;:&lt;port&gt;</code></p>
+                        <p><strong>NetworkPolicy:</strong> <code>kubectl get networkpolicies</code></p>
+                    </div>
+                </div>
+
+                <div class="checklist">
+                    <h3>📋 Ingress Debugging Checklist</h3>
+                    <div class="checklist-items">
+                        <p><strong>Exists:</strong> <code>kubectl get ingress</code></p>
+                        <p><strong>Address:</strong> Does ingress have IP/DNS assigned?</p>
+                        <p><strong>Backends:</strong> <code>kubectl describe ingress &lt;ingress&gt;</code></p>
+                        <p><strong>Backend Services:</strong> Do backend services exist and have endpoints?</p>
+                        <p><strong>Controller:</strong> Is ingress controller running? <code>kubectl get pods -n ingress-nginx</code></p>
+                        <p><strong>Controller Logs:</strong> <code>kubectl logs -n ingress-nginx &lt;controller&gt;</code></p>
+                        <p><strong>DNS:</strong> Does DNS point to ingress IP?</p>
+                        <p><strong>HTTP Test:</strong> <code>curl -v http://&lt;ingress-address&gt;</code></p>
+                        <p><strong>Path:</strong> Does request path match ingress rules?</p>
+                        <p><strong>Certificates:</strong> Check TLS config if using HTTPS</p>
+                    </div>
+                </div>
+
+                <div class="checklist">
+                    <h3>📋 DNS Debugging Checklist</h3>
+                    <div class="checklist-items">
+                        <p><strong>CoreDNS Pods:</strong> <code>kubectl get pods -n kube-system -l k8s-app=kube-dns</code></p>
+                        <p><strong>CoreDNS Logs:</strong> <code>kubectl logs -n kube-system -l k8s-app=kube-dns</code></p>
+                        <p><strong>Basic DNS:</strong> <code>kubectl exec -it &lt;pod&gt; -- nslookup kubernetes.default</code></p>
+                        <p><strong>Service DNS:</strong> <code>kubectl exec -it &lt;pod&gt; -- nslookup &lt;service&gt;</code></p>
+                        <p><strong>FQDN:</strong> <code>kubectl exec -it &lt;pod&gt; -- nslookup &lt;service&gt;.&lt;namespace&gt;.svc.cluster.local</code></p>
+                        <p><strong>Pod DNS Config:</strong> <code>kubectl exec -it &lt;pod&gt; -- cat /etc/resolv.conf</code></p>
+                        <p><strong>NetworkPolicy:</strong> Check if blocking UDP/TCP 53</p>
+                        <p><strong>Latency:</strong> <code>kubectl exec -it &lt;pod&gt; -- time nslookup &lt;service&gt;</code></p>
+                    </div>
+                </div>
+
+                <div class="checklist">
+                    <h3>📋 NetworkPolicy Debugging Checklist</h3>
+                    <div class="checklist-items">
+                        <p><strong>Policies Exist:</strong> <code>kubectl get networkpolicies</code></p>
+                        <p><strong>Policy Details:</strong> <code>kubectl describe networkpolicy &lt;policy&gt;</code></p>
+                        <p><strong>Pod Labels:</strong> <code>kubectl get pods --show-labels</code></p>
+                        <p><strong>Selector Match:</strong> Do pod labels match policy podSelector?</p>
+                        <p><strong>CNI:</strong> Does CNI support NetworkPolicy? (Calico, Cilium, Weave do)</p>
+                        <p><strong>Test Direct:</strong> <code>kubectl exec -it &lt;pod&gt; -- curl http://&lt;target-pod-ip&gt;</code></p>
+                        <p><strong>Egress:</strong> Can pod reach external services? DNS?</p>
+                        <p><strong>Ingress:</strong> Can other pods reach this pod?</p>
+                        <p><strong>Isolation:</strong> Are namespaces isolated by default?</p>
+                    </div>
+                </div>
+
+                <div class="checklist">
+                    <h3>📋 Storage/PVC Debugging Checklist</h3>
+                    <div class="checklist-items">
+                        <p><strong>PVC Status:</strong> <code>kubectl get pvc</code></p>
+                        <p><strong>PV Status:</strong> <code>kubectl get pv</code></p>
+                        <p><strong>PVC Details:</strong> <code>kubectl describe pvc &lt;pvc&gt;</code></p>
+                        <p><strong>PV Details:</strong> <code>kubectl describe pv &lt;pv&gt;</code></p>
+                        <p><strong>StorageClass:</strong> <code>kubectl get storageclass</code></p>
+                        <p><strong>Bound:</strong> Is PVC bound to PV?</p>
+                        <p><strong>Capacity:</strong> Enough storage available?</p>
+                        <p><strong>Access Modes:</strong> Do access modes match? (RWO, RWX, ReadOnlyMany)</p>
+                        <p><strong>Pod Mount:</strong> Is volume mounted in pod spec correctly?</p>
+                        <p><strong>Permissions:</strong> Does pod have permission to mount? (securityContext, fsGroup)</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="quiz-section">
+            <h2>Knowledge Check</h2>
+
+            <div class="quiz-container">
+                <div class="quiz-question">
+                    <h3>1. Pod is in CrashLoopBackOff. What's the first command to run?</h3>
+                    <div class="quiz-options">
+                        <button class="quiz-option" data-correct="true">kubectl logs &lt;pod&gt;</button>
+                        <button class="quiz-option" data-correct="false">kubectl delete pod &lt;pod&gt;</button>
+                        <button class="quiz-option" data-correct="false">kubectl describe pod &lt;pod&gt;</button>
+                        <button class="quiz-option" data-correct="false">kubectl get pods</button>
+                    </div>
+                    <div class="quiz-explanation">
+                        <strong>Correct: kubectl logs.</strong> Logs show why container is crashing. kubectl describe is second (check events), but logs first give actual application error.
+                    </div>
+                </div>
+
+                <div class="quiz-question">
+                    <h3>2. Pod stuck in Pending state. Where do you find the reason?</h3>
+                    <div class="quiz-options">
+                        <button class="quiz-option" data-correct="false">kubectl logs &lt;pod&gt;</button>
+                        <button class="quiz-option" data-correct="true">kubectl describe pod &lt;pod&gt; (Events section)</button>
+                        <button class="quiz-option" data-correct="false">kubectl get events</button>
+                        <button class="quiz-option" data-correct="false">kubectl top nodes</button>
+                    </div>
+                    <div class="quiz-explanation">
+                        <strong>Correct: kubectl describe pod.</strong> The Events section at the bottom tells you exactly why pod isn't scheduling (insufficient resources, taints, selector mismatch, etc.).
+                    </div>
+                </div>
+
+                <div class="quiz-question">
+                    <h3>3. Service exists but can't connect. What's the most critical check?</h3>
+                    <div class="quiz-options">
+                        <button class="quiz-option" data-correct="false">kubectl get svc</button>
+                        <button class="quiz-option" data-correct="true">kubectl get endpoints &lt;service&gt;</button>
+                        <button class="quiz-option" data-correct="false">kubectl describe svc</button>
+                        <button class="quiz-option" data-correct="false">kubectl logs</button>
+                    </div>
+                    <div class="quiz-explanation">
+                        <strong>Correct: kubectl get endpoints.</strong> If service has no endpoints (empty list), traffic can't reach pods. 90% of service issues are selector mismatch or pods not ready.
+                    </div>
+                </div>
+
+                <div class="quiz-question">
+                    <h3>4. Pod terminated with exit code 137. What happened?</h3>
+                    <div class="quiz-options">
+                        <button class="quiz-option" data-correct="true">OOMKilled (Out of Memory)</button>
+                        <button class="quiz-option" data-correct="false">Application error</button>
+                        <button class="quiz-option" data-correct="false">Killed by user</button>
+                        <button class="quiz-option" data-correct="false">Network timeout</button>
+                    </div>
+                    <div class="quiz-explanation">
+                        <strong>Correct: OOMKilled.</strong> Exit code 137 = 128 + 9 (SIGKILL). Kernel killed container for exceeding memory limit. Increase limit or fix memory leak.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="resources">
+            <h2>Additional Resources</h2>
+
+            <div class="resource-list">
+                <div class="resource">
+                    <h3>Official Documentation</h3>
+                    <ul>
+                        <li><a href="https://kubernetes.io/docs/tasks/debug/" target="_blank">Kubernetes Debugging Documentation</a></li>
+                        <li><a href="https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/" target="_blank">Pod Lifecycle States</a></li>
+                        <li><a href="https://kubernetes.io/docs/tasks/debug/debug-application/debug-pods/" target="_blank">Debug Pods</a></li>
+                    </ul>
+                </div>
+
+                <div class="resource">
+                    <h3>Debugging Tools</h3>
+                    <ul>
+                        <li><a href="https://krew.sigs.k8s.io/" target="_blank">Krew (kubectl plugin manager)</a></li>
+                        <li><a href="https://github.com/ahmetb/kubectl-aliases" target="_blank">kubectl aliases</a></li>
+                        <li><a href="https://k9scli.io/" target="_blank">k9s (Terminal UI for K8s)</a></li>
+                        <li><a href="https://www.stereolabs.com/monitoring-kubernetes-with-kubectl-top/" target="_blank">kubectl top and monitoring</a></li>
+                    </ul>
+                </div>
+
+                <div class="resource">
+                    <h3>Troubleshooting Guides</h3>
+                    <ul>
+                        <li><a href="https://learnk8s.io/troubleshooting-deployments" target="_blank">Learnk8s: Troubleshooting Deployments</a></li>
+                        <li><a href="https://kubernetes.io/docs/concepts/services-networking/service/" target="_blank">Debugging Services</a></li>
+                        <li><a href="https://kubernetes.io/docs/concepts/cluster-administration/logging/" target="_blank">Logging Architecture</a></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Kubernetes Learning Journey. Designed for comprehensive understanding.</p>
+            <div class="navigation">
+                <a href="landscape.html" class="prev">&larr; Landscape</a>
+                <a href="eloquent.html" class="next">Eloquent Conversation &rarr;</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../../js/components.js"></script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Debugging Process — Large Language Models Learning Journey">
+    <title>Debugging Process | LLM Learning Journey</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <a href="index.html" class="sidebar-brand">Large Language Models</a>
+            <span class="sidebar-subtitle">A Complete Learning Journey</span>
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="1_foundation.html" class="nav-link"><span class="nav-num">01</span> Foundation & Context</a>
+            <a href="2_living_analogy.html" class="nav-link"><span class="nav-num">02</span> Living Analogy</a>
+            <a href="3a_learning_journey.html" class="nav-link"><span class="nav-num">3a</span> Learning Journey</a>
+            <a href="3b_interview_conversations.html" class="nav-link"><span class="nav-num">3b</span> Interview Conversations</a>
+            <a href="4_system_design.html" class="nav-link"><span class="nav-num">04</span> System Design Integration</a>
+            <a href="5_ripple_effects.html" class="nav-link"><span class="nav-num">05</span> Ripple Effects Map</a>
+            <a href="6_evolution.html" class="nav-link"><span class="nav-num">06</span> Evolution Story</a>
+            <a href="7_patterns.html" class="nav-link"><span class="nav-num">07</span> Patterns & Anti-Patterns</a>
+            <a href="8_tradeoffs.html" class="nav-link"><span class="nav-num">08</span> Trade-offs Analysis</a>
+            <a href="9_at_scale.html" class="nav-link"><span class="nav-num">09</span> At Scale</a>
+            <a href="10_landscape.html" class="nav-link"><span class="nav-num">10</span> Technology Landscape</a>
+            <a href="11_pitfalls.html" class="nav-link"><span class="nav-num">11</span> Pitfalls & War Stories</a>
+            <a href="12_debugging.html" class="nav-link active"><span class="nav-num">12</span> Debugging Process</a>
+            <a href="13_eloquent.html" class="nav-link"><span class="nav-num">13</span> Eloquent Conversation</a>
+            <a href="14_exercises.html" class="nav-link"><span class="nav-num">14</span> Practice Exercises</a>
+            <a href="15_quick_ref.html" class="nav-link"><span class="nav-num">15</span> Quick Reference</a>
+            <a href="16_whats_next.html" class="nav-link"><span class="nav-num">16</span> What's Next</a>
+
+        </aside>
+        <main class="main-content">
+
+            <h4>Section Twelve</h4>
+            <h1>Debugging Process</h1>
+            <p class="page-intro">Symptom → Hypothesis → Diagnosis → Fix. A systematic approach to LLM failures.</p>
+
+            <div class="card card--accent">
+                <span class="card-label">Diagnostic Framework</span>
+                <h3>What I Check: First, Second, Third</h3>
+                <ol>
+                    <li><strong>The Prompt.</strong> 80% of LLM "bugs" are prompt bugs. Read the actual prompt being sent (including system prompt, retrieved context, user message). Look for: conflicting instructions, missing examples, ambiguous wording, excessive length.</li>
+                    <li><strong>The Context.</strong> If using RAG, inspect the retrieved chunks. Is the relevant information actually being retrieved? Is it ranked correctly? Are irrelevant chunks diluting the context?</li>
+                    <li><strong>The Model Version.</strong> Did the model get updated? Compare outputs from the pinned version vs. current version. Model providers silently update endpoints.</li>
+                    <li><strong>The Temperature.</strong> Is it set correctly for the task? Classification should be 0. Creative generation can be 0.7-1.0. A temperature mismatch is a common silent failure.</li>
+                    <li><strong>The Tokenizer.</strong> Is the input being tokenized as expected? Special characters, Unicode, and multilingual text can cause surprising tokenization artifacts.</li>
+                </ol>
+            </div>
+
+            <div class="card">
+                <h3>Symptom → Diagnosis Flow</h3>
+                <table>
+                    <tr><th>Symptom</th><th>Likely Cause</th><th>Diagnostic Step</th></tr>
+                    <tr><td>Model ignores part of the instruction</td><td>"Lost in the middle" — middle instructions get less attention</td><td>Move critical instructions to start AND end of prompt</td></tr>
+                    <tr><td>Output format breaks intermittently</td><td>Temperature too high or model version changed</td><td>Set temperature=0, pin model version, add format examples</td></tr>
+                    <tr><td>Hallucinated facts in RAG answers</td><td>Retrieved chunks don't contain the answer, but model generates one anyway</td><td>Add instruction: "If the provided context doesn't contain the answer, say 'I don't know.'" Inspect retrieval quality.</td></tr>
+                    <tr><td>Dramatically worse quality on Mondays</td><td>Weekend traffic pattern changes batch composition</td><td>Check if continuous batching is grouping long+short requests poorly. Check if model endpoint was updated over weekend.</td></tr>
+                    <tr><td>Output truncated mid-sentence</td><td>Hit max_tokens limit</td><td>Increase max_tokens or reduce prompt length. Check if you're logging the finish_reason ("length" vs "stop").</td></tr>
+                    <tr><td>Rate limits hit during normal traffic</td><td>Retry storm — failed requests retrying exponentially</td><td>Add circuit breakers. Implement exponential backoff with jitter. Set max retry count.</td></tr>
+                    <tr><td>Latency spikes at 2 PM daily</td><td>Batch job from another team hitting the same endpoint</td><td>Separate batch and real-time traffic to different model instances. Implement request priority queues.</td></tr>
+                </table>
+            </div>
+
+            <div class="card card--sage">
+                <h3>Tools for LLM Debugging</h3>
+                <ul>
+                    <li><strong>LangSmith / Langfuse:</strong> Full trace of every LLM call — see the exact prompt, retrieved context, model response, latency, token count, and cost. Essential for production debugging.</li>
+                    <li><strong>Prompt playground:</strong> Iterate on prompts in isolation before deploying. Every provider has one (OpenAI Playground, Anthropic Console).</li>
+                    <li><strong>Token counter / visualizer:</strong> Use tiktoken (OpenAI) or the HuggingFace tokenizer to see exactly how your text gets split into tokens. Catches encoding surprises.</li>
+                    <li><strong>A/B testing framework:</strong> Route 5% of traffic to a new prompt/model and compare quality metrics. Never deploy prompt changes to 100% without testing.</li>
+                </ul>
+            </div>
+
+        </main>
+    </div>
+    <script src="js/components.js"></script>
+</body>
+</html>

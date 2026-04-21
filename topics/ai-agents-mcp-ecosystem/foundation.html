@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foundation & Context - Learn AI Agents, Skills, Tools & MCP</title>
+    <link rel="stylesheet" href="../../css/styles.css">
+    <link rel="stylesheet" href="theme.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <a href="index.html" class="nav-back">Back to Overview</a>
+        <span class="current-section">Foundation &amp; Context</span>
+        <div class="nav-links">
+            <a href="index.html">Previous</a>
+            <a href="analogy.html">Next</a>
+        </div>
+    </nav>
+
+    <main>
+        <h1>Foundation &amp; Context</h1>
+
+        <section class="hero">
+            <p class="powerful-sentence">An AI Agent is not a smarter chatbot — it is a reasoning engine that decides what actions to take, executes them through tools, encodes repeatable workflows as skills, and connects to the world through MCP: the result is software that can pursue goals across systems it has never seen before.</p>
+            <p class="explanation">Before you can build or evaluate agent systems, you need to understand why each component exists — not just what it does. This section builds that mental model from first principles.</p>
+        </section>
+
+        <!-- Architecture Diagram -->
+        <section>
+            <h2>The Architecture at a Glance</h2>
+            <div class="diagram-container">
+                <svg class="architecture-diagram" viewBox="0 0 900 540" xmlns="http://www.w3.org/2000/svg" aria-label="AI Agent ecosystem architecture showing Agent at center connected to Tools, Skills, and MCP layer">
+
+                    <!-- Background layers -->
+                    <rect x="10" y="10" width="880" height="520" rx="16" fill="#0f172a" stroke="#1e293b" stroke-width="1.5"/>
+
+                    <!-- MCP Transport Layer (bottom band) -->
+                    <rect x="30" y="400" width="840" height="110" rx="10" fill="#1e1b4b" stroke="#4f46e5" stroke-width="1.5" stroke-dasharray="6,3"/>
+                    <text x="450" y="425" text-anchor="middle" fill="#818cf8" font-size="11" font-family="monospace" font-weight="600">MCP LAYER — Model Context Protocol</text>
+                    <text x="450" y="442" text-anchor="middle" fill="#6366f1" font-size="10" font-family="monospace">Standardized JSON-RPC transport · SSE streaming · Tool discovery · Authentication</text>
+
+                    <!-- MCP Servers row -->
+                    <rect x="55" y="452" width="130" height="44" rx="8" fill="#312e81" stroke="#6366f1" stroke-width="1"/>
+                    <text x="120" y="470" text-anchor="middle" fill="#a5b4fc" font-size="10" font-family="monospace" font-weight="600">MCP Server</text>
+                    <text x="120" y="485" text-anchor="middle" fill="#818cf8" font-size="9" font-family="monospace">File System</text>
+
+                    <rect x="205" y="452" width="130" height="44" rx="8" fill="#312e81" stroke="#6366f1" stroke-width="1"/>
+                    <text x="270" y="470" text-anchor="middle" fill="#a5b4fc" font-size="10" font-family="monospace" font-weight="600">MCP Server</text>
+                    <text x="270" y="485" text-anchor="middle" fill="#818cf8" font-size="9" font-family="monospace">Database</text>
+
+                    <rect x="355" y="452" width="130" height="44" rx="8" fill="#312e81" stroke="#6366f1" stroke-width="1"/>
+                    <text x="420" y="470" text-anchor="middle" fill="#a5b4fc" font-size="10" font-family="monospace" font-weight="600">MCP Server</text>
+                    <text x="420" y="485" text-anchor="middle" fill="#818cf8" font-size="9" font-family="monospace">GitHub / APIs</text>
+
+                    <rect x="505" y="452" width="130" height="44" rx="8" fill="#312e81" stroke="#6366f1" stroke-width="1"/>
+                    <text x="570" y="470" text-anchor="middle" fill="#a5b4fc" font-size="10" font-family="monospace" font-weight="600">MCP Server</text>
+                    <text x="570" y="485" text-anchor="middle" fill="#818cf8" font-size="9" font-family="monospace">Browser / Web</text>
+
+                    <rect x="655" y="452" width="130" height="44" rx="8" fill="#312e81" stroke="#6366f1" stroke-width="1"/>
+                    <text x="720" y="470" text-anchor="middle" fill="#a5b4fc" font-size="10" font-family="monospace" font-weight="600">MCP Server</text>
+                    <text x="720" y="485" text-anchor="middle" fill="#818cf8" font-size="9" font-family="monospace">Custom / Internal</text>
+
+                    <!-- Skills band (middle) -->
+                    <rect x="30" y="290" width="840" height="95" rx="10" fill="#1c1917" stroke="#d97706" stroke-width="1.5" stroke-dasharray="6,3"/>
+                    <text x="450" y="313" text-anchor="middle" fill="#fbbf24" font-size="11" font-family="monospace" font-weight="600">SKILLS LAYER — Reusable Multi-Step Workflows</text>
+
+                    <rect x="55" y="324" width="155" height="44" rx="8" fill="#292524" stroke="#d97706" stroke-width="1"/>
+                    <text x="132" y="342" text-anchor="middle" fill="#fde68a" font-size="10" font-family="monospace" font-weight="600">Research Skill</text>
+                    <text x="132" y="357" text-anchor="middle" fill="#d97706" font-size="9" font-family="monospace">search → read → summarize</text>
+
+                    <rect x="230" y="324" width="155" height="44" rx="8" fill="#292524" stroke="#d97706" stroke-width="1"/>
+                    <text x="307" y="342" text-anchor="middle" fill="#fde68a" font-size="10" font-family="monospace" font-weight="600">Code Review Skill</text>
+                    <text x="307" y="357" text-anchor="middle" fill="#d97706" font-size="9" font-family="monospace">fetch → analyze → report</text>
+
+                    <rect x="405" y="324" width="155" height="44" rx="8" fill="#292524" stroke="#d97706" stroke-width="1"/>
+                    <text x="482" y="342" text-anchor="middle" fill="#fde68a" font-size="10" font-family="monospace" font-weight="600">Deploy Skill</text>
+                    <text x="482" y="357" text-anchor="middle" fill="#d97706" font-size="9" font-family="monospace">build → test → push → notify</text>
+
+                    <rect x="580" y="324" width="155" height="44" rx="8" fill="#292524" stroke="#d97706" stroke-width="1"/>
+                    <text x="657" y="342" text-anchor="middle" fill="#fde68a" font-size="10" font-family="monospace" font-weight="600">Onboarding Skill</text>
+                    <text x="657" y="357" text-anchor="middle" fill="#d97706" font-size="9" font-family="monospace">create → config → notify</text>
+
+                    <!-- Tools band (upper) -->
+                    <rect x="30" y="175" width="840" height="95" rx="10" fill="#052e16" stroke="#16a34a" stroke-width="1.5" stroke-dasharray="6,3"/>
+                    <text x="450" y="198" text-anchor="middle" fill="#4ade80" font-size="11" font-family="monospace" font-weight="600">TOOLS LAYER — Discrete Callable Capabilities</text>
+
+                    <rect x="55" y="209" width="110" height="44" rx="8" fill="#14532d" stroke="#16a34a" stroke-width="1"/>
+                    <text x="110" y="229" text-anchor="middle" fill="#bbf7d0" font-size="10" font-family="monospace">read_file</text>
+                    <text x="110" y="244" text-anchor="middle" fill="#4ade80" font-size="9" font-family="monospace">I/O Tool</text>
+
+                    <rect x="182" y="209" width="110" height="44" rx="8" fill="#14532d" stroke="#16a34a" stroke-width="1"/>
+                    <text x="237" y="229" text-anchor="middle" fill="#bbf7d0" font-size="10" font-family="monospace">web_search</text>
+                    <text x="237" y="244" text-anchor="middle" fill="#4ade80" font-size="9" font-family="monospace">Retrieval Tool</text>
+
+                    <rect x="309" y="209" width="110" height="44" rx="8" fill="#14532d" stroke="#16a34a" stroke-width="1"/>
+                    <text x="364" y="229" text-anchor="middle" fill="#bbf7d0" font-size="10" font-family="monospace">run_code</text>
+                    <text x="364" y="244" text-anchor="middle" fill="#4ade80" font-size="9" font-family="monospace">Execution Tool</text>
+
+                    <rect x="436" y="209" width="110" height="44" rx="8" fill="#14532d" stroke="#16a34a" stroke-width="1"/>
+                    <text x="491" y="229" text-anchor="middle" fill="#bbf7d0" font-size="10" font-family="monospace">send_email</text>
+                    <text x="491" y="244" text-anchor="middle" fill="#4ade80" font-size="9" font-family="monospace">Action Tool</text>
+
+                    <rect x="563" y="209" width="110" height="44" rx="8" fill="#14532d" stroke="#16a34a" stroke-width="1"/>
+                    <text x="618" y="229" text-anchor="middle" fill="#bbf7d0" font-size="10" font-family="monospace">query_db</text>
+                    <text x="618" y="244" text-anchor="middle" fill="#4ade80" font-size="9" font-family="monospace">Data Tool</text>
+
+                    <rect x="690" y="209" width="110" height="44" rx="8" fill="#14532d" stroke="#16a34a" stroke-width="1"/>
+                    <text x="745" y="229" text-anchor="middle" fill="#bbf7d0" font-size="10" font-family="monospace">spawn_agent</text>
+                    <text x="745" y="244" text-anchor="middle" fill="#4ade80" font-size="9" font-family="monospace">Orchestration</text>
+
+                    <!-- Agent Core (top center) -->
+                    <rect x="310" y="30" width="280" height="120" rx="12" fill="#1e3a5f" stroke="#3b82f6" stroke-width="2"/>
+                    <text x="450" y="58" text-anchor="middle" fill="#93c5fd" font-size="13" font-family="monospace" font-weight="700">AI AGENT</text>
+                    <line x1="330" y1="65" x2="570" y2="65" stroke="#3b82f6" stroke-width="0.5" opacity="0.5"/>
+                    <text x="450" y="84" text-anchor="middle" fill="#bfdbfe" font-size="10" font-family="monospace">LLM Reasoning Engine</text>
+                    <text x="450" y="100" text-anchor="middle" fill="#93c5fd" font-size="10" font-family="monospace">Perceive · Plan · Act · Observe</text>
+                    <text x="450" y="116" text-anchor="middle" fill="#60a5fa" font-size="10" font-family="monospace">Memory · Context Window</text>
+                    <text x="450" y="134" text-anchor="middle" fill="#3b82f6" font-size="10" font-family="monospace">Goal pursuit across multiple turns</text>
+
+                    <!-- Arrows: Agent to Tools -->
+                    <line x1="450" y1="150" x2="450" y2="172" stroke="#16a34a" stroke-width="2" marker-end="url(#arrowGreen)"/>
+
+                    <!-- Arrows: Tools to Skills -->
+                    <line x1="450" y1="270" x2="450" y2="288" stroke="#d97706" stroke-width="2" marker-end="url(#arrowAmber)"/>
+
+                    <!-- Arrows: Skills to MCP -->
+                    <line x1="450" y1="385" x2="450" y2="398" stroke="#6366f1" stroke-width="2" marker-end="url(#arrowIndigo)"/>
+
+                    <!-- Arrow markers -->
+                    <defs>
+                        <marker id="arrowGreen" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+                            <path d="M1,1 L7,4 L1,7 Z" fill="#16a34a"/>
+                        </marker>
+                        <marker id="arrowAmber" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+                            <path d="M1,1 L7,4 L1,7 Z" fill="#d97706"/>
+                        </marker>
+                        <marker id="arrowIndigo" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+                            <path d="M1,1 L7,4 L1,7 Z" fill="#6366f1"/>
+                        </marker>
+                    </defs>
+
+                    <!-- Legend -->
+                    <text x="50" y="156" fill="#3b82f6" font-size="9" font-family="monospace">calls</text>
+                    <text x="50" y="272" fill="#16a34a" font-size="9" font-family="monospace">composed from</text>
+                    <text x="50" y="390" fill="#d97706" font-size="9" font-family="monospace">connects via</text>
+                </svg>
+            </div>
+        </section>
+
+        <!-- Why Each Component Exists -->
+        <section>
+            <h2>Why Each Component Exists: First Principles</h2>
+            <div class="sections-grid">
+
+                <div class="section-card">
+                    <h3>The Agent: Why Autonomy?</h3>
+                    <p>A single LLM call is a one-shot transformation: input in, output out. Real work requires iteration — you look at results, decide what to do next, encounter unexpected states, and adapt. The agent loop exists because goals cannot always be decomposed upfront. The doctor does not write all prescriptions before examining the patient. The agent perceives the current state, reasons about the next best action, executes it, observes the result, and continues until the goal is satisfied. This is not a chatbot with memory — it is goal-directed behavior with real-world consequences.</p>
+                </div>
+
+                <div class="section-card">
+                    <h3>Tools: Why Discrete Capabilities?</h3>
+                    <p>LLMs are text-in, text-out reasoning engines. They cannot natively read a file, query a database, or send an email. Tools provide grounded, side-effecting actions that the agent can call by name. Each tool has a strict schema (name, description, input parameters, return type) — this is the contract between the reasoning engine and the external world. Keeping tools atomic and single-purpose is not a style preference; it is how you make agent behavior predictable, testable, and composable. A tool that does too much becomes a black box that breaks reasoning chains.</p>
+                </div>
+
+                <div class="section-card">
+                    <h3>Skills: Why Encode Workflows?</h3>
+                    <p>Without skills, agents rediscover the same multi-step sequences repeatedly, wasting tokens and introducing variance. A skill is a proven, named workflow — a sequence of tool calls, decision points, and intermediate transformations that reliably accomplishes a class of tasks. Skills reduce cognitive load for the agent (it calls "research_topic" instead of orchestrating five tools), they encode institutional knowledge, and they become the building blocks of more complex behavior. Think of clinical protocols in medicine: the ER team does not invent trauma response each time. They follow a skill that captures decades of refined practice.</p>
+                </div>
+
+                <div class="section-card">
+                    <h3>MCP: Why a Standard?</h3>
+                    <p>Before MCP, every agent framework had its own plugin format, authentication model, and transport mechanism. Anthropic's Claude used one format, OpenAI's tools used another, LangChain had its own abstractions. MCP (released November 2024) is the attempt to create a universal standard — the USB-C of AI connectivity. It defines how a client (the agent's environment) discovers and calls tools from a server (the capability provider) through a stable JSON-RPC interface. The payoff is ecosystem: a single MCP server can be used by any conforming agent, and a single agent can use any conforming server, without custom integration code for each pair.</p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Essential Abbreviations -->
+        <section>
+            <h2>Essential Abbreviations with Practical Context</h2>
+
+            <div class="accordion">
+
+                <div class="accordion-item">
+                    <button class="accordion-header">LLM — Large Language Model</button>
+                    <div class="accordion-content">
+                        <p>The reasoning engine at the center of every agent. LLMs are transformer-based neural networks trained on vast text corpora that can generate coherent, contextually appropriate text. For agent systems, what matters is not that they "understand" language in a philosophical sense, but that they can (a) interpret complex instructions, (b) reason through multi-step problems, (c) generate structured outputs like JSON, and (d) decide which tool to call given a description. GPT-4, Claude, Gemini, and Llama are all LLMs. The quality of your agent is largely bounded by the quality of the LLM at its core, but the architecture around it determines whether that quality is reliably expressed.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header">MCP — Model Context Protocol</button>
+                    <div class="accordion-content">
+                        <p>Announced by Anthropic in November 2024. MCP defines a client-server protocol where: the MCP Client (inside the agent's host application) connects to one or more MCP Servers (standalone processes or services that expose tools, resources, and prompts). Communication uses JSON-RPC 2.0 over either stdio (for local servers) or HTTP with Server-Sent Events (for remote servers). The key innovation is capability discovery — the client asks the server what tools it exposes, and the server responds with schemas. This means agents can work with new capabilities without redeployment. Think of it as a self-describing API layer designed specifically for LLM tool use.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header">RAG — Retrieval-Augmented Generation</button>
+                    <div class="accordion-content">
+                        <p>RAG is the pattern of augmenting an LLM's context window with retrieved external knowledge before generating a response. In agent systems, RAG is usually implemented as a tool (search_knowledge_base, semantic_search) rather than a preprocessing step. This is an important distinction: in a RAG pipeline, retrieval is hardwired to happen before generation. In an agent with a RAG tool, the agent decides when retrieval is needed. The agent can retrieve multiple times, with different queries, based on intermediate results. This "agentic RAG" pattern is significantly more powerful but requires more careful retrieval tool design.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header">JSON-RPC — JSON Remote Procedure Call</button>
+                    <div class="accordion-content">
+                        <p>JSON-RPC 2.0 is the wire format underlying MCP. It is deliberately simple: a request is a JSON object with a method name, params, and id. A response has a result or error. There is no HTTP required — JSON-RPC can run over any transport (stdio, WebSockets, HTTP). MCP chose JSON-RPC because it is language-agnostic, well-understood, and easy to implement in any runtime. When you build an MCP server, you are essentially implementing a JSON-RPC 2.0 server that responds to a specific set of method names: initialize, tools/list, tools/call, resources/list, resources/read, and a handful of others defined by the MCP spec.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header">SSE — Server-Sent Events</button>
+                    <div class="accordion-content">
+                        <p>SSE is one of MCP's two transport mechanisms (the other being stdio). SSE allows a server to push data to a client over a persistent HTTP connection without requiring WebSocket handshakes. In the MCP context: the client opens an SSE connection to the server's /sse endpoint, receives a session endpoint URL, then sends JSON-RPC requests as POST requests to that URL while receiving responses and notifications over the SSE stream. This makes remote MCP servers work over standard HTTP infrastructure with no special firewall configuration. For production deployments, SSE transport is the default choice for servers that are not running in the same process as the client.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header">SDK — Software Development Kit</button>
+                    <div class="accordion-content">
+                        <p>In the MCP context, SDKs are the official libraries that implement the protocol for you, available in TypeScript/JavaScript and Python (with community SDKs for Go, Rust, Java, and others). Using an MCP SDK means you declare your tools with schema definitions, implement handler functions, and the SDK handles protocol negotiation, message routing, error formatting, and transport concerns. Without an SDK, building an MCP server means manually implementing JSON-RPC 2.0 message parsing, capability negotiation, and transport logic — possible but unnecessarily complex. Always use the official SDKs in production; they are the reference implementations and receive protocol updates first.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header">LSP — Language Server Protocol (Analogy)</button>
+                    <div class="accordion-content">
+                        <p>MCP was explicitly inspired by LSP, the Language Server Protocol. LSP solved a combinatorial problem in developer tooling: N editors times M languages = N*M integrations. LSP turned that into N+M by standardizing the editor-to-language-server interface. Before LSP, VS Code needed custom Go support, Vim needed custom Go support, and so on. After LSP, one Go language server works in every editor. MCP applies this exact insight to AI: N agent frameworks times M tool providers = N*M integrations becomes N+M with MCP. Understanding why LSP succeeded (and the decade it took to reach critical mass) provides a realistic timeline for MCP adoption.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header">API — Application Programming Interface</button>
+                    <div class="accordion-content">
+                        <p>APIs are the broader category that MCP tools are a specialized form of. A traditional REST API is designed for human developers writing code: the consumer knows the endpoint at build time, the authentication is configured at deploy time, and the response schema is documented separately. An MCP tool is designed for runtime LLM consumption: the tool's schema (name, description, parameters) must be interpretable by the LLM to decide when and how to call it. This means MCP tool descriptions are documentation written for a language model, not a human developer. The precision of that description — the word choices, the parameter names, the examples — directly impacts whether the agent uses the tool correctly.</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Historical Context -->
+        <section>
+            <h2>Historical Context: How We Got Here</h2>
+
+            <div class="card info">
+                <h3>The Timeline of AI Capability Expansion</h3>
+
+                <div class="sections-grid">
+                    <div class="section-card">
+                        <h4>2022: ChatGPT and the Prompt Era</h4>
+                        <p>LLMs became accessible to mainstream developers. The interaction model was purely conversational: send text, receive text. The idea of an "agent" was theoretical — researchers explored it in papers, but production systems were prompt-engineered chatbots. External capabilities required custom parsing: you prompted the model to produce structured output, then parsed it yourself and called external APIs outside the LLM loop. Fragile, inconsistent, not scalable.</p>
+                    </div>
+                    <div class="section-card">
+                        <h4>2023: Function Calling and Plugins</h4>
+                        <p>OpenAI introduced Function Calling (later renamed Tool Use), giving models a first-class mechanism to request tool invocations. ChatGPT Plugins followed — an early form of tool marketplace. Anthropic released Claude with tool use support. LangChain and AutoGen emerged as frameworks for chaining tool calls into agent loops. The industry discovered quickly that raw tool calling was not enough: agents needed structured workflows (skills), better error recovery, and consistent tool interfaces. The plugin ecosystem fractured — each provider had its own format.</p>
+                    </div>
+                    <div class="section-card">
+                        <h4>2024: MCP and the Standardization Era</h4>
+                        <p>Anthropic published the Model Context Protocol in November 2024, open-sourcing both the specification and reference SDKs. Within weeks, major development tools (VS Code Copilot, Cursor, Zed) and cloud providers (AWS, Google Cloud) began implementing MCP support. The ecosystem started building shared servers: a GitHub MCP server, a Postgres MCP server, a browser MCP server. This mirrors the LSP inflection point in 2016–2018. We are currently in the rapid adoption phase where the protocol is stable but the best practices are still being discovered.</p>
+                    </div>
+                    <div class="section-card">
+                        <h4>2025–Present: Production Reality</h4>
+                        <p>Agent systems are entering production at scale. The questions have shifted from "can this work?" to "can this be reliable, observable, and safe?" Multi-agent architectures (orchestrator agents coordinating specialist sub-agents) are becoming standard. MCP server registries are emerging. The industry is working through hard problems: token budget management, agent failure recovery, authorization models for tools, and testing strategies for non-deterministic systems. The hospital is built — now we are learning to run it safely.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="card warning">
+            <h3>The Mental Shift Required</h3>
+            <p>Most engineers first encounter agents through demos that make them look magical. The mental shift required for production work is recognizing that agents are software systems with all the same concerns as any other distributed system — plus new ones. Failure modes compound: a tool that returns malformed data, an LLM that misinterprets a description, a skill that hits a loop condition. Observability, testing, and graceful degradation are not afterthoughts. The hospital analogy is instructive here too: the most important thing a hospital gets right is not the technology — it is the protocols, checklists, and error-correction mechanisms that make technology reliable under real-world conditions.</p>
+        </div>
+
+    </main>
+
+    <footer class="section-footer">
+        <a href="index.html" class="btn">Previous: Overview</a>
+        <a href="analogy.html" class="btn">Next: Living Analogy</a>
+    </footer>
+
+    <script src="../../js/components.js"></script>
+</body>
+</html>

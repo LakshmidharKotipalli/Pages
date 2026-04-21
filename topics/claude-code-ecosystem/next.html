@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What's Next - Learn Claude Code Ecosystem</title>
+    <link rel="stylesheet" href="../../css/styles.css">
+    <link rel="stylesheet" href="theme.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <a href="index.html" class="nav-back">Back to Overview</a>
+        <span class="current-section">What's Next</span>
+        <div class="nav-links">
+            <a href="ecosystem.html">Previous</a>
+            <a href="index.html">Back to Start</a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <h1>What's Next</h1>
+            <p class="powerful-sentence">Claude Code Ecosystem is not the destination — it is the platform from which you reach the adjacent topics that unlock its full potential. Each one connects back to Claude Code in ways that compound your effectiveness.</p>
+            <p class="explanation">Seven related topics, each with a clear connection to what you just learned, a difficulty rating, and a recommended position in your learning sequence. Not a reading list — a development roadmap.</p>
+        </section>
+
+        <section>
+            <h2>How These Topics Connect</h2>
+            <p>The diagram below shows the Claude Code Ecosystem at the center and the seven related topics positioned around it by dependency and connection strength. Solid lines indicate direct, foundational dependencies. Dashed lines indicate enriching connections that build depth without being prerequisites.</p>
+
+            <div class="diagram-container">
+                <svg class="architecture-diagram" viewBox="0 0 900 680" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Mindmap showing how Claude Code Ecosystem connects to seven related learning topics">
+                    <defs>
+                        <marker id="nxt-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                            <polygon points="0 0, 8 3, 0 6" fill="#6b7280"/>
+                        </marker>
+                        <marker id="nxt-arrow-strong" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                            <polygon points="0 0, 8 3, 0 6" fill="#3b82f6"/>
+                        </marker>
+                    </defs>
+
+                    <!-- Center: Claude Code Ecosystem -->
+                    <ellipse cx="450" cy="340" rx="90" ry="58" fill="#1d4ed8" stroke="#1e3a8a" stroke-width="3"/>
+                    <text x="450" y="330" font-family="system-ui,sans-serif" font-size="13" font-weight="700" fill="white" text-anchor="middle">CLAUDE CODE</text>
+                    <text x="450" y="348" font-family="system-ui,sans-serif" font-size="11" font-weight="600" fill="#bfdbfe" text-anchor="middle">ECOSYSTEM</text>
+                    <text x="450" y="365" font-family="system-ui,sans-serif" font-size="9" fill="#93c5fd" text-anchor="middle">You are here</text>
+
+                    <!-- Topic 1: MCP Deep Dive (top) -->
+                    <ellipse cx="450" cy="145" rx="88" ry="38" fill="#b45309" stroke="#92400e" stroke-width="2"/>
+                    <text x="450" y="138" font-family="system-ui,sans-serif" font-size="12" font-weight="700" fill="white" text-anchor="middle">Model Context</text>
+                    <text x="450" y="154" font-family="system-ui,sans-serif" font-size="12" font-weight="700" fill="white" text-anchor="middle">Protocol Deep Dive</text>
+                    <line x1="450" y1="282" x2="450" y2="183" stroke="#3b82f6" stroke-width="2.5" marker-end="url(#nxt-arrow-strong)"/>
+                    <text x="455" y="238" font-family="system-ui,sans-serif" font-size="9" fill="#3b82f6">direct dependency</text>
+
+                    <!-- Topic 2: Prompt Engineering (top-left) -->
+                    <ellipse cx="215" cy="175" rx="90" ry="38" fill="#0369a1" stroke="#075985" stroke-width="2"/>
+                    <text x="215" y="168" font-family="system-ui,sans-serif" font-size="11" font-weight="700" fill="white" text-anchor="middle">Prompt Engineering</text>
+                    <text x="215" y="184" font-family="system-ui,sans-serif" font-size="11" font-weight="700" fill="white" text-anchor="middle">for Agentic Systems</text>
+                    <line x1="365" y1="297" x2="298" y2="202" stroke="#3b82f6" stroke-width="2.5" marker-end="url(#nxt-arrow-strong)"/>
+
+                    <!-- Topic 3: Git Advanced (top-right) -->
+                    <ellipse cx="685" cy="175" rx="90" ry="38" fill="#047857" stroke="#065f46" stroke-width="2"/>
+                    <text x="685" y="168" font-family="system-ui,sans-serif" font-size="11" font-weight="700" fill="white" text-anchor="middle">Git Advanced</text>
+                    <text x="685" y="184" font-family="system-ui,sans-serif" font-size="11" font-weight="700" fill="white" text-anchor="middle">Workflows</text>
+                    <line x1="534" y1="297" x2="604" y2="202" stroke="#3b82f6" stroke-width="2.5" marker-end="url(#nxt-arrow-strong)"/>
+
+                    <!-- Topic 4: Multi-Agent System Design (left) -->
+                    <ellipse cx="120" cy="340" rx="90" ry="38" fill="#7c3aed" stroke="#5b21b6" stroke-width="2"/>
+                    <text x="120" y="333" font-family="system-ui,sans-serif" font-size="11" font-weight="700" fill="white" text-anchor="middle">Multi-Agent</text>
+                    <text x="120" y="349" font-family="system-ui,sans-serif" font-size="11" font-weight="700" fill="white" text-anchor="middle">System Design</text>
+                    <line x1="360" y1="340" x2="210" y2="340" stroke="#6b7280" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#nxt-arrow)"/>
+
+                    <!-- Topic 5: LLM App Architecture (right) -->
+                    <ellipse cx="780" cy="340" rx="90" ry="38" fill="#9d174d" stroke="#831843" stroke-width="2"/>
+                    <text x="780" y="333" font-family="system-ui,sans-serif" font-size="11" font-weight="700" fill="white" text-anchor="middle">LLM Application</text>
+                    <text x="780" y="349" font-family="system-ui,sans-serif" font-size="11" font-weight="700" fill="white" text-anchor="middle">Architecture</text>
+                    <line x1="540" y1="340" x2="690" y2="340" stroke="#6b7280" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#nxt-arrow)"/>
+
+                    <!-- Topic 6: DevOps CI/CD (bottom-right) -->
+                    <ellipse cx="685" cy="510" rx="90" ry="38" fill="#064e3b" stroke="#065f46" stroke-width="2"/>
+                    <text x="685" y="503" font-family="system-ui,sans-serif" font-size="11" font-weight="700" fill="white" text-anchor="middle">DevOps &amp; CI/CD</text>
+                    <text x="685" y="519" font-family="system-ui,sans-serif" font-size="11" font-weight="700" fill="white" text-anchor="middle">with AI Agents</text>
+                    <line x1="534" y1="384" x2="604" y2="482" stroke="#6b7280" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#nxt-arrow)"/>
+
+                    <!-- Topic 7: Security & Compliance (bottom-left) -->
+                    <ellipse cx="215" cy="510" rx="90" ry="38" fill="#7f1d1d" stroke="#991b1b" stroke-width="2"/>
+                    <text x="215" y="503" font-family="system-ui,sans-serif" font-size="11" font-weight="700" fill="white" text-anchor="middle">Security &amp;</text>
+                    <text x="215" y="519" font-family="system-ui,sans-serif" font-size="11" font-weight="700" fill="white" text-anchor="middle">Compliance for AI</text>
+                    <line x1="365" y1="384" x2="300" y2="482" stroke="#6b7280" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#nxt-arrow)"/>
+
+                    <!-- Inter-topic connections (showing how they relate to each other) -->
+                    <!-- MCP connects to LLM App Arch -->
+                    <line x1="538" y1="158" x2="730" y2="314" stroke="#9ca3af" stroke-width="1" stroke-dasharray="3,4"/>
+                    <!-- Prompt Eng connects to Multi-Agent Design -->
+                    <line x1="165" y1="205" x2="138" y2="302" stroke="#9ca3af" stroke-width="1" stroke-dasharray="3,4"/>
+                    <!-- Git Advanced connects to DevOps -->
+                    <line x1="685" y1="213" x2="685" y2="472" stroke="#9ca3af" stroke-width="1" stroke-dasharray="3,4"/>
+                    <!-- Multi-Agent connects to LLM App Arch -->
+                    <line x1="210" y1="340" x2="690" y2="340" stroke="none"/>
+                    <!-- Security connects to DevOps -->
+                    <line x1="305" y1="510" x2="595" y2="510" stroke="#9ca3af" stroke-width="1" stroke-dasharray="3,4"/>
+
+                    <!-- Legend -->
+                    <rect x="18" y="600" width="280" height="62" rx="6" fill="none" stroke="#d1d5db" stroke-width="1" stroke-dasharray="3,3"/>
+                    <line x1="30" y1="620" x2="80" y2="620" stroke="#3b82f6" stroke-width="2.5"/>
+                    <text x="90" y="625" font-family="system-ui,sans-serif" font-size="10" fill="#374151">Direct dependency — build this next</text>
+                    <line x1="30" y1="645" x2="80" y2="645" stroke="#6b7280" stroke-width="1.5" stroke-dasharray="5,3"/>
+                    <text x="90" y="650" font-family="system-ui,sans-serif" font-size="10" fill="#374151">Enriching connection — deepen later</text>
+                </svg>
+                <p class="diagram-caption">Solid blue lines mark direct dependencies that should be learned next. Dashed gray lines mark connections that deepen understanding once prerequisites are covered.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>The Seven Topics</h2>
+            <p>Each topic below includes the specific connection to what you learned in this journey, the prerequisite knowledge required, and why it matters for your development as a senior engineer working with AI-assisted development.</p>
+
+            <div class="accordion">
+
+                <div class="accordion-item">
+                    <div class="accordion-header" role="button" aria-expanded="false" tabindex="0">
+                        <span>1. Model Context Protocol (MCP) Deep Dive</span>
+                        <span class="severity medium">Intermediate</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="comparison-grid">
+                            <div class="docker-concept">
+                                <div class="concept-card">
+                                    <div class="concept-name">Connection to Claude Code</div>
+                                    <p>MCP is the plumbing that connects Claude Code to the outside world. You have seen it referenced throughout this journey — in the architecture, in the debugging section, in the ecosystem map. Understanding MCP at the protocol level transforms you from a user of the connection to an architect of it.</p>
+                                </div>
+                                <div class="concept-card">
+                                    <div class="concept-name">What You Will Learn</div>
+                                    <p>The MCP protocol specification, how to build a custom MCP server in 2-3 hours, how to connect it to any internal tool or API, how to handle authentication, rate limiting, and error states, and how to design tool manifests that minimize context consumption.</p>
+                                </div>
+                            </div>
+                            <div class="analogy-concept">
+                                <div class="analogy-card">
+                                    <div class="analogy-name">Prerequisites</div>
+                                    <p>Basic Claude Code usage (you have this). Understanding of REST APIs and JSON. Basic familiarity with at least one server-side language (Node.js, Python, Go). Understanding of authentication concepts (tokens, OAuth).</p>
+                                </div>
+                                <div class="analogy-card">
+                                    <div class="analogy-name">Why It Matters</div>
+                                    <p>Building custom MCP servers is the fastest way to unlock Claude Code's full potential for your specific organization. Your internal tools — the ones no community MCP server covers — become available to Claude Code within hours of starting this topic. Every hour invested in MCP compounds across every future Claude Code session.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" role="button" aria-expanded="false" tabindex="0">
+                        <span>2. Prompt Engineering for Agentic Systems</span>
+                        <span class="severity medium">Intermediate to Advanced</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="comparison-grid">
+                            <div class="docker-concept">
+                                <div class="concept-card">
+                                    <div class="concept-name">Connection to Claude Code</div>
+                                    <p>CLAUDE.md and skill instructions are prompts — and the quality of those prompts directly determines Claude Code's effectiveness in your environment. Prompt engineering for agentic systems is not about clever one-shot prompts; it is about designing instruction sets that remain effective across long sessions, through compaction events, and across multiple sub-agents.</p>
+                                </div>
+                                <div class="concept-card">
+                                    <div class="concept-name">What You Will Learn</div>
+                                    <p>Instruction design for robustness (prompts that work after compaction, not just before it). Decomposition strategies for complex tasks. How to write sub-agent prompts that return structured, reliable outputs. How to design CLAUDE.md instructions that age well as the project evolves. The specific failure modes of long-horizon prompts and how to prevent them.</p>
+                                </div>
+                            </div>
+                            <div class="analogy-concept">
+                                <div class="analogy-card">
+                                    <div class="analogy-name">Prerequisites</div>
+                                    <p>Basic Claude Code usage and CLAUDE.md familiarity (you have this). Understanding of how LLMs process instructions — not implementation details, but behavioral patterns. Some experience with sessions that went off the rails due to instruction drift.</p>
+                                </div>
+                                <div class="analogy-card">
+                                    <div class="analogy-name">Why It Matters</div>
+                                    <p>The quality gap between a mediocre CLAUDE.md and an excellent one is larger than most engineers expect. Teams that invest in prompt engineering for their configuration files report 2-3x improvement in consistency and a measurable reduction in mid-session corrections. This is a high-leverage skill that applies everywhere Claude Code is used.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" role="button" aria-expanded="false" tabindex="0">
+                        <span>3. Git Advanced Workflows (Worktrees, Rebasing, Cherry-picking)</span>
+                        <span class="severity medium">Intermediate</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="comparison-grid">
+                            <div class="docker-concept">
+                                <div class="concept-card">
+                                    <div class="concept-name">Connection to Claude Code</div>
+                                    <p>Git worktrees are the isolation primitive that makes parallel agent execution feasible. The eloquent conversation section used the worktrees-as-containers analogy: this topic makes that analogy concrete. You will understand not just that worktrees provide isolation, but how to create them efficiently, manage them across a team, and clean them up after agent work completes.</p>
+                                </div>
+                                <div class="concept-card">
+                                    <div class="concept-name">What You Will Learn</div>
+                                    <p>Git worktree creation, switching, and lifecycle management. How to structure branch naming for agent workstreams. Rebasing strategies for merging parallel agent branches cleanly. Cherry-picking specific agent commits when an agent produces partial good work. Integration with GitHub workflow for agent-produced pull requests.</p>
+                                </div>
+                            </div>
+                            <div class="analogy-concept">
+                                <div class="analogy-card">
+                                    <div class="analogy-name">Prerequisites</div>
+                                    <p>Basic git operations (commit, push, pull, branch, merge). Understanding of what a branch is and why it exists. Familiarity with merge conflicts and basic resolution. You do not need to know what a worktree is before starting — that is the point of this topic.</p>
+                                </div>
+                                <div class="analogy-card">
+                                    <div class="analogy-name">Why It Matters</div>
+                                    <p>As agent teams become standard practice, engineers who are comfortable with advanced git patterns will be able to run parallel agent workstreams efficiently. Engineers who are not comfortable will serialize work that could be parallel, losing the core benefit of agent teams. This is a foundational skill that pays dividends regardless of how AI tooling evolves.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" role="button" aria-expanded="false" tabindex="0">
+                        <span>4. Multi-Agent System Design</span>
+                        <span class="severity high">Advanced</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="comparison-grid">
+                            <div class="docker-concept">
+                                <div class="concept-card">
+                                    <div class="concept-name">Connection to Claude Code</div>
+                                    <p>Agent teams are Claude Code's implementation of multi-agent collaboration. But agent teams are one narrow implementation of a much richer design space. The patterns from distributed systems — consensus, leader election, eventual consistency, task decomposition, fault tolerance — all apply to multi-agent AI systems, and understanding them makes you a dramatically better designer of agent team configurations.</p>
+                                </div>
+                                <div class="concept-card">
+                                    <div class="concept-name">What You Will Learn</div>
+                                    <p>Coordination patterns: hierarchical, peer-to-peer, market-based, blackboard. Task decomposition strategies and their failure modes. Fault tolerance: what happens when an agent fails mid-task. Consistency: how to ensure agent team outputs are coherent when agents work in parallel on related artifacts. Monitoring and observability for multi-agent systems.</p>
+                                </div>
+                            </div>
+                            <div class="analogy-concept">
+                                <div class="analogy-card">
+                                    <div class="analogy-name">Prerequisites</div>
+                                    <p>Claude Code agent teams (you have this — at least conceptually). Basic distributed systems concepts (not deep implementation knowledge, but familiarity with the problems: consistency, availability, partition tolerance, consensus). Some experience running agent teams and hitting coordination problems.</p>
+                                </div>
+                                <div class="analogy-card">
+                                    <div class="analogy-name">Why It Matters</div>
+                                    <p>The transition from "I use agent teams" to "I design agent team architectures" is career-defining. As organizations deploy multi-agent AI systems for production workloads, the engineers who can design, debug, and optimize coordination patterns will be the architects of those systems. This is the equivalent of understanding distributed systems in the microservices era — not mandatory for every role, but essential for senior platform and infrastructure engineers.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" role="button" aria-expanded="false" tabindex="0">
+                        <span>5. LLM Application Architecture</span>
+                        <span class="severity high">Advanced</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="comparison-grid">
+                            <div class="docker-concept">
+                                <div class="concept-card">
+                                    <div class="concept-name">Connection to Claude Code</div>
+                                    <p>Claude Code is itself an LLM application — an orchestration layer that manages context, delegates to sub-agents, integrates external tools, and produces developer-useful output. Understanding LLM application architecture means understanding how Claude Code works at the design level, and more importantly, how to build Claude Code-like systems for your own domain using the Agent SDK.</p>
+                                </div>
+                                <div class="concept-card">
+                                    <div class="concept-name">What You Will Learn</div>
+                                    <p>RAG (Retrieval-Augmented Generation) for giving LLMs access to large knowledge bases. Tool use architecture patterns. Context management at the application level (beyond what any single tool provides). Evaluation and testing patterns for LLM applications. The cost vs. quality trade-offs in application design. Building agents with the Claude Agent SDK.</p>
+                                </div>
+                            </div>
+                            <div class="analogy-concept">
+                                <div class="analogy-card">
+                                    <div class="analogy-name">Prerequisites</div>
+                                    <p>Claude API experience (calling the API directly, understanding tokens and pricing). Basic machine learning concepts (you do not need to train models, but you need to understand inference). Software architecture experience — LLM application patterns draw heavily on existing distributed systems and API design knowledge.</p>
+                                </div>
+                                <div class="analogy-card">
+                                    <div class="analogy-name">Why It Matters</div>
+                                    <p>The Agent SDK lets you build Claude Code-like systems for your specific domain — a code review agent, a documentation generation pipeline, an automated testing orchestrator. Engineers who understand both the tool and the underlying architecture can build custom agentic systems rather than being limited to what community tools provide. This is the transition from power user to platform builder.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" role="button" aria-expanded="false" tabindex="0">
+                        <span>6. DevOps and CI/CD Automation with AI Agents</span>
+                        <span class="severity medium">Intermediate</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="comparison-grid">
+                            <div class="docker-concept">
+                                <div class="concept-card">
+                                    <div class="concept-name">Connection to Claude Code</div>
+                                    <p>Hooks, MCP servers, and agent teams are not just development-time tools — they are also CI/CD primitives. A hook that runs on every commit can trigger a Claude Code agent to review the changes, update documentation, and update test coverage metrics. An MCP server connected to your deployment pipeline lets Claude Code agents manage deployments. This topic makes that infrastructure real.</p>
+                                </div>
+                                <div class="concept-card">
+                                    <div class="concept-name">What You Will Learn</div>
+                                    <p>How to run Claude Code agents as non-interactive CI/CD pipeline steps. How to configure Claude Code in full-auto permission mode safely for automated contexts. How to instrument hooks for audit logging and compliance. How to build agent-driven code review gates. How to design deployment automation with Claude Code and MCP. Real examples from companies deploying AI agents in production CI/CD.</p>
+                                </div>
+                            </div>
+                            <div class="analogy-concept">
+                                <div class="analogy-card">
+                                    <div class="analogy-name">Prerequisites</div>
+                                    <p>Basic CI/CD concepts (pipelines, stages, triggers). Claude Code hooks (covered in this learning journey). Understanding of permission modes. At least one CI/CD platform experience (GitHub Actions, GitLab CI, Jenkins, CircleCI, etc.).</p>
+                                </div>
+                                <div class="analogy-card">
+                                    <div class="analogy-name">Why It Matters</div>
+                                    <p>AI agents in CI/CD represent the next productivity frontier for engineering organizations. Companies deploying agents as pipeline steps in 2025-2026 are seeing review coverage improvements, documentation freshness improvements, and reduced time-to-merge for safe changes. Engineers who can design and maintain these pipelines are building the infrastructure that every software organization will eventually need.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" role="button" aria-expanded="false" tabindex="0">
+                        <span>7. Security and Compliance for AI-Assisted Development</span>
+                        <span class="severity high">Intermediate to Advanced</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="comparison-grid">
+                            <div class="docker-concept">
+                                <div class="concept-card">
+                                    <div class="concept-name">Connection to Claude Code</div>
+                                    <p>The practice exercise on regulated industries (Q11 in the Practice Exercises section) is a preview of this topic. Permission modes, hooks for secret scanning, read-only MCP access, auto memory controls — Claude Code has security primitives, but using them correctly in regulated environments requires understanding the underlying compliance frameworks they are designed to satisfy.</p>
+                                </div>
+                                <div class="concept-card">
+                                    <div class="concept-name">What You Will Learn</div>
+                                    <p>Threat modeling for AI-assisted development environments. Data handling requirements when AI agents process code containing PII or sensitive business logic. Audit trail requirements for AI-generated code in regulated industries. How to evaluate AI tool vendors for enterprise security compliance (SOC 2, HIPAA, FedRAMP relevance). Building secure CLAUDE.md and settings.json configurations for high-compliance environments. The emerging regulatory landscape for AI in software development.</p>
+                                </div>
+                            </div>
+                            <div class="analogy-concept">
+                                <div class="analogy-card">
+                                    <div class="analogy-name">Prerequisites</div>
+                                    <p>Basic security concepts (authentication, authorization, audit logging, data classification). Claude Code configuration experience. Awareness of at least one compliance framework (HIPAA, SOC 2, GDPR, PCI DSS). Understanding of what data flows through Claude Code sessions (context window contents, MCP data access).</p>
+                                </div>
+                                <div class="analogy-card">
+                                    <div class="analogy-name">Why It Matters</div>
+                                    <p>Every enterprise deploying Claude Code needs a security story. Without it, deployment is blocked by security review. With a well-designed security architecture, Claude Code can be approved for use in environments that handle sensitive data. Engineers who can design, document, and defend the security architecture of AI development tools are critical path resources in every enterprise AI adoption initiative — a rare combination of AI tool knowledge and security expertise.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section>
+            <h2>Recommended Learning Sequence</h2>
+            <p>The seven topics are not equally urgent. The sequence below is optimized for someone who is actively using Claude Code for production work and wants to deepen competency as quickly as possible while managing time investment.</p>
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-year">Wk 1-2</div>
+                    <div class="timeline-content">
+                        <h4>MCP Deep Dive + Git Advanced Workflows</h4>
+                        <p>These two topics have the highest immediate return on investment. MCP unlocks your internal tools for Claude Code. Git worktrees unlock parallel agent execution. Both are prerequisites for full benefit from agent teams. Do them concurrently — MCP is conceptual and practical; Git is mostly practical with hands-on exercises.</p>
+                        <div class="card success">
+                            <strong>Expected outcome after 2 weeks:</strong> You have built at least one custom MCP server for an internal tool. You are comfortable creating and managing git worktrees. Parallel agent work is no longer aspirational — it is part of your daily workflow.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-year">Wk 3-4</div>
+                    <div class="timeline-content">
+                        <h4>Prompt Engineering for Agentic Systems</h4>
+                        <p>With two weeks of enriched Claude Code usage under your belt (better MCP connectivity, parallel agent work), you now have concrete problems to bring to prompt engineering study. You know where your CLAUDE.md instructions are failing, which sub-agent prompts produce unreliable results, and which skill instructions need refinement. That real-world context makes the prompt engineering material immediately actionable.</p>
+                        <div class="card info">
+                            <strong>Expected outcome after 4 weeks:</strong> Your CLAUDE.md and key skill instructions have been redesigned using agentic prompt engineering principles. You notice measurable improvement in consistency across sessions. You have a documented prompt design review process for your team.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-year">Month 2</div>
+                    <div class="timeline-content">
+                        <h4>Multi-Agent System Design</h4>
+                        <p>By month two, you have had hands-on experience with agent teams. You have seen the coordination problems: tasks that blocked each other unexpectedly, teammates that duplicated work, a team lead that kept doing the work itself instead of delegating. Multi-Agent System Design gives you the vocabulary and patterns to diagnose and fix these problems systematically rather than through trial and error.</p>
+                        <div class="card warning">
+                            <strong>Expected outcome after month 2:</strong> You can design agent team configurations that avoid the common coordination failure modes. You have a personal library of 3-5 proven team patterns for specific task types. You are comfortable explaining agent team design trade-offs to colleagues who are new to the concept.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-year">Month 3</div>
+                    <div class="timeline-content">
+                        <h4>LLM Application Architecture + DevOps Automation</h4>
+                        <p>These two topics mature together. LLM Application Architecture gives you the theoretical foundation for building agent-powered systems. DevOps Automation gives you the operational context for deploying them in production. Learning them together prevents the common failure mode of building architecturally sophisticated systems that cannot be operated in production.</p>
+                        <div class="card success">
+                            <strong>Expected outcome after month 3:</strong> You have built at least one Agent SDK-powered tool for your organization. You have at least one CI/CD pipeline stage powered by a Claude Code agent. You have the full stack of AI-assisted development capability, from individual productivity to automated pipeline integration.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-year">Ongoing</div>
+                    <div class="timeline-content">
+                        <h4>Security and Compliance</h4>
+                        <p>Security and compliance is not a one-time study topic — it is an ongoing practice that evolves with the regulatory landscape and with your organization's deployment scope. Start with the foundational concepts once you have 2-3 months of active Claude Code experience, then revisit as your organization's AI deployment scope expands.</p>
+                        <div class="card error">
+                            <strong>The critical dependency:</strong> Do not defer security indefinitely. If your organization is in a regulated industry or handles sensitive data, start this topic concurrently with MCP Deep Dive in weeks 1-2. The security architecture needs to be designed before deployment at scale, not retrofitted after. For regulated industries, this is the first topic, not the last.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>You Have Completed the Claude Code Ecosystem Journey</h2>
+            <div class="card success">
+                <p>You have covered the full architecture from first principles through the complete ecosystem. You have the mental models for context management, agent orchestration, extensibility, and persistent knowledge. You know how to debug when things go wrong, how to discuss the trade-offs with depth and nuance, and you have practiced applying the concepts under question pressure.</p>
+                <p>The seven topics ahead will deepen each layer of what you have built here. The foundation is solid. What you do next determines how far it goes.</p>
+                <p style="text-align:center; margin-top: 1.5rem;">
+                    <a href="index.html" class="btn">Return to Overview</a>
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="section-footer">
+        <a href="ecosystem.html" class="btn">Previous: The Full Ecosystem</a>
+        <a href="index.html" class="btn">Back to Overview</a>
+    </footer>
+
+    <script src="../../js/components.js"></script>
+</body>
+</html>

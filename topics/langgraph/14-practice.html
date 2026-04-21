@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Section 14: Practice Exercises — LangGraph Learning Journey</title>
+    <meta name="description" content="15 hands-on LangGraph exercises from warm-up to expert. Build real graphs, practice checkpointing, multi-agent systems, and production patterns.">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        #progress-bar {
+            position: fixed; top: 0; left: 0; height: 3px;
+            background: linear-gradient(90deg, var(--primary), #a78bfa);
+            width: 0%; z-index: 200; transition: width 0.1s linear;
+        }
+
+        .hero-quote {
+            background: linear-gradient(135deg, #1e1b4b 0%, #2d1b69 100%);
+            border: 1px solid rgba(139,92,246,0.4);
+            border-radius: 14px;
+            padding: 36px 40px;
+            margin: 32px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-quote::before {
+            content: '"';
+            position: absolute; top: -20px; left: 24px;
+            font-size: 120px; color: rgba(139,92,246,0.12);
+            font-family: Georgia, serif; line-height: 1;
+        }
+        .hero-quote p {
+            font-size: 1.15rem; line-height: 1.85;
+            color: #e2d9f3; margin: 0; position: relative; z-index: 1;
+        }
+        .hero-quote em { color: #a78bfa; font-style: normal; font-weight: 600; }
+
+        .tier-tabs { margin: 32px 0; }
+        .tier-tab-buttons {
+            display: flex; gap: 0; border-bottom: 2px solid var(--border);
+            margin-bottom: 0; flex-wrap: wrap;
+        }
+        .tier-tab-btn {
+            padding: 14px 28px; background: transparent; border: none;
+            cursor: pointer; font-size: 0.95rem; font-weight: 600;
+            transition: all 0.2s; border-bottom: 3px solid transparent;
+            margin-bottom: -2px; display: flex; align-items: center; gap: 8px;
+        }
+        .tier-tab-btn .tier-badge {
+            display: inline-block; padding: 2px 10px; border-radius: 20px;
+            font-size: 0.75rem; font-weight: 700; letter-spacing: 0.04em;
+        }
+        .tier-tab-btn.warmup { color: var(--success); }
+        .tier-tab-btn.warmup.active { border-bottom-color: var(--success); }
+        .tier-tab-btn.warmup .tier-badge { background: rgba(63,185,80,0.15); color: var(--success); }
+        .tier-tab-btn.core { color: var(--info); }
+        .tier-tab-btn.core.active { border-bottom-color: var(--info); }
+        .tier-tab-btn.core .tier-badge { background: rgba(88,166,255,0.15); color: var(--info); }
+        .tier-tab-btn.advanced { color: var(--warning); }
+        .tier-tab-btn.advanced.active { border-bottom-color: var(--warning); }
+        .tier-tab-btn.advanced .tier-badge { background: rgba(210,153,34,0.15); color: var(--warning); }
+        .tier-tab-btn.expert { color: var(--danger); }
+        .tier-tab-btn.expert.active { border-bottom-color: var(--danger); }
+        .tier-tab-btn.expert .tier-badge { background: rgba(248,81,73,0.15); color: var(--danger); }
+        .tier-tab-btn:hover { background: rgba(139,92,246,0.06); }
+        .tier-panel { display: none; padding-top: 28px; }
+        .tier-panel.active { display: block; }
+
+        .ex-accordion { margin: 16px 0; }
+        .ex-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+        .ex-item:hover { border-color: rgba(139,92,246,0.35); }
+        .ex-item.active { border-color: rgba(139,92,246,0.55); }
+        .ex-header {
+            padding: 18px 22px; cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center;
+            transition: background 0.2s;
+        }
+        .ex-header:hover { background: rgba(139,92,246,0.06); }
+        .ex-header-left { display: flex; align-items: center; gap: 14px; }
+        .ex-num {
+            width: 36px; height: 36px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 0.9rem; flex-shrink: 0;
+        }
+        .warmup-num { background: rgba(63,185,80,0.15); color: var(--success); }
+        .core-num { background: rgba(88,166,255,0.15); color: var(--info); }
+        .advanced-num { background: rgba(210,153,34,0.15); color: var(--warning); }
+        .expert-num { background: rgba(248,81,73,0.15); color: var(--danger); }
+        .ex-title { font-weight: 600; font-size: 1.05rem; color: var(--text); }
+        .ex-subtitle { font-size: 0.82rem; color: var(--text-muted); margin-top: 3px; }
+        .ex-chevron {
+            font-size: 1.1rem; color: var(--text-muted);
+            transition: transform 0.3s; flex-shrink: 0;
+        }
+        .ex-item.active .ex-chevron { transform: rotate(180deg); }
+        .ex-body {
+            max-height: 0; overflow: hidden;
+            transition: max-height 0.5s ease;
+        }
+        .ex-item.active .ex-body { max-height: 4000px; }
+        .ex-body-inner { padding: 0 22px 24px; }
+
+        .ex-description {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 16px 0;
+            line-height: 1.75;
+        }
+        .ex-description p { margin: 0 0 10px; }
+        .ex-description p:last-child { margin: 0; }
+
+        .ex-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 16px 0;
+        }
+        @media (max-width: 768px) { .ex-grid { grid-template-columns: 1fr; } }
+
+        .ex-block {
+            border-radius: 8px;
+            padding: 18px 20px;
+        }
+        .ex-block h4 {
+            margin: 0 0 10px;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 700;
+        }
+        .ex-block ul { margin: 0; padding-left: 18px; }
+        .ex-block li { font-size: 0.9rem; margin: 6px 0; line-height: 1.55; }
+
+        .learn-block {
+            background: rgba(88,166,255,0.08);
+            border: 1px solid rgba(88,166,255,0.2);
+        }
+        .learn-block h4 { color: var(--info); }
+
+        .success-block {
+            background: rgba(63,185,80,0.08);
+            border: 1px solid rgba(63,185,80,0.2);
+        }
+        .success-block h4 { color: var(--success); }
+
+        .extension-block {
+            background: rgba(139,92,246,0.08);
+            border: 1px solid rgba(139,92,246,0.25);
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 16px 0;
+        }
+        .extension-block h4 {
+            margin: 0 0 8px;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--primary);
+            font-weight: 700;
+        }
+        .extension-block p { margin: 0; font-size: 0.9rem; color: var(--text-muted); }
+
+        .tier-intro {
+            border-radius: 10px;
+            padding: 20px 24px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+        .warmup-intro { background: rgba(63,185,80,0.07); border-left: 3px solid var(--success); }
+        .core-intro { background: rgba(88,166,255,0.07); border-left: 3px solid var(--info); }
+        .advanced-intro { background: rgba(210,153,34,0.07); border-left: 3px solid var(--warning); }
+        .expert-intro { background: rgba(248,81,73,0.07); border-left: 3px solid var(--danger); }
+
+        .copy-button {
+            position: absolute; top: 10px; right: 10px;
+            padding: 4px 12px; background: var(--bg-secondary);
+            border: 1px solid var(--border); border-radius: 4px;
+            color: var(--text-muted); font-size: 0.78rem;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .copy-button:hover { color: var(--text); border-color: var(--primary); }
+
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin: 24px 0;
+        }
+        @media (max-width: 900px) { .overview-grid { grid-template-columns: repeat(2,1fr); } }
+        @media (max-width: 480px) { .overview-grid { grid-template-columns: 1fr; } }
+        .ov-card {
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+        .ov-count { font-size: 2.4rem; font-weight: 800; line-height: 1; margin-bottom: 8px; }
+        .ov-label { font-size: 0.82rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+        .ov-warmup { background: rgba(63,185,80,0.1); }
+        .ov-warmup .ov-count { color: var(--success); }
+        .ov-warmup .ov-label { color: var(--success); }
+        .ov-core { background: rgba(88,166,255,0.1); }
+        .ov-core .ov-count { color: var(--info); }
+        .ov-core .ov-label { color: var(--info); }
+        .ov-advanced { background: rgba(210,153,34,0.1); }
+        .ov-advanced .ov-count { color: var(--warning); }
+        .ov-advanced .ov-label { color: var(--warning); }
+        .ov-expert { background: rgba(248,81,73,0.1); }
+        .ov-expert .ov-count { color: var(--danger); }
+        .ov-expert .ov-label { color: var(--danger); }
+    </style>
+</head>
+<body>
+<div id="progress-bar"></div>
+
+<nav class="navbar">
+    <div class="container">
+        <div class="logo">LangGraph</div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="01-foundation.html">Foundations</a>
+            <a href="07-patterns.html">Patterns</a>
+            <a href="15-reference.html">Reference</a>
+        </div>
+    </div>
+</nav>
+
+<main id="main-content" class="container">
+    <div class="breadcrumbs">
+        <a href="index.html">Home</a>
+        <span class="separator">›</span>
+        <span>Section 14: Practice Exercises</span>
+    </div>
+
+    <h1>Section 14: Practice Exercises</h1>
+
+    <div class="hero-quote">
+        <p>The only way to <em>truly understand</em> LangGraph is to <em>build with it</em>. Here are 15 exercises ranging from warm-up to expert. Each one targets a specific skill gap that trips up engineers at interviews and in production. Close the tab. Open your editor. Write the code.</p>
+    </div>
+
+    <div class="overview-grid">
+        <div class="ov-card ov-warmup">
+            <div class="ov-count">3</div>
+            <div class="ov-label">Warm-Up</div>
+        </div>
+        <div class="ov-card ov-core">
+            <div class="ov-count">5</div>
+            <div class="ov-label">Core</div>
+        </div>
+        <div class="ov-card ov-advanced">
+            <div class="ov-count">4</div>
+            <div class="ov-label">Advanced</div>
+        </div>
+        <div class="ov-card ov-expert">
+            <div class="ov-count">3</div>
+            <div class="ov-label">Expert</div>
+        </div>
+    </div>
+
+    <!-- TIER TABS -->
+    <div class="tier-tabs">
+        <div class="tier-tab-buttons">
+            <button class="tier-tab-btn warmup active" data-tier="warmup">
+                <span class="tier-badge">1-3</span> Warm-Up
+            </button>
+            <button class="tier-tab-btn core" data-tier="core">
+                <span class="tier-badge">4-8</span> Core
+            </button>
+            <button class="tier-tab-btn advanced" data-tier="advanced">
+                <span class="tier-badge">9-12</span> Advanced
+            </button>
+            <button class="tier-tab-btn expert" data-tier="expert">
+                <span class="tier-badge">13-15</span> Expert
+            </button>
+        </div>
+
+        <!-- ===================== WARM-UP ===================== -->
+        <div class="tier-panel active" id="tier-warmup">
+            <div class="tier-intro warmup-intro">
+                <strong>Warm-Up Exercises (1-3)</strong> — These exercises assume you have read the documentation but have not yet run LangGraph code. Each should take 30-60 minutes. If you get stuck, re-read the node and edge sections. The goal is fluency with the fundamental API, not speed.
+            </div>
+            <div class="ex-accordion">
+
+                <!-- Exercise 1 -->
+                <div class="ex-item active">
+                    <div class="ex-header">
+                        <div class="ex-header-left">
+                            <div class="ex-num warmup-num">1</div>
+                            <div>
+                                <div class="ex-title">Your First StateGraph</div>
+                                <div class="ex-subtitle">TypedDict state · add_node · add_edge · compile · invoke</div>
+                            </div>
+                        </div>
+                        <span class="ex-chevron">▾</span>
+                    </div>
+                    <div class="ex-body">
+                        <div class="ex-body-inner">
+                            <div class="ex-description">
+                                <p>Build a simple 2-node graph: a <strong>greeting node</strong> and a <strong>farewell node</strong>. Your state is a <code>TypedDict</code> with two fields: <code>name: str</code> and <code>message: str</code>. The first node sets <code>message</code> to <code>"Hello, {name}!"</code>. The second node reads the current message and appends <code>" Goodbye, {name}!"</code> to it. Chain them with a direct edge: <code>greeting → farewell → END</code>.</p>
+                                <p>Compile and invoke with <code>{"name": "Alice", "message": ""}</code>. After it works, print the final state and verify the message is exactly <code>"Hello, Alice! Goodbye, Alice!"</code>. Then draw the graph topology on paper before running <code>graph.get_graph().draw_mermaid()</code> — compare your drawing to the generated output.</p>
+                            </div>
+                            <div class="ex-grid">
+                                <div class="ex-block learn-block">
+                                    <h4>What You'll Learn</h4>
+                                    <ul>
+                                        <li>Declaring a <code>TypedDict</code>-based <code>State</code> class</li>
+                                        <li>Creating a <code>StateGraph(State)</code> instance</li>
+                                        <li>Defining node functions: <code>(state: State) -> dict</code></li>
+                                        <li>Using <code>add_node()</code> and <code>add_edge()</code></li>
+                                        <li>The role of <code>compile()</code> — what it validates and what it produces</li>
+                                        <li>Calling <code>invoke()</code> and reading the returned state</li>
+                                        <li>Why nodes return <strong>partial state dicts</strong>, not full state objects</li>
+                                    </ul>
+                                </div>
+                                <div class="ex-block success-block">
+                                    <h4>Success Criteria</h4>
+                                    <ul>
+                                        <li>Graph executes without error end-to-end</li>
+                                        <li>Final state: <code>message == "Hello, Alice! Goodbye, Alice!"</code></li>
+                                        <li>You can explain verbally what <code>compile()</code> does and why it is required before <code>invoke()</code></li>
+                                        <li>You can explain the difference between what a node <em>receives</em> and what it <em>returns</em></li>
+                                        <li>Given 3 nodes, you can describe what changes in the <code>add_edge</code> calls</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="extension-block">
+                                <h4>Extension Challenge</h4>
+                                <p>Add a third node called <code>timestamp_node</code> that appends the current UTC timestamp (ISO format) to the message — e.g., <code>" [2025-06-01T14:30:00Z]"</code>. Insert it between farewell and END. Verify the final message includes all three parts in order.</p>
+                            </div>
+                            <pre><code>from typing import TypedDict
+from langgraph.graph import StateGraph, START, END
+
+class State(TypedDict):
+    name: str
+    message: str
+
+def greeting_node(state: State) -> dict:
+    # Return only the fields you are changing
+    return {"message": f"Hello, {state['name']}!"}
+
+def farewell_node(state: State) -> dict:
+    # Append to existing message
+    return {"message": state["message"] + f" Goodbye, {state['name']}!"}
+
+builder = StateGraph(State)
+builder.add_node("greeting", greeting_node)
+builder.add_node("farewell", farewell_node)
+
+builder.add_edge(START, "greeting")
+builder.add_edge("greeting", "farewell")
+builder.add_edge("farewell", END)
+
+graph = builder.compile()
+result = graph.invoke({"name": "Alice", "message": ""})
+print(result)
+# Expected: {"name": "Alice", "message": "Hello, Alice! Goodbye, Alice!"}</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exercise 2 -->
+                <div class="ex-item">
+                    <div class="ex-header">
+                        <div class="ex-header-left">
+                            <div class="ex-num warmup-num">2</div>
+                            <div>
+                                <div class="ex-title">The Persistent Counter</div>
+                                <div class="ex-subtitle">Conditional edges · graph loops · MemorySaver · thread_id persistence</div>
+                            </div>
+                        </div>
+                        <span class="ex-chevron">▾</span>
+                    </div>
+                    <div class="ex-body">
+                        <div class="ex-body-inner">
+                            <div class="ex-description">
+                                <p>Build a graph where a single <strong>counter node</strong> increments a <code>count</code> field in state by 1 each time it runs. Add a <strong>conditional edge</strong>: if <code>count &lt; 5</code>, loop back to the counter node; if <code>count &gt;= 5</code>, route to <code>END</code>.</p>
+                                <p>Attach a <code>MemorySaver</code> checkpointer. Pass <code>config={"configurable": {"thread_id": "thread-001"}}</code> on every <code>invoke</code> call. Invoke twice with the same <code>thread_id</code> and observe what happens on the second call — does it loop again or exit immediately? Call <code>graph.get_state(config)</code> after both invocations and verify the count. Explain to yourself why the second call behaves differently.</p>
+                            </div>
+                            <div class="ex-grid">
+                                <div class="ex-block learn-block">
+                                    <h4>What You'll Learn</h4>
+                                    <ul>
+                                        <li>Writing a <strong>router function</strong> for <code>add_conditional_edges</code></li>
+                                        <li>Graph cycles and how LangGraph handles loops (recursion limit)</li>
+                                        <li><code>MemorySaver</code>: in-memory checkpointing for development use</li>
+                                        <li>The <code>config</code> dict and <code>thread_id</code> — what a "thread" means semantically</li>
+                                        <li>Why the second invoke starts from the <em>persisted</em> checkpoint, not the initial input</li>
+                                        <li><code>get_state(config)</code> for reading persisted thread state</li>
+                                    </ul>
+                                </div>
+                                <div class="ex-block success-block">
+                                    <h4>Success Criteria</h4>
+                                    <ul>
+                                        <li>First invoke: runs 5 iterations, final <code>count == 5</code></li>
+                                        <li>Second invoke (same thread): exits immediately, <code>count</code> still <code>5</code></li>
+                                        <li>You can articulate why the second call did not re-run the loop</li>
+                                        <li><code>get_state_history(config)</code> shows all checkpoints from the first run</li>
+                                        <li>Setting <code>recursion_limit=3</code> causes a <code>GraphRecursionError</code> you can explain</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="extension-block">
+                                <h4>Extension Challenge</h4>
+                                <p>Swap <code>MemorySaver</code> for <code>SqliteSaver</code> backed by a local <code>counter.db</code> file. Terminate your Python process entirely, restart it, and call <code>invoke</code> again with the same <code>thread_id</code>. The state should still be persisted. This simulates production application restarts.</p>
+                            </div>
+                            <pre><code>from typing import TypedDict
+from langgraph.graph import StateGraph, START, END
+from langgraph.checkpoint.memory import MemorySaver
+
+class State(TypedDict):
+    count: int
+
+def counter_node(state: State) -> dict:
+    return {"count": state["count"] + 1}
+
+def should_continue(state: State) -> str:
+    return "end" if state["count"] >= 5 else "continue"
+
+builder = StateGraph(State)
+builder.add_node("counter", counter_node)
+builder.add_edge(START, "counter")
+builder.add_conditional_edges(
+    "counter",
+    should_continue,
+    {"continue": "counter", "end": END}
+)
+
+memory = MemorySaver()
+graph = builder.compile(checkpointer=memory)
+config = {"configurable": {"thread_id": "thread-001"}}
+
+result1 = graph.invoke({"count": 0}, config=config)
+print("After first invoke:", result1)  # count == 5
+
+result2 = graph.invoke({"count": 0}, config=config)
+print("After second invoke:", result2)  # still count == 5, no iterations</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exercise 3 -->
+                <div class="ex-item">
+                    <div class="ex-header">
+                        <div class="ex-header-left">
+                            <div class="ex-num warmup-num">3</div>
+                            <div>
+                                <div class="ex-title">The Tool-Calling Agent</div>
+                                <div class="ex-subtitle">create_react_agent · @tool decorator · ReAct reasoning loop</div>
+                            </div>
+                        </div>
+                        <span class="ex-chevron">▾</span>
+                    </div>
+                    <div class="ex-body">
+                        <div class="ex-body-inner">
+                            <div class="ex-description">
+                                <p>Build a ReAct agent using the <code>create_react_agent</code> prebuilt with two tools: a <strong>calculator tool</strong> that accepts a math expression string and evaluates it using Python's <code>ast</code> module with an operator whitelist (no arbitrary code execution), and a <strong>unit converter tool</strong> that handles meters-to-feet (<code>m * 3.28084</code>) and Celsius-to-Fahrenheit (<code>c * 9/5 + 32</code>) conversions.</p>
+                                <p>Give the agent this prompt: <em>"What is 42 multiplied by 3.14159, and if that result is a distance in meters, how many feet is it?"</em>. Let it run to completion. Afterward, iterate over <code>state["messages"]</code> and print each tool call and tool result to understand the full ReAct trace.</p>
+                            </div>
+                            <div class="ex-grid">
+                                <div class="ex-block learn-block">
+                                    <h4>What You'll Learn</h4>
+                                    <ul>
+                                        <li>The <code>@tool</code> decorator — docstrings are the LLM's instruction manual</li>
+                                        <li><code>create_react_agent(model, tools)</code> — the prebuilt ReAct graph</li>
+                                        <li>How the agent decides which tool to call and when to stop</li>
+                                        <li>Reading the <code>messages</code> list: <code>HumanMessage</code>, <code>AIMessage</code>, <code>ToolMessage</code> sequence</li>
+                                        <li>The ReAct loop: Reason → Act → Observe → Reason until done</li>
+                                        <li>Why tool docstrings must be precise and unambiguous</li>
+                                    </ul>
+                                </div>
+                                <div class="ex-block success-block">
+                                    <h4>Success Criteria</h4>
+                                    <ul>
+                                        <li>Agent invokes the calculator tool first, obtains <code>131.94678</code></li>
+                                        <li>Agent then invokes the unit converter with that result</li>
+                                        <li>Final answer includes both the product and the feet equivalent (~432.9 feet)</li>
+                                        <li>You can trace the exact tool call order from <code>state["messages"]</code></li>
+                                        <li>You can identify which message types appear and in what order</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="extension-block">
+                                <h4>Extension Challenge</h4>
+                                <p>Add a third tool: <code>web_search(query: str) -> str</code> that returns a hard-coded response like <code>"According to Wikipedia, a football field is 91.44 meters long."</code> Craft a prompt that forces the agent to use all three tools in sequence. Observe the multi-tool trace and count how many message objects appear in the final state.</p>
+                            </div>
+                            <pre><code>import ast, operator as op
+from langchain_openai import ChatOpenAI
+from langchain_core.tools import tool
+from langgraph.prebuilt import create_react_agent
+
+# Safe AST-based math evaluator (whitelist operators only)
+_SAFE_OPS = {
+    ast.Add: op.add, ast.Sub: op.sub,
+    ast.Mult: op.mul, ast.Div: op.truediv,
+    ast.Pow: op.pow, ast.USub: op.neg,
+}
+
+def _safe_eval_node(node):
+    if isinstance(node, ast.Constant):
+        return node.value
+    if isinstance(node, ast.BinOp):
+        return _SAFE_OPS[type(node.op)](
+            _safe_eval_node(node.left),
+            _safe_eval_node(node.right)
+        )
+    if isinstance(node, ast.UnaryOp):
+        return _SAFE_OPS[type(node.op)](_safe_eval_node(node.operand))
+    raise ValueError(f"Disallowed expression type: {type(node).__name__}")
+
+@tool
+def calculator(expression: str) -> str:
+    """Evaluate a mathematical expression using only +, -, *, /, ** operators.
+    Input must be a plain math expression like '42 * 3.14159'.
+    Returns the numeric result as a string."""
+    try:
+        tree = ast.parse(expression.strip(), mode='eval')
+        result = _safe_eval_node(tree.body)
+        return str(round(result, 6))
+    except Exception as e:
+        return f"Error evaluating expression: {e}"
+
+@tool
+def unit_converter(value: float, from_unit: str, to_unit: str) -> str:
+    """Convert between measurement units.
+    Supports: meters to feet (m, ft), celsius to fahrenheit (c, f).
+    Example: unit_converter(100.0, 'm', 'ft')"""
+    conversions = {
+        ("m", "ft"): lambda v: v * 3.28084,
+        ("ft", "m"): lambda v: v / 3.28084,
+        ("c", "f"):  lambda v: v * 9 / 5 + 32,
+        ("f", "c"):  lambda v: (v - 32) * 5 / 9,
+    }
+    key = (from_unit.lower(), to_unit.lower())
+    if key not in conversions:
+        return f"Unsupported conversion: {from_unit} to {to_unit}"
+    return f"{round(conversions[key](value), 4)} {to_unit}"
+
+model = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+agent = create_react_agent(model, tools=[calculator, unit_converter])
+
+result = agent.invoke({
+    "messages": [("human",
+        "What is 42 multiplied by 3.14159, and if that result "
+        "is a distance in meters, how many feet is it?")]
+})
+
+print("\n--- Message Trace ---")
+for msg in result["messages"]:
+    mtype = type(msg).__name__
+    content = getattr(msg, 'content', '')
+    tool_calls = getattr(msg, 'tool_calls', [])
+    name = getattr(msg, 'name', '')
+    if tool_calls:
+        print(f"[{mtype}] Tool calls: {[tc['name'] for tc in tool_calls]}")
+    elif name:
+        print(f"[{mtype}:{name}] {content}")
+    else:
+        print(f"[{mtype}] {str(content)[:120]}")</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div><!-- /tier-panel warmup -->
+
+        <!-- ===================== CORE ===================== -->
+        <div class="tier-panel" id="tier-core">
+            <div class="tier-intro core-intro">
+                <strong>Core Exercises (4-8)</strong> — These require you to compose multiple LangGraph features together. Each should take 1-3 hours. You are expected to encounter errors and debug them. The ability to read error messages and trace the graph state is itself the skill being practiced.
+            </div>
+            <div class="ex-accordion">
+
+                <!-- Exercise 4 -->
+                <div class="ex-item">
+                    <div class="ex-header">
+                        <div class="ex-header-left">
+                            <div class="ex-num core-num">4</div>
+                            <div>
+                                <div class="ex-title">Human-in-the-Loop Email Sender</div>
+                                <div class="ex-subtitle">interrupt_before · Command(resume) · graph pausing · multi-step oversight</div>
+                            </div>
+                        </div>
+                        <span class="ex-chevron">▾</span>
+                    </div>
+                    <div class="ex-body">
+                        <div class="ex-body-inner">
+                            <div class="ex-description">
+                                <p>Build a customer service assistant that drafts and sends email responses. Graph topology: <code>classify_intent</code> → <code>draft_email</code> → <strong>[INTERRUPT]</strong> → <code>human_reviews</code> → route to either <code>send_email</code> or <code>revise_email</code>.</p>
+                                <p>State fields: <code>customer_message: str</code>, <code>draft_response: str</code>, <code>human_decision: str</code>, <code>final_response: str</code>. Use <code>interrupt_before=["send_email"]</code> in <code>compile()</code> so a human must approve every outbound email. When the graph pauses, print the draft, prompt the human for "approve" or "revise", and call <code>graph.invoke(Command(resume={"decision": user_input}), config=config)</code> to resume.</p>
+                            </div>
+                            <div class="ex-grid">
+                                <div class="ex-block learn-block">
+                                    <h4>What You'll Learn</h4>
+                                    <ul>
+                                        <li><code>interrupt_before</code> and <code>interrupt_after</code> in <code>compile()</code></li>
+                                        <li>How graph execution pauses and what "paused" state looks like</li>
+                                        <li><code>Command(resume=value)</code> to inject data into a resumed graph</li>
+                                        <li>Reading state from a paused graph with <code>get_state(config)</code></li>
+                                        <li>Designing state schemas for multi-step human oversight workflows</li>
+                                        <li>The difference between interrupting <em>before</em> vs. <em>after</em> a node</li>
+                                    </ul>
+                                </div>
+                                <div class="ex-block success-block">
+                                    <h4>Success Criteria</h4>
+                                    <ul>
+                                        <li>Graph pauses before <code>send_email</code> on every invocation</li>
+                                        <li>Draft is printed to console for human review</li>
+                                        <li>"approve" routes to <code>send_email</code> and logs "Email sent!"</li>
+                                        <li>"revise" routes to <code>revise_email</code> which updates the draft and loops</li>
+                                        <li><code>get_state(config).next</code> shows the pending node name when paused</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="extension-block">
+                                <h4>Extension Challenge</h4>
+                                <p>When the human types "revise", prompt them for specific feedback (e.g., "Make it more concise"). Store this in state as <code>revision_notes: str</code>. Route back to <code>draft_email</code> with the revision notes injected into the LLM prompt. Track revision count as <code>revision_count: int</code> and abort after 3 revisions with a "max revisions reached" message.</p>
+                            </div>
+                            <pre><code>from typing import TypedDict
+from langgraph.graph import StateGraph, START, END
+from langgraph.checkpoint.memory import MemorySaver
+from langgraph.types import Command, interrupt
+
+class EmailState(TypedDict):
+    customer_message: str
+    draft_response: str
+    human_decision: str
+    final_response: str
+
+def classify_intent(state: EmailState) -> dict:
+    return {}  # In production: LLM classifies intent
+
+def draft_email(state: EmailState) -> dict:
+    # In production: LLM generates a draft. Mocked here.
+    draft = (
+        f"Dear Customer,\n\n"
+        f"Thank you for contacting us regarding: '{state['customer_message']}'\n\n"
+        f"We are looking into this and will resolve it within 24 hours.\n\n"
+        f"Best regards,\nSupport Team"
+    )
+    return {"draft_response": draft}
+
+def human_reviews(state: EmailState) -> dict:
+    decision = interrupt({
+        "prompt": "Review the draft below. Type 'approve' or 'revise':",
+        "draft": state["draft_response"]
+    })
+    return {"human_decision": decision.get("decision", "approve")}
+
+def route_after_review(state: EmailState) -> str:
+    return "send_email" if state["human_decision"] == "approve" else "revise_email"
+
+def send_email(state: EmailState) -> dict:
+    print(f"\n--- EMAIL SENT ---\n{state['draft_response']}\n------------------")
+    return {"final_response": state["draft_response"]}
+
+def revise_email(state: EmailState) -> dict:
+    revised = state["draft_response"] + "\n\n[P.S. Revised for clarity.]"
+    return {"draft_response": revised}
+
+builder = StateGraph(EmailState)
+builder.add_node("classify_intent", classify_intent)
+builder.add_node("draft_email", draft_email)
+builder.add_node("human_reviews", human_reviews)
+builder.add_node("send_email", send_email)
+builder.add_node("revise_email", revise_email)
+builder.add_edge(START, "classify_intent")
+builder.add_edge("classify_intent", "draft_email")
+builder.add_edge("draft_email", "human_reviews")
+builder.add_conditional_edges("human_reviews", route_after_review)
+builder.add_edge("send_email", END)
+builder.add_edge("revise_email", "draft_email")
+
+memory = MemorySaver()
+graph = builder.compile(checkpointer=memory)
+config = {"configurable": {"thread_id": "email-session-001"}}
+
+initial = {
+    "customer_message": "My order #1234 has not arrived.",
+    "draft_response": "", "human_decision": "", "final_response": ""
+}
+# First call: runs until interrupt
+graph.invoke(initial, config=config)
+# Resume with approval
+graph.invoke(Command(resume={"decision": "approve"}), config=config)</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exercise 5 -->
+                <div class="ex-item">
+                    <div class="ex-header">
+                        <div class="ex-header-left">
+                            <div class="ex-num core-num">5</div>
+                            <div>
+                                <div class="ex-title">Parallel Research Aggregator</div>
+                                <div class="ex-subtitle">Send API · Annotated reducers · fan-out / fan-in pattern</div>
+                            </div>
+                        </div>
+                        <span class="ex-chevron">▾</span>
+                    </div>
+                    <div class="ex-body">
+                        <div class="ex-body-inner">
+                            <div class="ex-description">
+                                <p>Build a research agent that receives a topic string and fans out to 3 parallel research branches: <code>research_historical</code>, <code>research_technical</code>, and <code>research_recent</code>. Each branch returns a finding string for its domain.</p>
+                                <p>The critical design decision: <code>research_results</code> in state must use <code>Annotated[list[str], operator.add]</code> as its type. This tells LangGraph to <em>merge</em> results from all parallel branches via list concatenation rather than last-write-wins. Use the <code>Send</code> API in a <code>fan_out</code> function to dispatch all three branches simultaneously. A final <code>synthesize</code> node receives the merged list and produces a summary.</p>
+                            </div>
+                            <div class="ex-grid">
+                                <div class="ex-block learn-block">
+                                    <h4>What You'll Learn</h4>
+                                    <ul>
+                                        <li><code>Send(node_name, state_override)</code> for parallel dispatch</li>
+                                        <li><code>Annotated[list[str], operator.add]</code> — reducer-based state merging</li>
+                                        <li>The fan-out / fan-in execution pattern and when to use it</li>
+                                        <li>Why default state (last-write-wins) is wrong for parallel execution</li>
+                                        <li>How LangGraph waits for all branches before proceeding to the join node</li>
+                                        <li>Timing parallel vs. sequential to measure actual speedup</li>
+                                    </ul>
+                                </div>
+                                <div class="ex-block success-block">
+                                    <h4>Success Criteria</h4>
+                                    <ul>
+                                        <li>All 3 branches execute (add a print in each to confirm)</li>
+                                        <li><code>research_results</code> contains exactly 3 strings, one per branch</li>
+                                        <li>Without <code>operator.add</code> reducer, only 1 result survives — demonstrate this</li>
+                                        <li>Synthesizer output references content from all 3 branches</li>
+                                        <li>You can explain why <code>operator.add</code> is the correct reducer here</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="extension-block">
+                                <h4>Extension Challenge</h4>
+                                <p>Add <code>import time; time.sleep(2)</code> to the <code>research_recent</code> branch node. Measure total wall-clock time with <code>time.time()</code> before and after <code>invoke()</code>. Confirm total time is approximately 2 seconds (not 6), proving branches run in parallel and the slow branch does not block the others.</p>
+                            </div>
+                            <pre><code>import operator
+from typing import Annotated, TypedDict
+from langgraph.graph import StateGraph, START, END
+from langgraph.types import Send
+
+class ResearchState(TypedDict):
+    topic: str
+    research_results: Annotated[list[str], operator.add]
+    summary: str
+
+class BranchState(TypedDict):
+    topic: str
+    branch: str
+
+def fan_out(state: ResearchState):
+    """Dispatch 3 parallel research branches using the Send API."""
+    return [
+        Send("research_branch", {"topic": state["topic"], "branch": "historical"}),
+        Send("research_branch", {"topic": state["topic"], "branch": "technical"}),
+        Send("research_branch", {"topic": state["topic"], "branch": "recent"}),
+    ]
+
+def research_branch(state: BranchState) -> dict:
+    topic, branch = state["topic"], state["branch"]
+    findings = {
+        "historical": f"[Historical] The origins of {topic} trace back to...",
+        "technical":  f"[Technical] {topic} operates on the principle of...",
+        "recent":     f"[Recent] Current developments in {topic} include...",
+    }
+    print(f"  Branch '{branch}' completed for topic '{topic}'")
+    return {"research_results": [findings[branch]]}
+
+def synthesize(state: ResearchState) -> dict:
+    combined = "\n".join(state["research_results"])
+    return {"summary": f"Research on '{state['topic']}':\n{combined}"}
+
+builder = StateGraph(ResearchState)
+builder.add_node("research_branch", research_branch)
+builder.add_node("synthesize", synthesize)
+builder.add_conditional_edges(START, fan_out, ["research_branch"])
+builder.add_edge("research_branch", "synthesize")
+builder.add_edge("synthesize", END)
+
+graph = builder.compile()
+result = graph.invoke({
+    "topic": "quantum computing",
+    "research_results": [],
+    "summary": ""
+})
+print(result["summary"])</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exercise 6 -->
+                <div class="ex-item">
+                    <div class="ex-header">
+                        <div class="ex-header-left">
+                            <div class="ex-num core-num">6</div>
+                            <div>
+                                <div class="ex-title">The Supervisor Agent</div>
+                                <div class="ex-subtitle">Supervisor pattern · specialist routing · multi-agent state design</div>
+                            </div>
+                        </div>
+                        <span class="ex-chevron">▾</span>
+                    </div>
+                    <div class="ex-body">
+                        <div class="ex-body-inner">
+                            <div class="ex-description">
+                                <p>Build a supervisor with 2 specialists: a <strong>math_agent</strong> (calculator tools) and a <strong>writing_agent</strong> (text formatting tools: <code>to_uppercase</code>, <code>count_words</code>, <code>reverse_text</code>). The supervisor node inspects the task and outputs a routing decision: <code>"math_agent"</code>, <code>"writing_agent"</code>, or <code>"FINISH"</code>.</p>
+                                <p>State: <code>task: str</code>, <code>current_agent: str</code>, <code>completed_work: Annotated[list[str], operator.add]</code>, <code>final_answer: str</code>. When a specialist finishes, it appends its result to <code>completed_work</code> and routes back to the supervisor. The supervisor decides whether to delegate again or synthesize a <code>final_answer</code> and stop.</p>
+                            </div>
+                            <div class="ex-grid">
+                                <div class="ex-block learn-block">
+                                    <h4>What You'll Learn</h4>
+                                    <ul>
+                                        <li>Supervisor pattern: one orchestrator routing to multiple specialists</li>
+                                        <li>How the supervisor's routing decision passes through state</li>
+                                        <li>State that accumulates work across multiple specialist calls</li>
+                                        <li>The collect-and-re-route pattern for multi-turn supervisor loops</li>
+                                        <li>When to use supervisor vs. parallel fan-out (sequential dependency vs. independence)</li>
+                                        <li>Building a termination condition that isn't just a loop counter</li>
+                                    </ul>
+                                </div>
+                                <div class="ex-block success-block">
+                                    <h4>Success Criteria</h4>
+                                    <ul>
+                                        <li>"Calculate 15 * 7" routes to <code>math_agent</code>, not <code>writing_agent</code></li>
+                                        <li>"Reverse the text 'hello world'" routes to <code>writing_agent</code></li>
+                                        <li>Compound task requiring both agents: both called sequentially</li>
+                                        <li><code>completed_work</code> accumulates results from all agents called</li>
+                                        <li>Supervisor reaches FINISH and produces a coherent <code>final_answer</code></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="extension-block">
+                                <h4>Extension Challenge</h4>
+                                <p>Add a third <code>research_agent</code> that uses a mock web search tool. Design a prompt that requires all three agents: "Research quantum computing, calculate 2 raised to the power 10, then write the research findings in uppercase." Trace the supervisor's sequence of routing decisions. If the supervisor ever routes to the wrong agent, examine your supervisor prompt and fix it.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exercise 7 -->
+                <div class="ex-item">
+                    <div class="ex-header">
+                        <div class="ex-header-left">
+                            <div class="ex-num core-num">7</div>
+                            <div>
+                                <div class="ex-title">State Schema Migration</div>
+                                <div class="ex-subtitle">State evolution · backward compatibility · checkpoint migration · schema versioning</div>
+                            </div>
+                        </div>
+                        <span class="ex-chevron">▾</span>
+                    </div>
+                    <div class="ex-body">
+                        <div class="ex-body-inner">
+                            <div class="ex-description">
+                                <p>Start with a simple <code>StateV1</code> (<code>messages: list</code>, <code>count: int</code>). Build a minimal graph using this schema and run it 3 times with the same <code>thread_id</code> to generate checkpoints in a <code>SqliteSaver</code> database.</p>
+                                <p>Now "release a new version": define <code>StateV2</code> adding <code>version: str</code> and <code>metadata: dict</code> with sensible defaults. Write a <strong>migration function</strong> that takes an old checkpoint's values dict and returns a new dict with the added fields. Apply it using <code>graph.update_state(config, migration(old_values))</code>. Then invoke the graph with the old <code>thread_id</code> using the new schema — it should read the persisted count correctly and expose the new fields.</p>
+                            </div>
+                            <div class="ex-grid">
+                                <div class="ex-block learn-block">
+                                    <h4>What You'll Learn</h4>
+                                    <ul>
+                                        <li>Why state schema changes are dangerous in production systems</li>
+                                        <li><code>update_state(config, values)</code> for manually patching checkpoints</li>
+                                        <li>Default field values and backward compatibility strategies</li>
+                                        <li>Additive schema changes (safe) vs. breaking changes (dangerous)</li>
+                                        <li>Practical migration patterns: in-place patch, versioned threads, dual-write</li>
+                                        <li>Testing migration correctness end-to-end</li>
+                                    </ul>
+                                </div>
+                                <div class="ex-block success-block">
+                                    <h4>Success Criteria</h4>
+                                    <ul>
+                                        <li>Old checkpoints load without <code>KeyError</code> under the new schema</li>
+                                        <li><code>version</code> field shows <code>"v2"</code> after migration is applied</li>
+                                        <li><code>count</code> value from old checkpoint is preserved exactly</li>
+                                        <li>You can explain which schema changes are safe (additive) vs. dangerous (rename, type change, removal)</li>
+                                        <li>Bonus: a field rename causes an error you can identify and fix</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="extension-block">
+                                <h4>Extension Challenge</h4>
+                                <p>Simulate a breaking change: rename <code>count</code> to <code>iteration_count</code> in the schema. Write a migration that reads old checkpoints, renames the key, and patches them with <code>update_state</code>. Verify that graphs resuming from migrated checkpoints work correctly. Document the migration procedure as a runbook docstring in your code.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exercise 8 -->
+                <div class="ex-item">
+                    <div class="ex-header">
+                        <div class="ex-header-left">
+                            <div class="ex-num core-num">8</div>
+                            <div>
+                                <div class="ex-title">LangSmith Instrumented Agent</div>
+                                <div class="ex-subtitle">LangSmith tracing · run tagging · metadata · cost and latency analysis</div>
+                            </div>
+                        </div>
+                        <span class="ex-chevron">▾</span>
+                    </div>
+                    <div class="ex-body">
+                        <div class="ex-body-inner">
+                            <div class="ex-description">
+                                <p>Take any agent from a previous exercise and add full LangSmith instrumentation. Set environment variables: <code>LANGSMITH_API_KEY</code>, <code>LANGSMITH_PROJECT="langgraph-practice"</code>, and <code>LANGCHAIN_TRACING_V2="true"</code>. Add custom run metadata to each invoke call via the <code>config</code> dict: <code>run_name</code>, <code>tags</code>, and <code>metadata</code> containing <code>user_id</code>, <code>session_id</code>, and <code>task_type</code>.</p>
+                                <p>Run the agent 5 times with different inputs. Open LangSmith and navigate to your project. For each run, answer: Which node took the most time? Which node used the most tokens? Were there any retries or errors? Export one LLM call to the LangSmith Playground and test a different system prompt against the same input.</p>
+                            </div>
+                            <div class="ex-grid">
+                                <div class="ex-block learn-block">
+                                    <h4>What You'll Learn</h4>
+                                    <ul>
+                                        <li>Zero-code LangSmith activation via environment variables</li>
+                                        <li>Adding <code>run_name</code>, <code>tags</code>, <code>metadata</code> to the invoke <code>config</code></li>
+                                        <li>Reading hierarchical traces: run → node span → LLM call span</li>
+                                        <li>Identifying latency hotspots and token usage by node</li>
+                                        <li>The LangSmith Playground for prompt iteration on captured traces</li>
+                                        <li>Building an evaluation dataset from production traces</li>
+                                    </ul>
+                                </div>
+                                <div class="ex-block success-block">
+                                    <h4>Success Criteria</h4>
+                                    <ul>
+                                        <li>All 5 runs appear in LangSmith under <code>langgraph-practice</code> project</li>
+                                        <li>Tags and metadata are visible on each run detail page</li>
+                                        <li>Can identify the slowest node across 5 runs with confidence</li>
+                                        <li>Can identify the most token-expensive node across 5 runs</li>
+                                        <li>Can describe one specific optimization you would make based on the traces</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="extension-block">
+                                <h4>Extension Challenge</h4>
+                                <p>Create an evaluation dataset in LangSmith with 3 test cases: a math question, a writing question, and an ambiguous question. Use <code>langsmith.evaluate()</code> with an LLM-as-judge evaluator that scores response quality 0-10. Run the evaluation pipeline and identify which question type scores lowest. This is the foundation of a continuous evaluation workflow.</p>
+                            </div>
+                            <pre><code>import os
+os.environ["LANGCHAIN_TRACING_V2"] = "true"
+os.environ["LANGSMITH_PROJECT"] = "langgraph-practice"
+# Set LANGSMITH_API_KEY in your shell environment or .env file
+
+# Enrich any graph.invoke() call with metadata:
+config = {
+    "configurable": {"thread_id": "trace-demo-001"},
+    "run_name": "tool-agent-session-1",
+    "tags": ["practice", "exercise-8", "tool-calling"],
+    "metadata": {
+        "user_id": "user-123",
+        "session_id": "session-abc",
+        "task_type": "math_plus_conversion",
+        "exercise": "section-14-ex8"
+    }
+}
+
+result = graph.invoke(
+    {"messages": [("human", "What is 99 * 101?")]},
+    config=config
+)
+# Navigate to https://smith.langchain.com → your project → view the trace</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div><!-- /tier-panel core -->
+
+        <!-- ===================== ADVANCED ===================== -->
+        <div class="tier-panel" id="tier-advanced">
+            <div class="tier-intro advanced-intro">
+                <strong>Advanced Exercises (9-12)</strong> — These require production-level thinking: connection management, async patterns, streaming, cross-session memory, and modular architecture. Each should take half a day to a full day. The goal is not just working code — it is code you would be comfortable maintaining and debugging at 2am during an incident.
+            </div>
+            <div class="ex-accordion">
+
+                <!-- Exercise 9 -->
+                <div class="ex-item">
+                    <div class="ex-header">
+                        <div class="ex-header-left">
+                            <div class="ex-num advanced-num">9</div>
+                            <div>
+                                <div class="ex-title">Production Checkpointer Setup</div>
+                                <div class="ex-subtitle">PostgresSaver · Docker setup · thread TTL · naming conventions</div>
+                            </div>
+                        </div>
+                        <span class="ex-chevron">▾</span>
+                    </div>
+                    <div class="ex-body">
+                        <div class="ex-body-inner">
+                            <div class="ex-description">
+                                <p>Replace <code>MemorySaver</code> with <code>PostgresSaver</code> backed by a local PostgreSQL instance. Start it with Docker: <code>docker run -e POSTGRES_PASSWORD=dev -p 5432:5432 postgres:16</code>. Use <code>psycopg</code> (v3) for the connection. Use <code>AsyncPostgresSaver</code> if you are building an async application.</p>
+                                <p>Enforce a thread naming strategy: all thread IDs must follow <code>"user_{user_id}_session_{session_id}"</code>. Write a helper that constructs and validates this string. Implement a TTL archival job: iterate all known threads, check the <code>ts</code> timestamp of their latest checkpoint, and for threads idle more than 1 hour, log: <code>"[ARCHIVE] thread user_42_session_007 idle since ..."</code>. Schedule this job with APScheduler or a simple background loop.</p>
+                            </div>
+                            <div class="ex-grid">
+                                <div class="ex-block learn-block">
+                                    <h4>What You'll Learn</h4>
+                                    <ul>
+                                        <li><code>PostgresSaver.from_conn_string(conn_str)</code> and <code>setup()</code></li>
+                                        <li>Connection pooling considerations (never share a connection across threads)</li>
+                                        <li>Thread ID naming strategies — human-readable IDs aid incident debugging</li>
+                                        <li>Using <code>get_state_history()</code> to inspect thread checkpoint timestamps</li>
+                                        <li>Thread lifecycle: active → idle → archived → purged</li>
+                                        <li>Graceful handling of database unavailability at startup</li>
+                                    </ul>
+                                </div>
+                                <div class="ex-block success-block">
+                                    <h4>Success Criteria</h4>
+                                    <ul>
+                                        <li>Agent state persists across Python process restarts (kill, restart, re-invoke: same result)</li>
+                                        <li>Thread IDs follow the naming convention, enforced by a validator function</li>
+                                        <li>TTL archival log fires correctly for threads with stale checkpoints</li>
+                                        <li>If Postgres is unreachable, the app logs clearly and exits gracefully</li>
+                                        <li>Database tables created correctly by <code>PostgresSaver.setup()</code></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="extension-block">
+                                <h4>Extension Challenge</h4>
+                                <p>Implement actual thread deletion (not just logging) for threads idle over 24 hours by deleting rows from the checkpoints table directly via psycopg. Write a test that creates a thread, artificially backdates its checkpoint timestamp in the database, runs the archival job, and verifies the thread is gone. Handle the edge case where a thread becomes active during the archival window.</p>
+                            </div>
+                            <pre><code>from langgraph.checkpoint.postgres import PostgresSaver
+import psycopg
+from datetime import datetime, timezone, timedelta
+
+CONN_STRING = "postgresql://postgres:dev@localhost:5432/langgraph"
+
+def make_thread_id(user_id: str, session_id: str) -> str:
+    """Construct and validate a thread ID in the required format."""
+    if not user_id or not session_id:
+        raise ValueError("Both user_id and session_id must be non-empty strings")
+    return f"user_{user_id}_session_{session_id}"
+
+def archive_idle_threads(graph, known_thread_ids: list[str],
+                         idle_hours: int = 1) -> list[str]:
+    """Log threads that have been idle beyond the threshold."""
+    now = datetime.now(timezone.utc)
+    cutoff = timedelta(hours=idle_hours)
+    archived = []
+    for thread_id in known_thread_ids:
+        config = {"configurable": {"thread_id": thread_id}}
+        state = graph.get_state(config)
+        if state and state.metadata and "created_at" in state.metadata:
+            ts = datetime.fromisoformat(state.metadata["created_at"])
+            if now - ts > cutoff:
+                print(f"[ARCHIVE] thread {thread_id} idle since {ts.isoformat()}")
+                archived.append(thread_id)
+    return archived
+
+with psycopg.connect(CONN_STRING, autocommit=True) as conn:
+    checkpointer = PostgresSaver(conn)
+    checkpointer.setup()
+    graph = builder.compile(checkpointer=checkpointer)
+    config = {"configurable": {"thread_id": make_thread_id("42", "007")}}
+    result = graph.invoke(initial_state, config=config)</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exercise 10 -->
+                <div class="ex-item">
+                    <div class="ex-header">
+                        <div class="ex-header-left">
+                            <div class="ex-num advanced-num">10</div>
+                            <div>
+                                <div class="ex-title">Streaming Agent UI</div>
+                                <div class="ex-subtitle">astream_events · FastAPI SSE · token-by-token streaming · real-time UI</div>
+                            </div>
+                        </div>
+                        <span class="ex-chevron">▾</span>
+                    </div>
+                    <div class="ex-body">
+                        <div class="ex-body-inner">
+                            <div class="ex-description">
+                                <p>Build a FastAPI application with a <code>POST /chat</code> endpoint that accepts a user message and returns a <strong>Server-Sent Events</strong> stream. Inside the endpoint, call <code>graph.astream_events(input, version="v2")</code> and filter events: emit SSE data for <code>on_chat_model_stream</code> events (token chunks), <code>on_chain_start</code> events (node transitions for the UI status bar), and a final <code>done</code> event when the graph finishes.</p>
+                                <p>Build a simple HTML frontend using the <code>EventSource</code> API (no framework needed) that shows "Agent is thinking..." with the current node name during processing, then streams tokens character by character into a response area. Focus on the SSE mechanics, not the UI aesthetics.</p>
+                            </div>
+                            <div class="ex-grid">
+                                <div class="ex-block learn-block">
+                                    <h4>What You'll Learn</h4>
+                                    <ul>
+                                        <li><code>astream_events(input, version="v2")</code> and the event structure</li>
+                                        <li>Filtering <code>on_chat_model_stream</code>, <code>on_chain_start</code>, <code>on_chain_end</code></li>
+                                        <li>FastAPI <code>StreamingResponse</code> with <code>text/event-stream</code> content type</li>
+                                        <li>SSE protocol: <code>data:</code> lines, custom event types, <code>id:</code> field</li>
+                                        <li>Extracting token content from <code>event["data"]["chunk"].content</code></li>
+                                        <li>Why SSE is simpler than WebSockets for unidirectional streaming</li>
+                                    </ul>
+                                </div>
+                                <div class="ex-block success-block">
+                                    <h4>Success Criteria</h4>
+                                    <ul>
+                                        <li>Browser shows tokens arriving in real time (not all at once)</li>
+                                        <li>Node transition messages ("Entering: draft_email") appear before node output</li>
+                                        <li>Connection closes cleanly after graph finishes (no hanging open connections)</li>
+                                        <li>Multiple concurrent browser tabs operate independently</li>
+                                        <li>Browser DevTools Network tab shows the raw SSE event stream</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="extension-block">
+                                <h4>Extension Challenge</h4>
+                                <p>Add a <code>GET /threads/{thread_id}/history</code> endpoint returning full state history as JSON. In the frontend, add a collapsible "History" panel showing previous turns. Implement SSE reconnection logic in the <code>EventSource</code> client using the <code>id:</code> field to resume from the last received event if the connection drops mid-stream.</p>
+                            </div>
+                            <pre><code>from fastapi import FastAPI
+from fastapi.responses import StreamingResponse
+import json
+
+app = FastAPI()
+
+async def agent_event_stream(user_message: str, thread_id: str):
+    config = {"configurable": {"thread_id": thread_id}}
+    async for event in graph.astream_events(
+        {"messages": [("human", user_message)]},
+        config=config,
+        version="v2"
+    ):
+        event_type = event["event"]
+
+        if event_type == "on_chain_start":
+            node = event.get("name", "unknown")
+            yield f"event: node_start\ndata: {json.dumps({'node': node})}\n\n"
+
+        elif event_type == "on_chat_model_stream":
+            chunk = event["data"].get("chunk")
+            if chunk and chunk.content:
+                yield f"event: token\ndata: {json.dumps({'token': chunk.content})}\n\n"
+
+        elif event_type == "on_chain_end" and event.get("name") == "LangGraph":
+            yield f"event: done\ndata: {json.dumps({'status': 'complete'})}\n\n"
+
+@app.post("/chat")
+async def chat_endpoint(body: dict):
+    return StreamingResponse(
+        agent_event_stream(
+            body["message"],
+            body.get("thread_id", "default-thread")
+        ),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+            "Connection": "keep-alive"
+        }
+    )</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exercise 11 -->
+                <div class="ex-item">
+                    <div class="ex-header">
+                        <div class="ex-header-left">
+                            <div class="ex-num advanced-num">11</div>
+                            <div>
+                                <div class="ex-title">Multi-Turn Memory System</div>
+                                <div class="ex-subtitle">Store API · cross-session memory · preference extraction · long-term user state</div>
+                            </div>
+                        </div>
+                        <span class="ex-chevron">▾</span>
+                    </div>
+                    <div class="ex-body">
+                        <div class="ex-body-inner">
+                            <div class="ex-description">
+                                <p>Build a personal assistant with two tiers of memory. <strong>Short-term</strong>: the standard <code>messages</code> list in state, ephemeral within a single conversation thread. <strong>Long-term</strong>: the LangGraph <code>Store</code> API (<code>InMemoryStore</code>) to persist user preferences keyed by <code>user_id</code>, surviving across sessions.</p>
+                                <p>At conversation <strong>start</strong>: a <code>load_memory</code> node retrieves stored preferences and injects them into the system prompt (name, preferred_language, recent_topics). At conversation <strong>end</strong>: an <code>extract_and_store</code> node calls the LLM to extract any new preferences from the conversation and stores them. Test by running two separate conversations with different thread IDs but the same user ID: in session 1, mention your name and preferred programming language. In session 2, ask a coding question — the assistant should already know your name and default to your preferred language.</p>
+                            </div>
+                            <div class="ex-grid">
+                                <div class="ex-block learn-block">
+                                    <h4>What You'll Learn</h4>
+                                    <ul>
+                                        <li><code>InMemoryStore</code> — LangGraph's cross-thread storage layer</li>
+                                        <li><code>store.put(namespace, key, value)</code> and <code>store.get(namespace, key)</code></li>
+                                        <li>Namespace design: <code>("users", user_id, "preferences")</code></li>
+                                        <li>Memory extraction: LLM pulling structured facts from conversation history</li>
+                                        <li>Architectural distinction between in-state memory and Store memory</li>
+                                        <li>First-session graceful degradation when no prior memory exists</li>
+                                    </ul>
+                                </div>
+                                <div class="ex-block success-block">
+                                    <h4>Success Criteria</h4>
+                                    <ul>
+                                        <li>Session 2 greets user by name without being told it in that session</li>
+                                        <li>Code examples use the user's stored preferred language by default</li>
+                                        <li><code>store.get(("users", user_id), "preferences")</code> returns the correct dict</li>
+                                        <li>First-time users handled gracefully with sensible defaults</li>
+                                        <li>Preference updates work correctly when user changes a preference</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="extension-block">
+                                <h4>Extension Challenge</h4>
+                                <p>Add <code>recent_topics: list[str]</code> to user memory. Each session, append the main topic discussed (LLM-extracted). After 5 sessions, implement a <code>weekly_summary</code> function that loads all stored topics and generates a briefing: "This week you discussed X, Y, Z. Most frequent topic: X." Store this summary back in the Store for display at the start of the next session.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exercise 12 -->
+                <div class="ex-item">
+                    <div class="ex-header">
+                        <div class="ex-header-left">
+                            <div class="ex-num advanced-num">12</div>
+                            <div>
+                                <div class="ex-title">Subgraph Architecture</div>
+                                <div class="ex-subtitle">Compiled subgraphs as nodes · state interface design · modular document pipeline</div>
+                            </div>
+                        </div>
+                        <span class="ex-chevron">▾</span>
+                    </div>
+                    <div class="ex-body">
+                        <div class="ex-body-inner">
+                            <div class="ex-description">
+                                <p>Build a document processing pipeline as 3 independently compiled subgraphs. <strong>Subgraph 1 — Ingest</strong>: accepts <code>raw_document: str</code>, strips whitespace, detects language, outputs <code>cleaned_text: str</code> and <code>detected_language: str</code>. <strong>Subgraph 2 — Extract</strong>: accepts <code>cleaned_text: str</code>, extracts structured data (title, author, date, key_points list), outputs <code>extracted_data: dict</code>. <strong>Subgraph 3 — Validate</strong>: accepts <code>extracted_data: dict</code>, checks required fields are non-empty, outputs <code>is_valid: bool</code> and <code>validation_errors: list[str]</code>.</p>
+                                <p>Each subgraph must be independently testable via <code>subgraph.invoke()</code> without needing the others. The parent graph uses <code>add_node("ingest", ingest_graph)</code> (passing a compiled graph as a node) to compose all three. Design the parent state schema as a superset of all three subgraph schemas.</p>
+                            </div>
+                            <div class="ex-grid">
+                                <div class="ex-block learn-block">
+                                    <h4>What You'll Learn</h4>
+                                    <ul>
+                                        <li>Passing a compiled graph as a node in a parent graph</li>
+                                        <li>State schema compatibility requirements between subgraphs and parent</li>
+                                        <li>When subgraph state is a subset of parent state (key name mapping)</li>
+                                        <li>Unit testing subgraphs independently before parent integration</li>
+                                        <li>Swapping subgraph implementations without touching the parent graph</li>
+                                        <li>Navigating subgraph errors when invoked from a parent (trace hierarchy)</li>
+                                    </ul>
+                                </div>
+                                <div class="ex-block success-block">
+                                    <h4>Success Criteria</h4>
+                                    <ul>
+                                        <li>Each subgraph works when invoked in isolation</li>
+                                        <li>Parent graph composes all three and passes state between them correctly</li>
+                                        <li>Swapping the ingest subgraph for a "v2" does not require touching extract or validate</li>
+                                        <li>Validation errors in subgraph 3 are visible in the parent state</li>
+                                        <li>You can draw the nested graph structure on a whiteboard accurately</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="extension-block">
+                                <h4>Extension Challenge</h4>
+                                <p>Add a fourth subgraph — <strong>Transform</strong> — that runs in parallel with Extract using the <code>Send</code> API (both receive <code>cleaned_text</code>; Extract produces structured data, Transform produces a plain-English summary). The parent collects both outputs before passing to Validate. This combines subgraph composition with the parallel fan-out pattern from Exercise 5.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div><!-- /tier-panel advanced -->
+
+        <!-- ===================== EXPERT ===================== -->
+        <div class="tier-panel" id="tier-expert">
+            <div class="tier-intro expert-intro">
+                <strong>Expert Exercises (13-15)</strong> — System-design-level exercises. There is no single correct solution. You will make architectural decisions, defend them, and understand their trade-offs. Each represents a real challenge you will face building production agent systems. Expect 1-3 days each. The goal is building judgment, not just working code.
+            </div>
+            <div class="ex-accordion">
+
+                <!-- Exercise 13 -->
+                <div class="ex-item">
+                    <div class="ex-header">
+                        <div class="ex-header-left">
+                            <div class="ex-num expert-num">13</div>
+                            <div>
+                                <div class="ex-title">A/B Testing Graph Topologies</div>
+                                <div class="ex-subtitle">Graph versioning · traffic splitting · evaluation methodology · comparative analysis</div>
+                            </div>
+                        </div>
+                        <span class="ex-chevron">▾</span>
+                    </div>
+                    <div class="ex-body">
+                        <div class="ex-body-inner">
+                            <div class="ex-description">
+                                <p>Build two versions of a research agent. <strong>v1</strong>: a single monolithic LLM node that receives the question and returns a complete answer in one call. <strong>v2</strong>: a four-step pipeline — <code>plan</code> (decompose into sub-questions) → <code>search</code> (mock search per sub-question) → <code>evaluate</code> (assess result quality) → <code>synthesize</code> (compose verified answer).</p>
+                                <p>Build a <code>traffic_router</code> node that checks a <code>variant</code> field in state (pre-assigned or set via <code>random.random() &lt; 0.5</code>) and routes to either <code>v1_subgraph</code> or <code>v2_subgraph</code>. Add <code>version_used: str</code> to state. Tag LangSmith runs with <code>"variant:v1"</code> or <code>"variant:v2"</code>. Run 20 test cases. Filter by tag in LangSmith and compare average latency and output length per variant.</p>
+                            </div>
+                            <div class="ex-grid">
+                                <div class="ex-block learn-block">
+                                    <h4>What You'll Learn</h4>
+                                    <ul>
+                                        <li>Branching graph topology for controlled experiments</li>
+                                        <li>Deterministic vs. random traffic splitting strategies</li>
+                                        <li>LangSmith tag-based filtering for cohort analysis</li>
+                                        <li>Tracking experimental metadata in state fields</li>
+                                        <li>Statistical basics: why 20 samples may not be enough for conclusions</li>
+                                        <li>Safely graduating a winning variant to 100% traffic</li>
+                                    </ul>
+                                </div>
+                                <div class="ex-block success-block">
+                                    <h4>Success Criteria</h4>
+                                    <ul>
+                                        <li>After 20 runs, roughly 10 use v1 and 10 use v2 (with natural variance)</li>
+                                        <li>LangSmith shows distinct traces per variant, filterable by tag</li>
+                                        <li>v2 average latency is measurably higher (more steps) than v1</li>
+                                        <li>Written comparison: "v1 is faster by X, v2 outputs Y% more text, I recommend Z because..."</li>
+                                        <li>You understand why output length alone is not a quality metric</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="extension-block">
+                                <h4>Extension Challenge</h4>
+                                <p>Add LLM-as-judge quality scoring: after each run, have a separate LLM evaluate the output on a 1-5 scale (factual accuracy, completeness, clarity). Store the judge score in state as <code>quality_score: float</code>. After 20 runs, compute mean quality per variant. Plot latency vs. quality as a 2D scatter to visualize the speed-quality trade-off curve between v1 and v2.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exercise 14 -->
+                <div class="ex-item">
+                    <div class="ex-header">
+                        <div class="ex-header-left">
+                            <div class="ex-num expert-num">14</div>
+                            <div>
+                                <div class="ex-title">Self-Improving Agent with Evaluation Loop</div>
+                                <div class="ex-subtitle">Self-evaluation · iterative refinement · aggregate performance analysis · report generation</div>
+                            </div>
+                        </div>
+                        <span class="ex-chevron">▾</span>
+                    </div>
+                    <div class="ex-body">
+                        <div class="ex-body-inner">
+                            <div class="ex-description">
+                                <p>Build an agent with this state: <code>question: str</code>, <code>answer: str</code>, <code>critique: str</code>, <code>score: int</code> (0-100), <code>iteration: int</code>, <code>score_history: Annotated[list[int], operator.add]</code>. Graph: <code>generate_answer</code> → <code>self_critique</code> (separate LLM call, returns score + feedback) → conditional edge: if <code>score &lt; 70</code> and <code>iteration &lt; 5</code>, go to <code>revise_answer</code>; otherwise go to <code>finalize</code>.</p>
+                                <p>Run the agent on 5 diverse questions. After all 5 runs, implement an <code>analyze_performance</code> function that reads stored score histories across all threads and produces a report: which questions needed the most revisions, what was the average score improvement per iteration, and which topics scored below 70 even after 5 revisions.</p>
+                            </div>
+                            <div class="ex-grid">
+                                <div class="ex-block learn-block">
+                                    <h4>What You'll Learn</h4>
+                                    <ul>
+                                        <li>Self-evaluation pattern: one LLM call judging another's output</li>
+                                        <li>Iterative refinement with dual exit condition (score threshold + iteration cap)</li>
+                                        <li>Score history accumulation with <code>operator.add</code> reducer</li>
+                                        <li>Cross-thread analysis: aggregating from multiple thread checkpoints</li>
+                                        <li>Judge prompt design: what makes an LLM a consistent 0-100 scorer</li>
+                                        <li>Why self-critique can be gamed by the same model and mitigation strategies</li>
+                                    </ul>
+                                </div>
+                                <div class="ex-block success-block">
+                                    <h4>Success Criteria</h4>
+                                    <ul>
+                                        <li>Agent demonstrably improves score from first to final iteration on knowledge-weak questions</li>
+                                        <li>Iteration cap enforced strictly — no run exceeds 5 iterations</li>
+                                        <li>Score history accurately records every iteration's score in order</li>
+                                        <li>Performance report correctly identifies the lowest-scoring question</li>
+                                        <li>Report includes iteration count and final score per question</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="extension-block">
+                                <h4>Extension Challenge</h4>
+                                <p>Replace the single self-critique with a panel of 3 independent judges, each scoring on a different dimension: accuracy, clarity, and depth. Average the three scores for the final score. A question triggers revision if <em>any</em> judge gives below 60. Track which judge is most often the blocking factor across 10 runs — this reveals which dimension of your agent's output most needs improvement.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exercise 15 -->
+                <div class="ex-item">
+                    <div class="ex-header">
+                        <div class="ex-header-left">
+                            <div class="ex-num expert-num">15</div>
+                            <div>
+                                <div class="ex-title">Production Incident Simulation</div>
+                                <div class="ex-subtitle">Resilience engineering · failure mode detection · recovery mechanisms · runbooks</div>
+                            </div>
+                        </div>
+                        <span class="ex-chevron">▾</span>
+                    </div>
+                    <div class="ex-body">
+                        <div class="ex-body-inner">
+                            <div class="ex-description">
+                                <p>Take a working 4-node agent graph and <strong>deliberately introduce 3 failure modes</strong>. <strong>Failure 1</strong>: an external API mock that raises a <code>ConnectionError</code> on every 3rd call (track a call counter in a closure). <strong>Failure 2</strong>: a node that occasionally returns a string value when state expects an integer — triggered on specific input patterns. <strong>Failure 3</strong>: a routing function with a logic bug that creates an infinite loop when <code>count &gt; 10</code> and <code>topic == "recursion"</code>.</p>
+                                <p>For each failure mode, build: (a) a <strong>detector</strong> — a monitoring wrapper that identifies the failure within 2 invocations; (b) a <strong>recovery mechanism</strong> — exponential backoff for Failure 1, type coercion with logging for Failure 2, a loop guard counter for Failure 3; (c) a <strong>runbook docstring</strong> that explains symptoms, root cause, diagnostic steps, and fix procedure for an on-call engineer unfamiliar with the codebase.</p>
+                            </div>
+                            <div class="ex-grid">
+                                <div class="ex-block learn-block">
+                                    <h4>What You'll Learn</h4>
+                                    <ul>
+                                        <li>Wrapping nodes with try/except for graceful failure handling</li>
+                                        <li>Exponential backoff with jitter for external API retries</li>
+                                        <li>Runtime type validation of node outputs before state update</li>
+                                        <li>Loop detection via custom iteration counters (beyond <code>recursion_limit</code>)</li>
+                                        <li>Structured logging that makes failures diagnosable from logs alone</li>
+                                        <li>Runbook discipline: what on-call engineers need vs. what developers assume they know</li>
+                                    </ul>
+                                </div>
+                                <div class="ex-block success-block">
+                                    <h4>Success Criteria</h4>
+                                    <ul>
+                                        <li>Failure 1: detected and recovered, total invocation succeeds on retry within 3 attempts</li>
+                                        <li>Failure 2: type error caught before state corruption, logged with field name and received vs. expected types</li>
+                                        <li>Failure 3: infinite loop terminated before <code>recursion_limit</code>, informative message produced</li>
+                                        <li>All 3 runbooks actionable by someone reading the code for the first time</li>
+                                        <li>No failure mode crashes the Python process — all caught and handled</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="extension-block">
+                                <h4>Extension Challenge</h4>
+                                <p>Add a 4th failure mode: the checkpointer database becomes unavailable mid-run (simulate by closing the connection). The agent should detect this, fall back to in-memory state for the current run, log a critical alert, and resume normal persistence when the database reconnects. Add a <code>GET /health/checkpointer</code> endpoint returning <code>{"status": "ok"}</code> or <code>{"status": "degraded", "fallback": "memory"}</code>.</p>
+                            </div>
+                            <pre><code>import time
+import random
+from functools import wraps
+
+# --- Failure Mode 1: Flaky external API ---
+_api_call_count = 0
+
+def flaky_external_api(query: str) -> str:
+    global _api_call_count
+    _api_call_count += 1
+    if _api_call_count % 3 == 0:
+        raise ConnectionError(f"Simulated timeout on call #{_api_call_count}")
+    return f"Result for: {query}"
+
+def with_retry(max_retries: int = 3, base_delay: float = 0.5):
+    """Retry decorator with exponential backoff and jitter."""
+    def decorator(fn):
+        @wraps(fn)
+        def wrapper(*args, **kwargs):
+            for attempt in range(max_retries):
+                try:
+                    return fn(*args, **kwargs)
+                except ConnectionError as exc:
+                    if attempt == max_retries - 1:
+                        raise
+                    delay = base_delay * (2 ** attempt) + random.uniform(0, 0.1)
+                    print(f"[RETRY] Attempt {attempt + 1} failed ({exc}). Retrying in {delay:.2f}s")
+                    time.sleep(delay)
+        return wrapper
+    return decorator
+
+# --- Failure Mode 2: Type mismatch in node output ---
+def validate_node_output(output: dict, expected_types: dict) -> dict:
+    """Validate and safely coerce node output fields."""
+    validated = dict(output)
+    for field, expected_type in expected_types.items():
+        if field in output:
+            value = output[field]
+            if not isinstance(value, expected_type):
+                print(
+                    f"[TYPE_MISMATCH] Field '{field}': "
+                    f"expected {expected_type.__name__}, "
+                    f"got {type(value).__name__} (value={value!r}). "
+                    f"Coercing to {expected_type.__name__}."
+                )
+                try:
+                    validated[field] = expected_type(value)
+                except (ValueError, TypeError):
+                    validated[field] = expected_type()
+    return validated
+
+# --- Failure Mode 3: Loop guard ---
+def make_loop_safe_router(base_router, max_iterations: int = 10):
+    """Wrap a router function to detect and break runaway loops."""
+    def safe_router(state: dict) -> str:
+        loop_count = state.get("_loop_count", 0)
+        if loop_count >= max_iterations:
+            print(
+                f"[LOOP_GUARD] Loop count {loop_count} reached "
+                f"max {max_iterations}. Forcing termination."
+            )
+            return "__end__"
+        return base_router(state)
+    return safe_router</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div><!-- /tier-panel expert -->
+
+    </div><!-- /tier-tabs -->
+
+    <div class="key-takeaway">
+        <h3>How to Get the Most From These Exercises</h3>
+        <p>Work through them in order. Each exercise builds vocabulary and muscle memory needed for the next. Skipping Exercise 2 (checkpointing) makes Exercise 9 (production checkpointer) confusing. Skipping Exercise 5 (parallel) makes Exercise 13 (A/B testing) opaque.</p>
+        <p>The extension challenges are not optional for senior roles. Engineers at companies running LangGraph in production will ask about exactly the patterns covered in extensions: SQLite-to-Postgres migration, multi-judge panels, cross-session memory, and resilience engineering. These are the questions that separate people who have read about LangGraph from people who have built real systems with it.</p>
+        <p><strong>The goal is not working code. The goal is being able to explain every line of your working code.</strong></p>
+    </div>
+
+    <nav class="navigation">
+        <a href="07-patterns.html" class="button secondary">Previous: Section 13</a>
+        <a href="15-reference.html" class="button primary">Next: Section 15 — Quick Reference</a>
+    </nav>
+</main>
+
+<script src="js/components.js"></script>
+<script>
+    // Tier tab switching
+    document.querySelectorAll('.tier-tab-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var tier = this.getAttribute('data-tier');
+            document.querySelectorAll('.tier-tab-btn').forEach(function(b) {
+                b.classList.remove('active');
+            });
+            document.querySelectorAll('.tier-panel').forEach(function(p) {
+                p.classList.remove('active');
+            });
+            this.classList.add('active');
+            var panel = document.getElementById('tier-' + tier);
+            if (panel) panel.classList.add('active');
+        });
+    });
+
+    // Exercise accordion (independent per tier panel)
+    document.querySelectorAll('.ex-header').forEach(function(header) {
+        header.addEventListener('click', function() {
+            var item = this.closest('.ex-item');
+            var isActive = item.classList.contains('active');
+            var siblings = item.closest('.ex-accordion').querySelectorAll('.ex-item');
+            siblings.forEach(function(s) { s.classList.remove('active'); });
+            if (!isActive) item.classList.add('active');
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debugging Process - Learn Claude Code Ecosystem</title>
+    <link rel="stylesheet" href="../../css/styles.css">
+    <link rel="stylesheet" href="theme.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <a href="index.html" class="nav-back">Back to Overview</a>
+        <span class="current-section">Debugging Process</span>
+        <div class="nav-links">
+            <a href="pitfalls.html">Previous</a>
+            <a href="eloquent.html">Next</a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <h1>Debugging Process</h1>
+            <p class="powerful-sentence">When Claude Code misbehaves, the problem is almost never the model — it is the environment: missing context, misconfigured files, wrong tool permissions, or a context window that ran out of room to think.</p>
+            <p class="explanation">A senior engineer's first move is always to check the environment before blaming the tool. This section gives you a systematic diagnosis framework for the six most common failure modes.</p>
+        </section>
+
+        <section>
+            <h2>The Universal Debugging Flowchart</h2>
+            <p>Before diving into specific symptoms, every debugging session starts at the same entry point. The film production analogy applies here: when a scene goes wrong, the director checks the script first, then the actors' preparation, then the equipment — in that order.</p>
+
+            <div class="diagram-container">
+                <svg class="architecture-diagram" viewBox="0 0 860 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Debugging flowchart from symptom through diagnosis to fix">
+                    <defs>
+                        <marker id="dbg-arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#4a4a6a"/>
+                        </marker>
+                        <marker id="dbg-arrow-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#2dd4bf"/>
+                        </marker>
+                        <marker id="dbg-arrow-red" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#f87171"/>
+                        </marker>
+                    </defs>
+
+                    <!-- SYMPTOM box -->
+                    <rect x="330" y="20" width="200" height="56" rx="10" fill="#f87171" stroke="#b94a4a" stroke-width="2"/>
+                    <text x="430" y="44" font-family="system-ui,sans-serif" font-size="14" font-weight="700" fill="#e2e8f0" text-anchor="middle">SYMPTOM</text>
+                    <text x="430" y="62" font-family="system-ui,sans-serif" font-size="10" fill="#e8d0d0" text-anchor="middle">Something is wrong — what exactly?</text>
+
+                    <!-- Arrow down -->
+                    <line x1="430" y1="76" x2="430" y2="108" stroke="#4a4a6a" stroke-width="2" marker-end="url(#dbg-arrow)"/>
+
+                    <!-- DIAGNOSIS box -->
+                    <rect x="310" y="108" width="240" height="56" rx="10" fill="#fb923c" stroke="#b56a2a" stroke-width="2"/>
+                    <text x="430" y="132" font-family="system-ui,sans-serif" font-size="14" font-weight="700" fill="#e2e8f0" text-anchor="middle">DIAGNOSIS</text>
+                    <text x="430" y="150" font-family="system-ui,sans-serif" font-size="10" fill="#e8dcc8" text-anchor="middle">Check the environment, not the model</text>
+
+                    <!-- Arrows from DIAGNOSIS to three paths -->
+                    <line x1="310" y1="136" x2="170" y2="136" stroke="#4a4a6a" stroke-width="2"/>
+                    <line x1="170" y1="136" x2="170" y2="186" stroke="#4a4a6a" stroke-width="2" marker-end="url(#dbg-arrow)"/>
+
+                    <line x1="430" y1="164" x2="430" y2="196" stroke="#4a4a6a" stroke-width="2" marker-end="url(#dbg-arrow)"/>
+
+                    <line x1="550" y1="136" x2="690" y2="136" stroke="#4a4a6a" stroke-width="2"/>
+                    <line x1="690" y1="136" x2="690" y2="186" stroke="#4a4a6a" stroke-width="2" marker-end="url(#dbg-arrow)"/>
+
+                    <!-- Three diagnosis categories -->
+                    <rect x="80" y="186" width="180" height="64" rx="8" fill="#1a2044" stroke="#d4a574" stroke-width="2"/>
+                    <text x="170" y="208" font-family="system-ui,sans-serif" font-size="12" font-weight="700" fill="#c8ceda" text-anchor="middle">Context Issue</text>
+                    <text x="170" y="224" font-family="system-ui,sans-serif" font-size="10" fill="#c8ceda" text-anchor="middle">Window full, compacted,</text>
+                    <text x="170" y="238" font-family="system-ui,sans-serif" font-size="10" fill="#c8ceda" text-anchor="middle">or CLAUDE.md not loaded</text>
+
+                    <rect x="340" y="196" width="180" height="64" rx="8" fill="#1e1840" stroke="#a78bfa" stroke-width="2"/>
+                    <text x="430" y="218" font-family="system-ui,sans-serif" font-size="12" font-weight="700" fill="#c8ceda" text-anchor="middle">Configuration Issue</text>
+                    <text x="430" y="234" font-family="system-ui,sans-serif" font-size="10" fill="#c8ceda" text-anchor="middle">Permissions, MCP, skills,</text>
+                    <text x="430" y="248" font-family="system-ui,sans-serif" font-size="10" fill="#c8ceda" text-anchor="middle">or rule conflicts</text>
+
+                    <rect x="600" y="186" width="180" height="64" rx="8" fill="#122a22" stroke="#2dd4bf" stroke-width="2"/>
+                    <text x="690" y="208" font-family="system-ui,sans-serif" font-size="12" font-weight="700" fill="#c8ceda" text-anchor="middle">Task Issue</text>
+                    <text x="690" y="224" font-family="system-ui,sans-serif" font-size="10" fill="#c8ceda" text-anchor="middle">Scope too broad, wrong</text>
+                    <text x="690" y="238" font-family="system-ui,sans-serif" font-size="10" fill="#c8ceda" text-anchor="middle">model, poor prompt</text>
+
+                    <!-- Arrows down to fix paths -->
+                    <line x1="170" y1="250" x2="170" y2="306" stroke="#4a4a6a" stroke-width="2" marker-end="url(#dbg-arrow)"/>
+                    <line x1="430" y1="260" x2="430" y2="306" stroke="#4a4a6a" stroke-width="2" marker-end="url(#dbg-arrow)"/>
+                    <line x1="690" y1="250" x2="690" y2="306" stroke="#4a4a6a" stroke-width="2" marker-end="url(#dbg-arrow)"/>
+
+                    <!-- Fix boxes -->
+                    <rect x="80" y="306" width="180" height="52" rx="8" fill="#1a2044"/>
+                    <text x="170" y="326" font-family="system-ui,sans-serif" font-size="11" font-weight="700" fill="#e2e8f0" text-anchor="middle">/context, /compact,</text>
+                    <text x="170" y="343" font-family="system-ui,sans-serif" font-size="11" fill="#d0dce8" text-anchor="middle">reload CLAUDE.md</text>
+
+                    <rect x="340" y="306" width="180" height="52" rx="8" fill="#1e1840"/>
+                    <text x="430" y="326" font-family="system-ui,sans-serif" font-size="11" font-weight="700" fill="#e2e8f0" text-anchor="middle">Edit settings.json,</text>
+                    <text x="430" y="343" font-family="system-ui,sans-serif" font-size="11" fill="#d4d0e8" text-anchor="middle">resolve rule conflicts</text>
+
+                    <rect x="600" y="306" width="180" height="52" rx="8" fill="#122a22"/>
+                    <text x="690" y="326" font-family="system-ui,sans-serif" font-size="11" font-weight="700" fill="#e2e8f0" text-anchor="middle">Narrow scope, spawn</text>
+                    <text x="690" y="343" font-family="system-ui,sans-serif" font-size="11" fill="#d8e8e4" text-anchor="middle">sub-agent, re-prompt</text>
+
+                    <!-- Converge arrows to FIX -->
+                    <line x1="170" y1="358" x2="170" y2="384" stroke="#2dd4bf" stroke-width="2"/>
+                    <line x1="170" y1="384" x2="380" y2="384" stroke="#2dd4bf" stroke-width="2"/>
+                    <line x1="430" y1="358" x2="430" y2="384" stroke="#2dd4bf" stroke-width="2"/>
+                    <line x1="690" y1="358" x2="690" y2="384" stroke="#2dd4bf" stroke-width="2"/>
+                    <line x1="690" y1="384" x2="480" y2="384" stroke="#2dd4bf" stroke-width="2"/>
+                    <line x1="430" y1="384" x2="430" y2="398" stroke="#2dd4bf" stroke-width="2" marker-end="url(#dbg-arrow-green)"/>
+
+                    <!-- FIX box -->
+                    <rect x="350" y="398" width="160" height="14" rx="6" fill="#2dd4bf"/>
+                    <text x="430" y="410" font-family="system-ui,sans-serif" font-size="11" font-weight="700" fill="#e2e8f0" text-anchor="middle">FIX APPLIED — VERIFY</text>
+                </svg>
+                <p class="diagram-caption">Every debugging session follows the same arc: name the symptom precisely, diagnose the environment layer, apply the targeted fix.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>What I Check First — Every Single Time</h2>
+            <p>After 15 years of building systems and the last two years working with AI agents, I have a five-item checklist I run before anything else. Think of it as the pre-flight check the director of photography runs before calling action.</p>
+
+            <div class="component-explanation">
+                <div class="component-item">
+                    <div class="component-name">1. Run /context</div>
+                    <p><strong>Why first:</strong> If the context window is at 85%+, nothing else you check will matter until you address that. An AI agent running low on context starts making subtle, hard-to-diagnose errors — it begins forgetting early instructions rather than failing loudly. You will chase phantom bugs while the real cause is spatial.</p>
+                    <p><strong>What to look for:</strong> Overall utilization percentage, which components are consuming the most tokens, whether CLAUDE.md is present in the breakdown.</p>
+                </div>
+                <div class="component-item">
+                    <div class="component-name">2. Check CLAUDE.md is current and loaded</div>
+                    <p><strong>Why second:</strong> CLAUDE.md is your instruction contract with the AI. If it is stale, missing, or truncated (past line 200 for the global file, depending on length), Claude is operating without its constitution. Behavior will drift toward generic patterns instead of your project conventions.</p>
+                    <p><strong>What to look for:</strong> Did you recently update the file? Does the /context breakdown confirm it loaded? Is it under 100 lines (recommended), or bloated and risking truncation?</p>
+                </div>
+                <div class="component-item">
+                    <div class="component-name">3. Check auto memory for previous session residue</div>
+                    <p><strong>Why third:</strong> Auto memory accumulates notes across sessions. Occasionally, a previous session leaves incorrect assumptions or outdated architecture notes that carry into the current session. The production bible metaphor breaks down when yesterday's script contradicts today's director's vision.</p>
+                    <p><strong>What to look for:</strong> Open ~/.claude/projects/&lt;project&gt;/memory/ and scan for stale entries. /memory lets you edit MEMORY.md directly.</p>
+                </div>
+                <div class="component-item">
+                    <div class="component-name">4. Verify tool permissions match what is needed</div>
+                    <p><strong>Why fourth:</strong> Claude will not always tell you it lacks permission — sometimes it will attempt a workaround, produce a degraded result, or simply skip the step silently. Permission mode (ask / auto-edit / full-auto) and MCP server availability are both factors here.</p>
+                    <p><strong>What to look for:</strong> Check .claude/settings.json for permission mode and MCP configuration. If a tool Claude needs is not in the settings, it cannot access it regardless of how good the prompt is.</p>
+                </div>
+                <div class="component-item">
+                    <div class="component-name">5. Confirm model selection for the task</div>
+                    <p><strong>Why fifth:</strong> Running Haiku on a complex architecture task is like assigning a production assistant to direct the film. The model is not wrong — it is just being asked to do work beyond its design parameters. Conversely, running Opus on a trivial lookup wastes budget and slows feedback loops.</p>
+                    <p><strong>What to look for:</strong> Is the current model shown in the session status appropriate? Architecture and complex reasoning need Sonnet or Opus. Quick sub-agent lookups should use Haiku.</p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Symptom-by-Symptom Diagnosis Trees</h2>
+            <p>Each symptom below maps to a specific set of checks. Work through them in order — later checks assume earlier ones have been cleared.</p>
+
+            <div class="accordion">
+
+                <div class="accordion-item">
+                    <div class="accordion-header" role="button" aria-expanded="false" tabindex="0">
+                        <span>Symptom: "Claude isn't following my CLAUDE.md rules"</span>
+                        <span class="severity critical">Common</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>This is the most frequent complaint from teams adopting Claude Code. The cause is almost always one of five things, in order of likelihood:</p>
+                        <div class="card info">
+                            <strong>Check 1: Did you save the file?</strong>
+                            <p>Surprisingly, the most common cause. Claude Code reads CLAUDE.md from disk. An editor with unsaved changes means Claude is reading the old version. Verify the file's modification timestamp.</p>
+                        </div>
+                        <div class="card warning">
+                            <strong>Check 2: Is the rule past line 200 in a long file?</strong>
+                            <p>The first 200 lines of the global ~/.claude/CLAUDE.md are loaded eagerly. Rules beyond that may or may not load depending on total token budget. If your CLAUDE.md has grown over time, extract lower-priority rules into .claude/rules/ modules.</p>
+                        </div>
+                        <div class="card warning">
+                            <strong>Check 3: Did auto-compaction summarize it away?</strong>
+                            <p>Run /context to inspect what is currently in the window. If your session has been running for hours, auto-compaction may have condensed the CLAUDE.md content into a summary that lost the nuance of specific rules. A /clear or /compact with a targeted focus string restores fidelity.</p>
+                        </div>
+                        <div class="card info">
+                            <strong>Check 4: Is there a conflicting rule in .claude/rules/?</strong>
+                            <p>Rules files are loaded in alphabetical order after CLAUDE.md. A rule in .claude/rules/backend.md that says "use tabs for indentation" overrides a CLAUDE.md rule that says "use spaces." Last write wins, and later files in load order are the last writers.</p>
+                        </div>
+                        <div class="card info">
+                            <strong>Check 5: Did a skill override with its own instructions?</strong>
+                            <p>Skills loaded via invocation inject their own instruction context. A skill with permissive "do whatever the task needs" framing can implicitly override your project standards. Add "defer to CLAUDE.md for all style and architecture conventions" to skills that touch project code.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" role="button" aria-expanded="false" tabindex="0">
+                        <span>Symptom: "Sub-agent returned garbage"</span>
+                        <span class="severity high">Frequent</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Sub-agents operate in isolated context windows. When they return poor results, the failure is almost always in the delegation, not the sub-agent itself. Think of it like a film crew receiving an incomplete brief from the director.</p>
+                        <div class="card warning">
+                            <strong>Check 1: Was the prompt specific enough?</strong>
+                            <p>Vague task delegation is the root cause of most sub-agent failures. "Investigate the authentication module" is insufficient. "Explore src/auth/, identify all functions that validate JWT tokens, and return a list of function names with their signature and which validation step they perform" is a prompt a sub-agent can execute reliably.</p>
+                        </div>
+                        <div class="card warning">
+                            <strong>Check 2: Did the sub-agent have access to the right tools?</strong>
+                            <p>Sub-agents inherit permission constraints. An Explore agent restricted to read-only mode cannot write findings to a file. A Plan agent with no Bash access cannot verify assumptions by running commands. Match tool permissions to the task type when spawning.</p>
+                        </div>
+                        <div class="card error">
+                            <strong>Check 3: Was the task too broad for a single sub-agent context?</strong>
+                            <p>A sub-agent with a 200K token context window trying to analyze 50 large files will run out of room and either truncate analysis or start hallucinating. Decompose broad tasks into smaller sub-tasks and spawn multiple specialized sub-agents instead of one general-purpose one.</p>
+                        </div>
+                        <div class="card info">
+                            <strong>Check 4: Is the sub-agent type appropriate for the task?</strong>
+                            <p>Built-in sub-agent types are specialized. Using a Bash agent for code review yields worse results than a code-reviewer agent. The type selection primes the sub-agent's initial context framing. Mismatched type means the sub-agent is working against its own initialization.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" role="button" aria-expanded="false" tabindex="0">
+                        <span>Symptom: "Context is full and I'm mid-task"</span>
+                        <span class="severity critical">Critical</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>This is the most disruptive runtime failure. You are 3 hours into a complex refactoring, the context is at 95%, and Claude is starting to lose thread of what it was doing. The film equivalent is the production running out of budget halfway through the shoot.</p>
+                        <div class="card error">
+                            <strong>Immediate Action: Run /compact with a focus string</strong>
+                            <p>Do not run plain /compact — it summarizes the conversation without direction. Instead, run /compact followed by a focus description: what the current task is, what decisions have been made, what remains to do. This preserves the essential state while reducing token count by 70-80%.</p>
+                        </div>
+                        <div class="card warning">
+                            <strong>If Still Full: /clear and re-state just the current task</strong>
+                            <p>After /clear, CLAUDE.md reloads but the conversation is gone. Immediately provide a focused re-statement of the specific remaining work: the file you are editing, the bug you are fixing, the decision you need to make. Do not re-explain the full project history — auto memory has that.</p>
+                        </div>
+                        <div class="card info">
+                            <strong>Prevention: Monitor with /context throughout complex sessions</strong>
+                            <p>For tasks expected to run over an hour, run /context every 20-30 minutes. At 60% utilization, start thinking about whether you can delegate research to sub-agents. At 75%, run a proactive /compact. Do not wait for auto-compaction — it is a fallback, not a strategy.</p>
+                        </div>
+                        <div class="card success">
+                            <strong>Nuclear Option: Start fresh, rely on auto memory</strong>
+                            <p>If you need a clean slate, start a new session. Auto memory will have notes from the previous session. Write a brief handoff note before ending the old session: "Next session: continue from X, key decisions were Y, remaining work is Z." Use /memory to write this explicitly.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" role="button" aria-expanded="false" tabindex="0">
+                        <span>Symptom: "MCP server not responding"</span>
+                        <span class="severity high">Frequent</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>MCP servers are external processes. Unlike built-in tools, they can fail independently of Claude Code itself. The diagnosis follows standard distributed systems debugging patterns.</p>
+                        <div class="card error">
+                            <strong>Check 1: Is the server process actually running?</strong>
+                            <p>MCP servers run as separate processes. If the terminal session that started the MCP server was closed, or the process crashed, Claude Code has no way to surface this error cleanly — it will just time out. Check your process list for the MCP server process.</p>
+                        </div>
+                        <div class="card warning">
+                            <strong>Check 2: Configuration in .claude/settings.json correct?</strong>
+                            <p>MCP server configuration includes the server name, command, arguments, and any environment variables it needs. A typo in the command path, a missing environment variable (like an API key), or an incorrect port number all cause silent failures. Compare your config against the server's documentation.</p>
+                        </div>
+                        <div class="card info">
+                            <strong>Check 3: Does the server support the operation you're attempting?</strong>
+                            <p>MCP servers expose a specific set of tools. If you ask Claude to use a capability the MCP server does not implement, Claude may attempt to work around it (poorly) or report a generic failure. Check the server's tool manifest against what you are trying to do.</p>
+                        </div>
+                        <div class="card info">
+                            <strong>Check 4: Rate limits or authentication expired?</strong>
+                            <p>MCP servers connecting to external APIs (GitHub, databases, web services) often have authentication tokens and rate limits. An expired token returns a 401 that the MCP server may not surface clearly. A rate-limited endpoint returns a 429 that causes apparent slowness or failures. Check your API token validity first.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" role="button" aria-expanded="false" tabindex="0">
+                        <span>Symptom: "Skill not being invoked"</span>
+                        <span class="severity medium">Moderate</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Skills are triggered by invocation patterns defined in their YAML frontmatter. When a skill does not activate, the cause is almost always in the invocation definition or a naming collision.</p>
+                        <div class="card warning">
+                            <strong>Check 1: SKILL.md YAML frontmatter — is invocation set correctly?</strong>
+                            <p>The YAML block between --- markers must be syntactically valid and include a properly defined invocation field. A single wrong indent, a missing colon, or an incorrect keyword type will cause the skill to fail silently. Validate your YAML at a linter before debugging further.</p>
+                        </div>
+                        <div class="card info">
+                            <strong>Check 2: Is the skill in the right location?</strong>
+                            <p>Custom project skills live in .claude/skills/ within your project. Globally installed skills from plugins live in the Claude Code plugin directory. Skills installed via /plugin install go to the global location. If you created a skill manually and placed it elsewhere, it will not be discovered.</p>
+                        </div>
+                        <div class="card warning">
+                            <strong>Check 3: Is there a name conflict with another skill?</strong>
+                            <p>If two skills have the same invocation trigger — one from a plugin and one you wrote locally — behavior is undefined. The last-loaded skill wins, and load order is not always obvious. Rename your skill to something project-specific to avoid collisions.</p>
+                        </div>
+                        <div class="card success">
+                            <strong>Check 4: Try explicit invocation with /skillname</strong>
+                            <p>Since slash commands merged into skills in v2.0, you can invoke any skill explicitly with /skillname regardless of its natural language trigger. If explicit invocation works but natural language does not, the problem is in the trigger pattern definition, not the skill itself.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" role="button" aria-expanded="false" tabindex="0">
+                        <span>Symptom: "Agent team members aren't coordinating"</span>
+                        <span class="severity high">Advanced</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Agent teams (TeammateTool) are still experimental as of Feb 2026. Coordination failures are often the result of missing infrastructure — the feature requires specific setup before it will work reliably.</p>
+                        <div class="card error">
+                            <strong>Check 1: Is CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS enabled?</strong>
+                            <p>This is the most common oversight. The feature is opt-in and requires the environment variable to be set before Claude Code starts. Without it, teammate messaging silently does nothing and each agent operates as an isolated sub-agent with no awareness of the others.</p>
+                        </div>
+                        <div class="card warning">
+                            <strong>Check 2: Are tasks clearly scoped in the shared task list?</strong>
+                            <p>Agent teams coordinate through a shared task list. If tasks are ambiguous, overlapping, or have unstated dependencies, teammates will either duplicate work or block each other. Treat the shared task list like a sprint board: each task has one owner, clear acceptance criteria, and explicit dependencies.</p>
+                        </div>
+                        <div class="card info">
+                            <strong>Check 3: Are teammates working in separate worktrees?</strong>
+                            <p>Without worktree isolation, two teammates writing to the same files will create merge conflicts that neither can resolve independently. Each teammate should operate in its own git worktree, with merges happening at well-defined synchronization points approved by the team lead.</p>
+                        </div>
+                        <div class="card warning">
+                            <strong>Check 4: Is the team lead actually delegating?</strong>
+                            <p>A common anti-pattern: the team lead agent receives tasks and does all the work itself instead of routing to teammates. This defeats the purpose of the team. Verify in your prompt to the team lead that it should explicitly delegate to named teammates rather than completing the work directly.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section>
+            <h2>When Nothing Works: The Nuclear Options</h2>
+            <p>Sometimes you have tried everything and the session is just broken. Here is the escalation ladder, from least destructive to most:</p>
+
+            <div class="safe-zones">
+                <div class="zone-card">
+                    <div class="component-name">Level 1</div>
+                    <h4>/compact "focus: [task]"</h4>
+                    <p>Reduces context while preserving key decisions. Best first response to any context-related weirdness. Takes 30 seconds.</p>
+                </div>
+                <div class="zone-card">
+                    <div class="component-name">Level 2</div>
+                    <h4>/clear</h4>
+                    <p>Wipes the conversation. CLAUDE.md reloads. You re-state the task. Lose conversation history but retain project configuration.</p>
+                </div>
+                <div class="zone-card">
+                    <div class="component-name">Level 3</div>
+                    <h4>New Session</h4>
+                    <p>End the current session entirely. Auto memory persists. Start fresh. Write a handoff note in /memory before quitting.</p>
+                </div>
+                <div class="zone-card">
+                    <div class="component-name">Level 4</div>
+                    <h4>Edit CLAUDE.md</h4>
+                    <p>If the problem is persistent and session-independent, the issue is in configuration. Edit CLAUDE.md or settings.json and test in a new session.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="section-footer">
+        <a href="pitfalls.html" class="btn">Previous: Common Pitfalls</a>
+        <a href="eloquent.html" class="btn">Next: Eloquent Conversation</a>
+    </footer>
+
+    <script src="../../js/components.js"></script>
+</body>
+</html>

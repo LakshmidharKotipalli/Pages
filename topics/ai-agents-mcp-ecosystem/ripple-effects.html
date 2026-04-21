@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ripple Effects Map - Learn AI Agents, Skills, Tools & MCP</title>
+    <link rel="stylesheet" href="../../css/styles.css">
+    <link rel="stylesheet" href="theme.css">
+    <style>
+        .ripple-section { margin: 2.5rem 0; }
+        .ripple-section h2 { font-size: 1.25rem; margin-bottom: 0.5rem; }
+        .decision-box { background: #1e40af; color: #fff; padding: 1rem 1.5rem; border-radius: 0.5rem; display: inline-block; font-weight: 700; font-size: 1rem; margin-bottom: 1.5rem; }
+        .effects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; margin-top: 1rem; }
+        .effect-card { border-radius: 0.5rem; padding: 1rem; border-left: 4px solid; }
+        .effect-card.positive { background: #ecfdf5; border-color: #10b981; }
+        .effect-card.negative { background: #fef2f2; border-color: #ef4444; }
+        .effect-card.mixed { background: #fffbeb; border-color: #f59e0b; }
+        .effect-card h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 0.4rem; }
+        .effect-card .magnitude { font-size: 0.75rem; font-weight: 600; margin-bottom: 0.35rem; }
+        .effect-card.positive h4, .effect-card.positive .magnitude { color: #065f46; }
+        .effect-card.negative h4, .effect-card.negative .magnitude { color: #991b1b; }
+        .effect-card.mixed h4, .effect-card.mixed .magnitude { color: #92400e; }
+        .effect-card p { font-size: 0.82rem; color: #374151; }
+        .time-badge { display: inline-block; padding: 0.1rem 0.5rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 600; background: #e5e7eb; color: #374151; margin-bottom: 0.35rem; }
+        .decision-label { font-size: 0.75rem; color: #6b7280; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; }
+        .divider { border: none; border-top: 2px solid var(--border-color); margin: 3rem 0; }
+    </style>
+</head>
+<body>
+    <nav class="main-nav">
+        <a href="index.html" class="nav-back">Back to Overview</a>
+        <span class="current-section">Ripple Effects Map</span>
+        <div class="nav-links">
+            <a href="integration.html">Previous</a>
+            <a href="evolution.html">Next</a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <h1>Ripple Effects Map</h1>
+            <p class="powerful-sentence">Every architecture decision in an agent system creates waves that reach far beyond the immediate choice — mapping them is the difference between a 10x engineer and a principal architect.</p>
+            <p class="explanation">Four high-stakes architectural decisions, each with cascading effects across your system's dimensions. Color-coded by outcome: green for positive, red for negative, yellow for mixed. Time horizon indicates when the effect becomes significant.</p>
+        </section>
+
+        <div class="card info" style="margin-bottom: 2rem;">
+            <strong>How to read this map:</strong> Each decision is a fork in the road. The effects shown are not exhaustive — they are the highest-signal consequences that experienced architects use to reason about the choice. Magnitude indicates how strongly the effect registers in a production system at scale. Time horizon shows when the pain (or gain) becomes undeniable.
+        </div>
+
+        <!-- Decision 1: Single vs Multi-Agent -->
+        <div class="ripple-section">
+            <div class="decision-label">Decision 1 of 4</div>
+            <div class="decision-box">Single-Agent vs. Multi-Agent Architecture</div>
+            <p style="color:#6b7280;margin-bottom:1.25rem;">Choosing one general-purpose agent vs. an orchestrator coordinating multiple specialized agents. Like choosing between one doctor handling every specialty vs. a hospital network of specialists.</p>
+
+            <!-- SVG Ripple Diagram -->
+            <div class="diagram-container">
+                <svg viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;display:block;margin:0 auto 1.5rem;">
+                    <defs>
+                        <marker id="rp1g" markerWidth="8" markerHeight="6" refX="6" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#10b981"/></marker>
+                        <marker id="rp1r" markerWidth="8" markerHeight="6" refX="6" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#ef4444"/></marker>
+                        <marker id="rp1y" markerWidth="8" markerHeight="6" refX="6" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#f59e0b"/></marker>
+                    </defs>
+                    <!-- Center: Single Agent -->
+                    <rect x="260" y="75" width="180" height="50" rx="8" fill="#1e40af" />
+                    <text x="350" y="98" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">SINGLE AGENT</text>
+                    <text x="350" y="114" text-anchor="middle" font-size="10" fill="#bfdbfe">choosing this path</text>
+                    <!-- Positive effects (green) -->
+                    <line x1="260" y1="90" x2="160" y2="40" stroke="#10b981" stroke-width="2" marker-end="url(#rp1g)"/>
+                    <rect x="20" y="15" width="135" height="45" rx="6" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+                    <text x="87" y="34" text-anchor="middle" font-size="10" font-weight="600" fill="#065f46">Simplicity</text>
+                    <text x="87" y="48" text-anchor="middle" font-size="9" fill="#065f46">Lower complexity, easier</text>
+                    <text x="87" y="58" text-anchor="middle" font-size="9" fill="#065f46">to debug initially</text>
+                    <!-- Negative effect 1: Scalability -->
+                    <line x1="260" y1="100" x2="155" y2="100" stroke="#ef4444" stroke-width="2" marker-end="url(#rp1r)"/>
+                    <rect x="20" y="77" width="130" height="45" rx="6" fill="#fef2f2" stroke="#ef4444" stroke-width="1.5"/>
+                    <text x="85" y="96" text-anchor="middle" font-size="10" font-weight="600" fill="#991b1b">Scalability</text>
+                    <text x="85" y="110" text-anchor="middle" font-size="9" fill="#991b1b">Context window grows</text>
+                    <text x="85" y="122" text-anchor="middle" font-size="9" fill="#991b1b">unbounded with task size</text>
+                    <!-- Negative effect 2: Capability -->
+                    <line x1="260" y1="115" x2="160" y2="155" stroke="#ef4444" stroke-width="2" marker-end="url(#rp1r)"/>
+                    <rect x="20" y="135" width="135" height="45" rx="6" fill="#fef2f2" stroke="#ef4444" stroke-width="1.5"/>
+                    <text x="87" y="154" text-anchor="middle" font-size="10" font-weight="600" fill="#991b1b">Capability Ceiling</text>
+                    <text x="87" y="168" text-anchor="middle" font-size="9" fill="#991b1b">One model can't be</text>
+                    <text x="87" y="180" text-anchor="middle" font-size="9" fill="#991b1b">best at everything</text>
+                    <!-- Right side: Multi-Agent context -->
+                    <!-- Mixed: Latency -->
+                    <line x1="442" y1="90" x2="545" y2="40" stroke="#f59e0b" stroke-width="2" marker-end="url(#rp1y)"/>
+                    <rect x="548" y="15" width="135" height="45" rx="6" fill="#fffbeb" stroke="#f59e0b" stroke-width="1.5"/>
+                    <text x="615" y="34" text-anchor="middle" font-size="10" font-weight="600" fill="#92400e">Latency</text>
+                    <text x="615" y="48" text-anchor="middle" font-size="9" fill="#92400e">Lower per-agent context</text>
+                    <text x="615" y="58" text-anchor="middle" font-size="9" fill="#92400e">but coordination adds RTT</text>
+                    <!-- Negative: Cost -->
+                    <line x1="442" y1="100" x2="547" y2="100" stroke="#ef4444" stroke-width="2" marker-end="url(#rp1r)"/>
+                    <rect x="550" y="77" width="132" height="45" rx="6" fill="#fef2f2" stroke="#ef4444" stroke-width="1.5"/>
+                    <text x="616" y="96" text-anchor="middle" font-size="10" font-weight="600" fill="#991b1b">Cost (single agent)</text>
+                    <text x="616" y="110" text-anchor="middle" font-size="9" fill="#991b1b">All tasks use the same</text>
+                    <text x="616" y="122" text-anchor="middle" font-size="9" fill="#991b1b">expensive frontier model</text>
+                    <!-- Positive: Debuggability for single -->
+                    <line x1="442" y1="115" x2="545" y2="158" stroke="#10b981" stroke-width="2" marker-end="url(#rp1g)"/>
+                    <rect x="548" y="135" width="132" height="45" rx="6" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+                    <text x="614" y="154" text-anchor="middle" font-size="10" font-weight="600" fill="#065f46">Debuggability</text>
+                    <text x="614" y="168" text-anchor="middle" font-size="9" fill="#065f46">One trace to follow vs.</text>
+                    <text x="614" y="180" text-anchor="middle" font-size="9" fill="#065f46">distributed agent mesh</text>
+                </svg>
+            </div>
+
+            <div class="effects-grid">
+                <div class="effect-card positive">
+                    <div class="time-badge">Immediate</div>
+                    <h4>Lower Initial Complexity</h4>
+                    <div class="magnitude">Magnitude: High (short term)</div>
+                    <p>Single agent means one codebase, one set of prompts, one context to debug. The hospital analogy: a general practitioner is easier to schedule than coordinating five specialists.</p>
+                </div>
+                <div class="effect-card negative">
+                    <div class="time-badge">3-6 months</div>
+                    <h4>Context Window Saturation</h4>
+                    <div class="magnitude">Magnitude: Critical at scale</div>
+                    <p>As tasks grow, one agent accumulates all tool results in a single context. After 30+ tool calls, the context degrades. The physician's notebook gets too full to read quickly. Performance collapses before you realize why.</p>
+                </div>
+                <div class="effect-card negative">
+                    <div class="time-badge">6-12 months</div>
+                    <h4>Capability Ceiling</h4>
+                    <div class="magnitude">Magnitude: High for complex domains</div>
+                    <p>No single model excels equally at code generation, legal analysis, and mathematical reasoning. Specialization requires separate models tuned for each domain — impossible with one agent.</p>
+                </div>
+                <div class="effect-card mixed">
+                    <div class="time-badge">Ongoing</div>
+                    <h4>Cost Allocation Difficulty</h4>
+                    <div class="magnitude">Magnitude: Medium</div>
+                    <p>All tasks route to the same expensive frontier model. Simple tasks (formatting, extraction) pay the same token price as complex reasoning. Multi-agent lets you route cheap tasks to small models.</p>
+                </div>
+                <div class="effect-card positive">
+                    <div class="time-badge">Ongoing</div>
+                    <h4>Debuggability Advantage</h4>
+                    <div class="magnitude">Magnitude: High during development</div>
+                    <p>One linear trace to follow. When multi-agent systems fail, you debug a distributed system where agents can be in any state. Single agent failures have a clear, sequential root cause path.</p>
+                </div>
+            </div>
+        </div>
+
+        <hr class="divider">
+
+        <!-- Decision 2: Custom Tools vs MCP Ecosystem -->
+        <div class="ripple-section">
+            <div class="decision-label">Decision 2 of 4</div>
+            <div class="decision-box">Building Custom Tools vs. Using MCP Ecosystem</div>
+            <p style="color:#6b7280;margin-bottom:1.25rem;">Writing bespoke tool integrations vs. adopting standardized MCP servers from the growing ecosystem. Like a hospital building proprietary medical equipment vs. using FDA-certified standard instruments.</p>
+
+            <div class="diagram-container">
+                <svg viewBox="0 0 700 180" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;display:block;margin:0 auto 1.5rem;">
+                    <defs>
+                        <marker id="d2g" markerWidth="8" markerHeight="6" refX="6" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#10b981"/></marker>
+                        <marker id="d2r" markerWidth="8" markerHeight="6" refX="6" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#ef4444"/></marker>
+                        <marker id="d2y" markerWidth="8" markerHeight="6" refX="6" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#f59e0b"/></marker>
+                    </defs>
+                    <rect x="250" y="65" width="200" height="50" rx="8" fill="#1e40af"/>
+                    <text x="350" y="87" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">CUSTOM TOOLS</text>
+                    <text x="350" y="103" text-anchor="middle" font-size="10" fill="#bfdbfe">choosing this path</text>
+                    <!-- Left effects (negative for custom) -->
+                    <line x1="250" y1="80" x2="155" y2="35" stroke="#ef4444" stroke-width="2" marker-end="url(#d2r)"/>
+                    <rect x="10" y="10" width="140" height="48" rx="6" fill="#fef2f2" stroke="#ef4444" stroke-width="1.5"/>
+                    <text x="80" y="30" text-anchor="middle" font-size="10" font-weight="600" fill="#991b1b">Dev Speed</text>
+                    <text x="80" y="44" text-anchor="middle" font-size="9" fill="#991b1b">Months to build what MCP</text>
+                    <text x="80" y="56" text-anchor="middle" font-size="9" fill="#991b1b">ecosystem offers today</text>
+                    <line x1="250" y1="90" x2="153" y2="90" stroke="#ef4444" stroke-width="2" marker-end="url(#d2r)"/>
+                    <rect x="10" y="68" width="140" height="44" rx="6" fill="#fef2f2" stroke="#ef4444" stroke-width="1.5"/>
+                    <text x="80" y="87" text-anchor="middle" font-size="10" font-weight="600" fill="#991b1b">Maintenance Burden</text>
+                    <text x="80" y="101" text-anchor="middle" font-size="9" fill="#991b1b">You own every API change,</text>
+                    <text x="80" y="112" text-anchor="middle" font-size="9" fill="#991b1b">auth rotation, schema update</text>
+                    <line x1="250" y1="105" x2="155" y2="148" stroke="#ef4444" stroke-width="2" marker-end="url(#d2r)"/>
+                    <rect x="10" y="128" width="140" height="44" rx="6" fill="#fef2f2" stroke="#ef4444" stroke-width="1.5"/>
+                    <text x="80" y="147" text-anchor="middle" font-size="10" font-weight="600" fill="#991b1b">Vendor Lock-in Risk</text>
+                    <text x="80" y="161" text-anchor="middle" font-size="9" fill="#991b1b">Tight coupling to current</text>
+                    <text x="80" y="172" text-anchor="middle" font-size="9" fill="#991b1b">tool interfaces</text>
+                    <!-- Right effects -->
+                    <line x1="452" y1="80" x2="548" y2="35" stroke="#10b981" stroke-width="2" marker-end="url(#d2g)"/>
+                    <rect x="552" y="10" width="138" height="48" rx="6" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+                    <text x="621" y="30" text-anchor="middle" font-size="10" font-weight="600" fill="#065f46">Full Control</text>
+                    <text x="621" y="44" text-anchor="middle" font-size="9" fill="#065f46">Custom behavior,</text>
+                    <text x="621" y="56" text-anchor="middle" font-size="9" fill="#065f46">proprietary data access</text>
+                    <line x1="452" y1="90" x2="550" y2="90" stroke="#f59e0b" stroke-width="2" marker-end="url(#d2y)"/>
+                    <rect x="553" y="68" width="138" height="44" rx="6" fill="#fffbeb" stroke="#f59e0b" stroke-width="1.5"/>
+                    <text x="622" y="87" text-anchor="middle" font-size="10" font-weight="600" fill="#92400e">Capability Breadth</text>
+                    <text x="622" y="101" text-anchor="middle" font-size="9" fill="#92400e">MCP ecosystem offers 500+</text>
+                    <text x="622" y="112" text-anchor="middle" font-size="9" fill="#92400e">integrations. Custom: only yours.</text>
+                    <line x1="452" y1="105" x2="548" y2="148" stroke="#10b981" stroke-width="2" marker-end="url(#d2g)"/>
+                    <rect x="552" y="128" width="138" height="44" rx="6" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+                    <text x="621" y="147" text-anchor="middle" font-size="10" font-weight="600" fill="#065f46">Perf Optimization</text>
+                    <text x="621" y="161" text-anchor="middle" font-size="9" fill="#065f46">Custom batching, caching,</text>
+                    <text x="621" y="172" text-anchor="middle" font-size="9" fill="#065f46">and protocol shortcuts</text>
+                </svg>
+            </div>
+
+            <div class="effects-grid">
+                <div class="effect-card negative">
+                    <div class="time-badge">Immediate</div>
+                    <h4>Development Speed Tax</h4>
+                    <div class="magnitude">Magnitude: Very High</div>
+                    <p>Building a reliable GitHub integration from scratch takes 2-4 weeks. The MCP ecosystem has battle-tested servers for GitHub, Slack, Postgres, and hundreds more. Custom tools delay the real work: the agent's reasoning quality.</p>
+                </div>
+                <div class="effect-card negative">
+                    <div class="time-badge">Ongoing</div>
+                    <h4>Compounding Maintenance Debt</h4>
+                    <div class="magnitude">Magnitude: Critical long-term</div>
+                    <p>Every external API you integrate against will change. Custom tools mean your team owns those changes forever. The hospital that builds its own MRI machines also services them — that is not where physician expertise should go.</p>
+                </div>
+                <div class="effect-card positive">
+                    <div class="time-badge">Immediate</div>
+                    <h4>Proprietary Data Access</h4>
+                    <div class="magnitude">Magnitude: High for internal tools</div>
+                    <p>MCP ecosystem tools can't access your internal databases, company-specific APIs, or proprietary systems. Custom tools are essential for connecting agents to your organization's unique data surfaces.</p>
+                </div>
+                <div class="effect-card mixed">
+                    <div class="time-badge">6-18 months</div>
+                    <h4>Ecosystem Network Effects</h4>
+                    <div class="magnitude">Magnitude: Growing rapidly</div>
+                    <p>Every new MCP server in the ecosystem is a free capability for adopters. The value of choosing MCP standards compounds over time — like being on the internet vs. a private WAN. Custom tools don't benefit from this.</p>
+                </div>
+            </div>
+        </div>
+
+        <hr class="divider">
+
+        <!-- Decision 3: Tight vs Loose Coupling -->
+        <div class="ripple-section">
+            <div class="decision-label">Decision 3 of 4</div>
+            <div class="decision-box">Tight Coupling vs. Loose Coupling of Agent-Tool Interfaces</div>
+            <p style="color:#6b7280;margin-bottom:1.25rem;">Whether agents hardcode assumptions about tool schemas and behavior vs. treating tools as interchangeable services discovered at runtime. Like a surgeon who only works with one supplier's instruments vs. one trained on standard surgical protocols.</p>
+
+            <div class="diagram-container">
+                <svg viewBox="0 0 700 190" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;display:block;margin:0 auto 1.5rem;">
+                    <defs>
+                        <marker id="d3g" markerWidth="8" markerHeight="6" refX="6" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#10b981"/></marker>
+                        <marker id="d3r" markerWidth="8" markerHeight="6" refX="6" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#ef4444"/></marker>
+                        <marker id="d3y" markerWidth="8" markerHeight="6" refX="6" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#f59e0b"/></marker>
+                    </defs>
+                    <rect x="240" y="70" width="220" height="50" rx="8" fill="#1e40af"/>
+                    <text x="350" y="92" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">TIGHT COUPLING</text>
+                    <text x="350" y="108" text-anchor="middle" font-size="10" fill="#bfdbfe">choosing this path</text>
+                    <!-- Left -->
+                    <line x1="240" y1="83" x2="150" y2="35" stroke="#10b981" stroke-width="2" marker-end="url(#d3g)"/>
+                    <rect x="8" y="10" width="138" height="48" rx="6" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+                    <text x="77" y="30" text-anchor="middle" font-size="10" font-weight="600" fill="#065f46">Performance</text>
+                    <text x="77" y="44" text-anchor="middle" font-size="9" fill="#065f46">No schema discovery</text>
+                    <text x="77" y="56" text-anchor="middle" font-size="9" fill="#065f46">overhead per call</text>
+                    <line x1="240" y1="95" x2="148" y2="95" stroke="#ef4444" stroke-width="2" marker-end="url(#d3r)"/>
+                    <rect x="8" y="73" width="138" height="44" rx="6" fill="#fef2f2" stroke="#ef4444" stroke-width="1.5"/>
+                    <text x="77" y="92" text-anchor="middle" font-size="10" font-weight="600" fill="#991b1b">Flexibility</text>
+                    <text x="77" y="106" text-anchor="middle" font-size="9" fill="#991b1b">Tool swap = agent rewrite.</text>
+                    <text x="77" y="117" text-anchor="middle" font-size="9" fill="#991b1b">High change cost.</text>
+                    <line x1="240" y1="108" x2="150" y2="155" stroke="#ef4444" stroke-width="2" marker-end="url(#d3r)"/>
+                    <rect x="8" y="132" width="138" height="48" rx="6" fill="#fef2f2" stroke="#ef4444" stroke-width="1.5"/>
+                    <text x="77" y="152" text-anchor="middle" font-size="10" font-weight="600" fill="#991b1b">Evolution</text>
+                    <text x="77" y="166" text-anchor="middle" font-size="9" fill="#991b1b">Schema changes are</text>
+                    <text x="77" y="177" text-anchor="middle" font-size="9" fill="#991b1b">breaking changes</text>
+                    <!-- Right -->
+                    <line x1="462" y1="83" x2="552" y2="35" stroke="#10b981" stroke-width="2" marker-end="url(#d3g)"/>
+                    <rect x="555" y="10" width="138" height="48" rx="6" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+                    <text x="624" y="30" text-anchor="middle" font-size="10" font-weight="600" fill="#065f46">Testability</text>
+                    <text x="624" y="44" text-anchor="middle" font-size="9" fill="#065f46">Swap real tools for</text>
+                    <text x="624" y="56" text-anchor="middle" font-size="9" fill="#065f46">mock MCP servers in tests</text>
+                    <line x1="462" y1="95" x2="552" y2="95" stroke="#f59e0b" stroke-width="2" marker-end="url(#d3y)"/>
+                    <rect x="555" y="73" width="138" height="44" rx="6" fill="#fffbeb" stroke="#f59e0b" stroke-width="1.5"/>
+                    <text x="624" y="92" text-anchor="middle" font-size="10" font-weight="600" fill="#92400e">Perf Overhead</text>
+                    <text x="624" y="106" text-anchor="middle" font-size="9" fill="#92400e">Schema negotiation at</text>
+                    <text x="624" y="117" text-anchor="middle" font-size="9" fill="#92400e">connect adds small latency</text>
+                    <line x1="462" y1="108" x2="552" y2="155" stroke="#10b981" stroke-width="2" marker-end="url(#d3g)"/>
+                    <rect x="555" y="132" width="138" height="48" rx="6" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+                    <text x="624" y="152" text-anchor="middle" font-size="10" font-weight="600" fill="#065f46">Safe Evolution</text>
+                    <text x="624" y="166" text-anchor="middle" font-size="9" fill="#065f46">Add new tool versions</text>
+                    <text x="624" y="177" text-anchor="middle" font-size="9" fill="#065f46">without breaking agents</text>
+                </svg>
+            </div>
+
+            <div class="effects-grid">
+                <div class="effect-card negative">
+                    <div class="time-badge">3-6 months</div>
+                    <h4>Fragile Evolution</h4>
+                    <div class="magnitude">Magnitude: Critical</div>
+                    <p>When an MCP tool changes its parameter schema, every tightly-coupled agent that calls it breaks. With hundreds of deployed agents, this becomes a coordination nightmare — like changing a standard scalpel grip and retraining every surgeon simultaneously.</p>
+                </div>
+                <div class="effect-card positive">
+                    <div class="time-badge">Ongoing</div>
+                    <h4>Mock-Driven Testing</h4>
+                    <div class="magnitude">Magnitude: High</div>
+                    <p>Loose coupling via MCP interfaces means you can swap real services for test doubles without touching agent logic. Testing a code review agent against a mock GitHub MCP server is far cheaper and faster than hitting the real API.</p>
+                </div>
+                <div class="effect-card positive">
+                    <div class="time-badge">Immediate</div>
+                    <h4>Performance Advantage</h4>
+                    <div class="magnitude">Magnitude: Low-Medium</div>
+                    <p>Tight coupling eliminates the schema discovery handshake at connection time. For ultra-low-latency applications, this matters. But for most agent workloads dominated by LLM inference time, this benefit is below the noise floor.</p>
+                </div>
+            </div>
+        </div>
+
+        <hr class="divider">
+
+        <!-- Decision 4: Write Access to Production -->
+        <div class="ripple-section">
+            <div class="decision-label">Decision 4 of 4</div>
+            <div class="decision-box">Giving Agents Write Access to Production Systems</div>
+            <p style="color:#6b7280;margin-bottom:1.25rem;">Whether agents can autonomously modify live databases, trigger deployments, send emails, or execute financial transactions. Like authorizing a medical AI to administer drugs without a physician review step.</p>
+
+            <div class="diagram-container">
+                <svg viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;display:block;margin:0 auto 1.5rem;">
+                    <defs>
+                        <marker id="d4g" markerWidth="8" markerHeight="6" refX="6" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#10b981"/></marker>
+                        <marker id="d4r" markerWidth="8" markerHeight="6" refX="6" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#ef4444"/></marker>
+                        <marker id="d4y" markerWidth="8" markerHeight="6" refX="6" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#f59e0b"/></marker>
+                    </defs>
+                    <!-- Decision node -->
+                    <rect x="240" y="75" width="220" height="50" rx="8" fill="#dc2626"/>
+                    <text x="350" y="97" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">WRITE ACCESS TO PROD</text>
+                    <text x="350" y="113" text-anchor="middle" font-size="10" fill="#fecaca">choosing this path</text>
+                    <!-- Left: severe negatives -->
+                    <line x1="240" y1="85" x2="148" y2="35" stroke="#ef4444" stroke-width="2.5" marker-end="url(#d4r)"/>
+                    <rect x="8" y="8" width="136" height="52" rx="6" fill="#fef2f2" stroke="#ef4444" stroke-width="2"/>
+                    <text x="76" y="28" text-anchor="middle" font-size="10" font-weight="700" fill="#991b1b">Blast Radius</text>
+                    <text x="76" y="42" text-anchor="middle" font-size="9" fill="#991b1b">A prompt injection attack</text>
+                    <text x="76" y="54" text-anchor="middle" font-size="9" fill="#991b1b">can delete production data</text>
+                    <line x1="240" y1="100" x2="146" y2="100" stroke="#ef4444" stroke-width="2.5" marker-end="url(#d4r)"/>
+                    <rect x="8" y="78" width="136" height="44" rx="6" fill="#fef2f2" stroke="#ef4444" stroke-width="2"/>
+                    <text x="76" y="97" text-anchor="middle" font-size="10" font-weight="700" fill="#991b1b">Compliance Risk</text>
+                    <text x="76" y="111" text-anchor="middle" font-size="9" fill="#991b1b">SOC2/HIPAA requires</text>
+                    <text x="76" y="122" text-anchor="middle" font-size="9" fill="#991b1b">human approval chain</text>
+                    <line x1="240" y1="115" x2="148" y2="162" stroke="#ef4444" stroke-width="2.5" marker-end="url(#d4r)"/>
+                    <rect x="8" y="140" width="136" height="48" rx="6" fill="#fef2f2" stroke="#ef4444" stroke-width="2"/>
+                    <text x="76" y="160" text-anchor="middle" font-size="10" font-weight="700" fill="#991b1b">User Trust</text>
+                    <text x="76" y="174" text-anchor="middle" font-size="9" fill="#991b1b">Users need to know what</text>
+                    <text x="76" y="185" text-anchor="middle" font-size="9" fill="#991b1b">the agent changed and why</text>
+                    <!-- Right: upside and mitigations -->
+                    <line x1="462" y1="85" x2="554" y2="35" stroke="#10b981" stroke-width="2" marker-end="url(#d4g)"/>
+                    <rect x="557" y="8" width="136" height="52" rx="6" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+                    <text x="625" y="28" text-anchor="middle" font-size="10" font-weight="600" fill="#065f46">Capability</text>
+                    <text x="625" y="42" text-anchor="middle" font-size="9" fill="#065f46">Agents can complete</text>
+                    <text x="625" y="54" text-anchor="middle" font-size="9" fill="#065f46">end-to-end workflows</text>
+                    <line x1="462" y1="100" x2="554" y2="100" stroke="#f59e0b" stroke-width="2" marker-end="url(#d4y)"/>
+                    <rect x="557" y="78" width="136" height="44" rx="6" fill="#fffbeb" stroke="#f59e0b" stroke-width="1.5"/>
+                    <text x="625" y="97" text-anchor="middle" font-size="10" font-weight="600" fill="#92400e">Velocity</text>
+                    <text x="625" y="111" text-anchor="middle" font-size="9" fill="#92400e">Human gates slow down</text>
+                    <text x="625" y="122" text-anchor="middle" font-size="9" fill="#92400e">async workflows</text>
+                    <line x1="462" y1="115" x2="554" y2="162" stroke="#f59e0b" stroke-width="2" marker-end="url(#d4y)"/>
+                    <rect x="557" y="140" width="136" height="48" rx="6" fill="#fffbeb" stroke="#f59e0b" stroke-width="1.5"/>
+                    <text x="625" y="160" text-anchor="middle" font-size="10" font-weight="600" fill="#92400e">Auditability</text>
+                    <text x="625" y="174" text-anchor="middle" font-size="9" fill="#92400e">Feasible but requires</text>
+                    <text x="625" y="185" text-anchor="middle" font-size="9" fill="#92400e">significant investment</text>
+                </svg>
+            </div>
+
+            <div class="effects-grid">
+                <div class="effect-card negative">
+                    <div class="time-badge">Immediate</div>
+                    <h4>Catastrophic Blast Radius</h4>
+                    <div class="magnitude">Magnitude: Existential</div>
+                    <p>An agent with production write access and a successful prompt injection attack can delete databases, send mass emails, or trigger financial transactions. The hospital analogy: an AI with medication administration rights that gets confused by a forged doctor's note. The damage is real and often irreversible.</p>
+                </div>
+                <div class="effect-card negative">
+                    <div class="time-badge">Immediate</div>
+                    <h4>Compliance Failure</h4>
+                    <div class="magnitude">Magnitude: High in regulated industries</div>
+                    <p>SOC2, HIPAA, GDPR, and PCI DSS all require human accountability chains for data modification and financial operations. Autonomous agent writes may violate these requirements. Your compliance team must be in this decision before the first agent writes to production.</p>
+                </div>
+                <div class="effect-card positive">
+                    <div class="time-badge">Immediate</div>
+                    <h4>Full Workflow Completion</h4>
+                    <div class="magnitude">Magnitude: High for automation value</div>
+                    <p>Read-only agents can advise but can't act. For genuine automation — auto-remediating incidents, executing approved playbooks, processing transactions — write access is necessary. The question is how narrowly scoped and how audited that access is.</p>
+                </div>
+                <div class="effect-card mixed">
+                    <div class="time-badge">Ongoing</div>
+                    <h4>Trust Erosion Over Time</h4>
+                    <div class="magnitude">Magnitude: High for user adoption</div>
+                    <p>Even one autonomous agent mistake that modifies production data can set back organizational trust in AI agents by 12-24 months. Building trust incrementally — starting with read-only, then write to staging, then write to production with gates — is safer than granting full access and walking it back after an incident.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card success" style="margin-top: 2rem;">
+            <strong>The Architect's Synthesis:</strong> These four decisions interact. Choosing multi-agent architecture makes write access blast radius smaller (each agent has a narrower scope). Choosing loose coupling makes both decisions safer (you can swap in a read-only tool for testing). Choosing the MCP ecosystem gives you community-vetted servers with security defaults already baked in. Decisions compound — optimize them together, not in isolation.
+        </div>
+
+    </main>
+
+    <footer class="section-footer">
+        <a href="integration.html" class="btn">Previous: System Design Integration</a>
+        <a href="evolution.html" class="btn">Next: Evolution Story</a>
+    </footer>
+
+    <script src="../../js/components.js"></script>
+</body>
+</html>

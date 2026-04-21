@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Conversations - Learn Claude Code Ecosystem</title>
+    <link rel="stylesheet" href="../../css/styles.css">
+    <link rel="stylesheet" href="theme.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <a href="index.html" class="nav-back">Back to Overview</a>
+        <span class="current-section">Interview Conversations</span>
+        <div class="nav-links">
+            <a href="journey.html">Previous</a>
+            <a href="integration.html">Next</a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <h1>Interview Conversations</h1>
+            <p class="powerful-sentence">The questions below are not trivia tests — they are invitations to demonstrate architectural thinking. A weak answer lists features. A strong answer explains tradeoffs, constraints, and design rationale.</p>
+            <p class="explanation">Seven questions, each with talking points, follow-up traps, and a production story that grounds the abstract in lived experience. Study these until you can answer each one without looking.</p>
+        </section>
+
+        <div class="accordion" data-multiple-open="false">
+
+            <!-- QUESTION 1 -->
+            <div class="accordion-item">
+                <div class="accordion-header">
+                    <span><strong>Q1.</strong> What is Claude Code and how does it differ from GitHub Copilot?</span>
+                    <span class="severity medium">Architecture</span>
+                </div>
+                <div class="accordion-content">
+                    <h4>Core Talking Points</h4>
+                    <ul>
+                        <li><strong>Paradigm difference, not feature difference.</strong> Copilot is reactive autocomplete — it waits for you to type and suggests continuations. Claude Code is an agentic system — it receives a goal, plans a sequence of actions, executes them using real tools, reads results, and iterates until the goal is achieved. The human's role shifts from typist to director.</li>
+                        <li><strong>Execution vs. suggestion.</strong> Copilot produces text suggestions that you accept or reject. Claude Code reads actual files from your filesystem, runs real shell commands, modifies real files, and reads test output. It operates in your environment, not in a sandbox that approximates it.</li>
+                        <li><strong>Context scope.</strong> Copilot's effective context is the current file plus a few open tabs — call it a few hundred to a few thousand tokens in practice. Claude Code has a ~200K token context window and can actively search the codebase using Glob, Grep, and Read tools to load exactly what it needs. It understands the whole system, not just the current screen.</li>
+                        <li><strong>Tool and extension ecosystem.</strong> Copilot is IDE-native and UI-bound. Claude Code has a first-class extensibility model: Skills (procedural knowledge), MCP Servers (external connectivity), Plugins (bundled capabilities), and Hooks (lifecycle automation). Each adds capabilities that Copilot's architecture cannot accommodate.</li>
+                        <li><strong>Memory and persistence.</strong> Copilot has no memory across sessions. Claude Code has CLAUDE.md (loaded every session), auto memory (written by Claude, read at session start), and project-level context that accumulates over time.</li>
+                    </ul>
+
+                    <h4>Follow-Up Questions to Expect</h4>
+                    <div class="card warning">
+                        <ul>
+                            <li>"Is Claude Code always better than Copilot?" — No. For low-context completion tasks (finishing a for loop, completing a method signature), inline autocomplete is faster and less disruptive. Claude Code shines on multi-step, multi-file, goal-oriented work. They are different tools for different jobs.</li>
+                            <li>"What are the risks of giving an AI direct shell access?" — This is a good follow-up. The answer involves the importance of CLAUDE.md guardrails, pre-commit hooks, the developer's responsibility to review every action, and why the terminal context (where the developer is already operating as a privileged user) is the right place for this kind of tool.</li>
+                            <li>"How does context window size affect the comparison?" — Larger context means Claude can hold more of the codebase in mind simultaneously. But it also means more tokens per session, which means more cost. Context management strategy is what separates effective Claude Code users from expensive ones.</li>
+                        </ul>
+                    </div>
+
+                    <h4>Production Story</h4>
+                    <div class="card success">
+                        <p><strong>The authentication migration scenario:</strong> A team needed to migrate from session-based auth to JWT across a Rails monolith — 47 files involved. With Copilot, this would take a senior engineer 2-3 days: manually finding all auth touchpoints, writing each change, running tests, fixing failures. With Claude Code, the engineer wrote a detailed prompt describing the migration requirements, Claude used Grep and Glob to map every auth touchpoint, proposed a migration plan, executed changes file-by-file while running the test suite after each batch, and completed the initial migration in 6 hours. The engineer spent that time reviewing diffs and handling the 4 edge cases Claude flagged it could not resolve confidently. The result was not "Claude did it" — it was "the engineer directed a tireless senior developer."</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QUESTION 2 -->
+            <div class="accordion-item">
+                <div class="accordion-header">
+                    <span><strong>Q2.</strong> Explain the CLAUDE.md memory hierarchy.</span>
+                    <span class="severity medium">Memory</span>
+                </div>
+                <div class="accordion-content">
+                    <h4>Core Talking Points</h4>
+                    <ul>
+                        <li><strong>Four distinct tiers, four distinct purposes.</strong> Global CLAUDE.md (~/.claude/CLAUDE.md) applies to all projects — personal preferences, global tool configurations, universal coding style. Project CLAUDE.md (./CLAUDE.md) applies to the specific project, lives in git, and is shared with the team. Rules folder (.claude/rules/) introduced in v2.0 (January 2026) allows domain-specific modular rules — one file for testing conventions, one for deployment, one for security requirements. Auto memory (~/.claude/projects/[project]/memory/MEMORY.md) is written by Claude itself during sessions — not human-authored, but Claude-authored institutional knowledge.</li>
+                        <li><strong>Loading order and precedence.</strong> At session start, Claude loads CLAUDE.md files in order: global, then project, then relevant rules. More specific files can refine or override more general ones. The first 200 lines of MEMORY.md are also loaded automatically. This happens before you type your first prompt — it is the pre-production briefing before the shoot begins.</li>
+                        <li><strong>Auto-compaction interaction.</strong> The "Compact Instructions" section of CLAUDE.md guides what the auto-compaction algorithm preserves when it summarizes conversation history. This is the mechanism by which your standing instructions shape how Claude manages its own context window — meta-programming the production's editing workflow.</li>
+                        <li><strong>MEMORY.md vs. CLAUDE.md.</strong> CLAUDE.md is human-authored and static between sessions (unless you edit it). MEMORY.md is AI-authored and grows dynamically — Claude writes to it when it discovers important context: a tricky dependency, an undocumented behavior, a performance constraint. The first 200 lines load automatically; everything beyond requires explicit reference. Managing MEMORY.md quality is a Level 3 concern: periodically reviewing, pruning irrelevant notes, and structuring it so the most important information lands in the first 200 lines.</li>
+                        <li><strong>Team sharing implications.</strong> Project CLAUDE.md belongs in version control. It is the team's shared set of AI-facing conventions — as important as your linting configuration or your CI pipeline. Treat it as a first-class engineering artifact: review it in PRs, update it when conventions change, onboard new team members through it.</li>
+                    </ul>
+
+                    <h4>Follow-Up Questions to Expect</h4>
+                    <div class="card warning">
+                        <ul>
+                            <li>"What happens if CLAUDE.md files conflict?" — More specific files take precedence. Project overrides global; rules override both. If genuine conflicts exist, Claude will flag them. This is why global CLAUDE.md should be abstract (style preferences) and project CLAUDE.md should be concrete (project-specific commands).</li>
+                            <li>"How do you prevent CLAUDE.md from becoming a dumping ground?" — Structure it deliberately: a short summary at the top (the 30-second brief), then sections for development environment, testing, deployment, conventions, and off-limits areas. Ruthlessly prune instructions that Claude follows correctly without being told — only document the non-obvious.</li>
+                            <li>"How does this compare to cursor rules or system prompts?" — Conceptually similar but architecturally richer: the hierarchy (global/project/rules/memory), the auto-compaction instruction capability, and the auto memory system are unique to Claude Code's model.</li>
+                        </ul>
+                    </div>
+
+                    <h4>Production Story</h4>
+                    <div class="card success">
+                        <p><strong>The MEMORY.md gold mine:</strong> A senior engineer at a fintech startup noticed after three months of daily Claude Code use that MEMORY.md had grown to 800 lines. On review, they found Claude had documented: the fact that the payment processing service was on an older API version that rejected certain content-type headers, a race condition in the test suite that would fail non-deterministically when run in parallel, the specific Postgres configuration that caused query plan changes on certain dataset sizes, and 14 other quirks discovered during sessions. This was institutional knowledge that existed nowhere else in the codebase. The engineer promoted the most critical 20 items to CLAUDE.md and shared them with the team as a "Claude's discoveries" doc. The auto memory system had been building an undocumented project knowledge base the whole time.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QUESTION 3 -->
+            <div class="accordion-item">
+                <div class="accordion-header">
+                    <span><strong>Q3.</strong> How do sub-agents work and when would you use them?</span>
+                    <span class="severity medium">Orchestration</span>
+                </div>
+                <div class="accordion-content">
+                    <h4>Core Talking Points</h4>
+                    <ul>
+                        <li><strong>Context isolation is the primary benefit.</strong> Sub-agents run in their own context windows, completely isolated from the main agent. This means a sub-agent can load an entire module's codebase, analyze it deeply, and return a result — without that analysis consuming the main agent's context budget. The main agent stays focused on orchestration; sub-agents handle depth.</li>
+                        <li><strong>Parallel execution is the performance benefit.</strong> Multiple sub-agents can run simultaneously. In worktree isolation mode, each sub-agent operates in its own branch with no filesystem contention. Three sub-agents analyzing three independent components in parallel compress a 3-hour analysis into a 40-minute one.</li>
+                        <li><strong>Delegation patterns.</strong> Good sub-agent tasks are bounded, well-defined, and returnable: "find all places in the codebase where we use this deprecated API," "generate a comprehensive test suite for this module," "analyze the performance characteristics of these three query patterns." Bad sub-agent tasks are vague, open-ended, or require continuous main-agent judgment: "improve the codebase" is not a sub-agent task.</li>
+                        <li><strong>Custom system prompts and tool permissions.</strong> Sub-agents can be given custom system prompts (making them specialists in a domain) and restricted tool access (a sub-agent that only analyzes code should not have Bash access to execute it). This principle of least privilege improves both safety and focus.</li>
+                        <li><strong>The "worktree" keyword.</strong> Adding "worktree" to a sub-agent's configuration gives it an isolated git worktree to work in. Changes it makes do not affect the main branch until explicitly merged. Critical for sub-agents that modify files — prevents interference between parallel agents and gives you a clean review boundary.</li>
+                    </ul>
+
+                    <h4>Follow-Up Questions to Expect</h4>
+                    <div class="card warning">
+                        <ul>
+                            <li>"How does the main agent know when to delegate vs. do the work itself?" — This is a judgment call that improves with experience. A useful heuristic: if the task requires reading more than ~20% of your context budget in files, or if it is genuinely independent of other work in progress, it is a candidate for sub-agent delegation.</li>
+                            <li>"What is the cost model for sub-agents?" — Each sub-agent is a separate context window, which means separate token consumption and (with API-based models) separate billing. Many sub-agents on long tasks can multiply cost. The trade-off is context preservation in the main agent vs. total token spend.</li>
+                            <li>"How is this different from Agent Teams?" — Sub-agents are parent-child: the main agent spawns them, they report back. Agent Teams are peer-to-peer: teammates can message each other directly and share a task list. Sub-agents are generally more appropriate for well-defined delegation; Agent Teams are more appropriate for genuinely collaborative work where agents need to coordinate in real time.</li>
+                        </ul>
+                    </div>
+
+                    <h4>Production Story</h4>
+                    <div class="card success">
+                        <p><strong>The parallel codebase audit:</strong> A team needed to audit their 300KLOC Node.js monorepo for three classes of issues: insecure direct object references, missing input validation, and SQL injection vectors. Sequentially, this would take days. Instead, the engineer defined three sub-agents, each assigned one class of issue, each with read-only tool access (no modifications), each running in parallel. All three ran simultaneously for 45 minutes. The main agent received three structured reports and synthesized them into a prioritized remediation plan. Total time: 90 minutes, of which the engineer was actively involved for perhaps 20. The context window strategy was elegant: each sub-agent loaded only the code relevant to its issue class, none of them burdened the main agent with 300KLOC of source, and the main agent's context was fully available for synthesis and planning.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QUESTION 4 -->
+            <div class="accordion-item">
+                <div class="accordion-header">
+                    <span><strong>Q4.</strong> What are skills, and how do they differ from MCP servers and plugins?</span>
+                    <span class="severity medium">Extensibility</span>
+                </div>
+                <div class="accordion-content">
+                    <h4>Core Talking Points</h4>
+                    <ul>
+                        <li><strong>Skills = procedural knowledge.</strong> A skill is a named, reusable procedure — a SKILL.md file with YAML frontmatter that describes a workflow Claude should follow for a specific type of task. "How do I deploy to staging?" is a skill. "How do I generate a database migration for our ORM?" is a skill. Skills encode the how — the step-by-step process that, without the skill, Claude would either invent from first principles or ask you about repeatedly.</li>
+                        <li><strong>MCP Servers = external connectivity.</strong> An MCP server is a lightweight process that exposes tools Claude can call to interact with external systems: GitHub (create PRs, list issues), databases (run queries), cloud providers (deploy services), internal APIs (fetch data). MCP servers do not contain procedures; they provide capabilities. The procedure for how to use those capabilities might live in a skill.</li>
+                        <li><strong>Plugins = bundled collections.</strong> A plugin is a deployable package that bundles slash commands, agents, MCP servers, and hooks into a single installable unit. If a skill is a shooting script and an MCP server is an equipment rental relationship, a plugin is a complete production package — everything a new production team needs to start filming a specific genre of film. Installed via /plugin; 9,000+ available as of February 2026.</li>
+                        <li><strong>The interplay.</strong> A deploy plugin might contain: a "deploy-to-staging" skill (the procedure), a cloud provider MCP server (the connectivity), a pre-deploy hook (safety check), and a /deploy slash command (the entry point). All four work together; none is a substitute for another.</li>
+                        <li><strong>The Agent Skills open standard.</strong> Skills use a cross-platform open standard — a SKILL.md in the same format works in Claude Code, OpenAI Codex CLI, Cursor, and Gemini CLI. Skills built for one platform are portable. The skills.sh marketplace has 20,000+ skills; skillsmp.com and skillhub.club provide alternative registries. This portability is a significant ecosystem advantage over proprietary extension formats.</li>
+                    </ul>
+
+                    <h4>Follow-Up Questions to Expect</h4>
+                    <div class="card warning">
+                        <ul>
+                            <li>"When would you choose a skill over just writing a detailed prompt?" — A skill encodes proven procedure. If you find yourself writing the same detailed prompt more than twice for a specific type of task, it is a candidate for a skill. Skills also benefit the whole team automatically once shared — a detailed prompt helps only the person who remembered to write it.</li>
+                            <li>"How are custom slash commands related to skills?" — Since v2.0 of Claude Code, custom slash commands and skills are the same underlying mechanism. A slash command is just a skill with a specific invocation trigger. The unification simplified the mental model significantly.</li>
+                            <li>"What is the lazy loading benefit for MCP servers?" — By default, Claude loads tool descriptions from all configured MCP servers at session start, consuming context budget. Lazy loading via MCP Tool Search loads tool descriptions only when Claude determines they are needed for the current task — reducing context overhead by approximately 95% for sessions that do not use all configured servers. Critical for teams with many MCP servers configured.</li>
+                        </ul>
+                    </div>
+
+                    <h4>Production Story</h4>
+                    <div class="card success">
+                        <p><strong>The migration workflow composition:</strong> A platform team at a SaaS company needed every developer to follow a specific database migration procedure: generate the migration, validate backward compatibility, test the migration against a snapshot of production data, run the test suite, and create a PR with a standardized description format. Before skills, this was a 6-page runbook that half the team had not read. After: one skill (migration.md) encoding the complete procedure, one MCP server (internal database tools), one hook (loading current schema into context at session start). A developer types "create a migration to add indexes to the users table" and Claude follows the full procedure automatically. The runbook became executable.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QUESTION 5 -->
+            <div class="accordion-item">
+                <div class="accordion-header">
+                    <span><strong>Q5.</strong> Walk me through context window management in Claude Code.</span>
+                    <span class="severity high">Context Management</span>
+                </div>
+                <div class="accordion-content">
+                    <h4>Core Talking Points</h4>
+                    <ul>
+                        <li><strong>The context window is a finite resource — treat it like one.</strong> Claude's effective context window is approximately 200,000 tokens. Every file read, shell command output, sub-agent result, and conversational turn consumes tokens. As the window fills, two things happen: performance degrades (older context is effectively down-weighted) and costs rise (more tokens per request). Proactive management is not optional at Level 3+.</li>
+                        <li><strong>/context for visibility.</strong> The /context command renders a visual representation of context usage: a colored grid showing what is consuming tokens, with a categorical breakdown (conversation history, file contents, tool results). Running /context at the start of a complex session establishes your baseline; running it periodically shows you the burn rate. Developers who never run /context are flying blind.</li>
+                        <li><strong>/compact for controlled reduction.</strong> /compact summarizes the conversation history, replacing verbose earlier exchanges with a distilled summary. You can guide it: "/compact focus on the authentication refactor, discard the early exploration" tells Claude what story to preserve. The "Compact Instructions" section in CLAUDE.md provides standing guidance for the auto-compaction algorithm — the most powerful lever for teams that want consistent compaction behavior.</li>
+                        <li><strong>/clear for a clean slate.</strong> /clear wipes all conversational context but CLAUDE.md and auto memory survive. Use it when a session has become so polluted or confused that compaction cannot recover it. The cost: you lose all session context. The benefit: you start fresh with only the standing knowledge that actually belongs to the project.</li>
+                        <li><strong>Auto-compaction and its triggers.</strong> Auto-compaction fires automatically when the context window approaches capacity. If you have not set Compact Instructions in CLAUDE.md, the algorithm makes its own choices about what to preserve. These choices may not align with your priorities. Setting Compact Instructions is a 10-minute investment that pays dividends across every long session.</li>
+                    </ul>
+
+                    <h4>Strategic Approaches for Long Sessions</h4>
+                    <div class="card info">
+                        <ul>
+                            <li><strong>Sub-agent delegation:</strong> The single most effective context management strategy. When a task requires deep reading of large file sets, delegate it to a sub-agent. The sub-agent loads and processes the files in its own context; the main agent receives only the result.</li>
+                            <li><strong>Targeted file loading:</strong> Resist the urge to say "read the whole codebase." Instead, direct Claude to specific files. The Glob and Grep tools exist precisely so Claude can find what it needs without loading everything.</li>
+                            <li><strong>Session segmentation:</strong> For very large tasks, design them as multiple sessions: exploration session (sub-agents map the problem space, /clear after), planning session (develop the approach, /clear after), execution session (implement the plan, informed by CLAUDE.md notes from previous sessions).</li>
+                            <li><strong>Compact before complexity:</strong> When about to start a complex, context-heavy operation, run /compact first with a focus directive. Start the heavy work with maximum available budget.</li>
+                        </ul>
+                    </div>
+
+                    <h4>Follow-Up Questions to Expect</h4>
+                    <div class="card warning">
+                        <ul>
+                            <li>"What happens when context fills up and auto-compaction fires mid-task?" — Claude summarizes and continues. But if the compaction was not guided, it may lose critical intermediate decisions. The symptom: Claude seems to "forget" something that was established 30 minutes ago. The diagnosis: check whether it was lost in compaction. The prevention: Compact Instructions in CLAUDE.md, and periodic voluntary /compact with focus directives.</li>
+                            <li>"How does context management affect cost?" — Each token in context costs money with API-based models. A 200K token session is dramatically more expensive than a 20K token session. For enterprise teams with many developers running long sessions, context management is a significant cost lever. The analytics do not exist yet to give precise figures across all use patterns, but the order-of-magnitude difference is real.</li>
+                        </ul>
+                    </div>
+
+                    <h4>Production Story</h4>
+                    <div class="card success">
+                        <p><strong>The 6-hour refactor that did not collapse:</strong> A principal engineer needed to refactor a 150KLOC Python monolith's data access layer — replacing direct SQLAlchemy calls with a repository pattern across 80 files. They designed a three-session strategy: Session 1 mapped all data access patterns using explore sub-agents (sub-agents loaded files, main agent accumulated only structured summaries — ended session with /compact focus:data-access-patterns, saved CLAUDE.md notes with key discoveries). Session 2 designed the repository pattern with the accumulated map in context (clean session, CLAUDE.md notes provided context). Session 3 executed changes file-by-file using implementation sub-agents in worktree isolation, running tests after each batch. Total session time: ~6 hours across 3 sessions. Context never degraded because no single session held everything. The architecture — not the AI — enabled the scale.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QUESTION 6 -->
+            <div class="accordion-item">
+                <div class="accordion-header">
+                    <span><strong>Q6.</strong> How would you set up Claude Code for a team of 20 developers?</span>
+                    <span class="severity high">Team Setup</span>
+                </div>
+                <div class="accordion-content">
+                    <h4>Core Talking Points</h4>
+                    <ul>
+                        <li><strong>Shared CLAUDE.md in version control is the foundation.</strong> The project-level CLAUDE.md belongs in git. It is the team's shared AI interface specification: what every Claude session should know about this codebase. Structure it with care: tech stack versions, test commands, lint commands, deployment procedures, coding conventions, team-specific patterns, and off-limits files. Review it in PRs when conventions change. Treat it as documentation that Claude reads — because it is.</li>
+                        <li><strong>Modular rules for domain-specific standards (.claude/rules/).</strong> A single CLAUDE.md file for a large team can become unwieldy. Use the rules folder (v2.0, January 2026) to segment: security-rules.md for security requirements, testing-rules.md for testing conventions, deployment-rules.md for deployment procedures. Individual engineers can PR changes to the rules relevant to their domain without touching the master CLAUDE.md.</li>
+                        <li><strong>Shared skills library for common workflows.</strong> Identify the 5-10 most repetitive complex workflows on your team (deploy to staging, create migration, generate API endpoint, write component test) and write skills for each. Distribute them via a shared skills configuration or a private skills registry. Skills reduce the variance in how different team members accomplish the same task — and variance is the enemy of maintainable codebases.</li>
+                        <li><strong>MCP server configurations via infrastructure-as-code.</strong> Configure shared MCP servers (GitHub, internal database tools, monitoring APIs) in a team-maintained .claude/settings.json committed to the repository. Engineers inherit the full MCP configuration when they clone the repo. New team members have full Claude connectivity from day one, not after a day of manual setup.</li>
+                        <li><strong>Compliance hooks for safety and audit requirements.</strong> Hooks run shell commands at lifecycle events. For enterprise teams: a pre-tool-call hook that logs all tool calls to an audit log, a session-start hook that injects current security advisories into context, a post-session hook that generates a session summary for team review. These are especially important for teams in regulated industries where AI-assisted development requires audit trails.</li>
+                        <li><strong>Training program mapped to the four levels.</strong> Not all 20 developers will be at the same level. Design a structured onboarding: week 1 materials for Level 1 (survival checklist, basic usage), month 1 materials for Level 2 (custom CLAUDE.md, skills, MCP setup), and a mentoring pairing system where Level 3+ developers pair with Level 1 developers for their first complex tasks.</li>
+                    </ul>
+
+                    <h4>Follow-Up Questions to Expect</h4>
+                    <div class="card warning">
+                        <ul>
+                            <li>"How do you handle developers who use Claude Code in ways that violate team conventions?" — This is where CLAUDE.md standards and hooks provide structural enforcement rather than relying on individual compliance. A hook that validates commit messages before the commit is more reliable than a CLAUDE.md instruction to "follow our commit message format."</li>
+                            <li>"What are the security considerations for a team setup?" — Developers running Claude Code locally have the same system access they already have — Claude operates as the user. The risk surface is primarily: Claude accessing secrets in environment variables or config files. Mitigations: .claudeignore for sensitive files, hooks that warn when Claude is about to read files in known-sensitive directories, and clear CLAUDE.md instructions listing off-limits files and directories.</li>
+                            <li>"How do you measure the ROI of this setup investment?" — Measure before and after: time to complete 5 representative tasks, rate of test failures on newly authored code, frequency of "style inconsistency" comments in code review, time for new developers to complete their first meaningful contribution. The baseline matters; without it, ROI claims are speculation.</li>
+                        </ul>
+                    </div>
+
+                    <h4>Production Story</h4>
+                    <div class="card success">
+                        <p><strong>The 90-day team rollout:</strong> A 22-person engineering team at a Series B startup rolled out Claude Code over 90 days with a deliberate program. Week 1: each engineer installed Claude Code and completed the Level 1 survival checklist independently, with a Slack channel for questions. Month 1: a designated "Claude Code champions" program — 3 senior engineers who reached Level 2-3 quickly and became the internal experts. Month 2: the champions wrote the team's core CLAUDE.md, identified the 8 highest-value skills to build, and configured shared MCP servers. Month 3: full team operating with shared infrastructure; champions running Level 2 workshops for the rest of the team. By month 3, the team reported a 40% reduction in time spent on repetitive implementation tasks and a measurable decrease in "style inconsistency" comments in code review. The investment in CLAUDE.md quality in Month 2 was cited as the single highest-leverage action — every session benefited from it immediately.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QUESTION 7 -->
+            <div class="accordion-item">
+                <div class="accordion-header">
+                    <span><strong>Q7.</strong> What are agent teams and how do they differ from sub-agents?</span>
+                    <span class="severity high">Agent Teams</span>
+                </div>
+                <div class="accordion-content">
+                    <h4>Core Talking Points</h4>
+                    <ul>
+                        <li><strong>The fundamental architectural difference: hierarchy vs. peer network.</strong> Sub-agents are parent-child: the main agent spawns them with a specific task and tool permissions; they execute and return results; they cannot initiate communication with each other or with other branches of the agent tree. Agent Teams (powered by TeammateTool, Opus 4.6, experimental as of February 2026) are peer-to-peer: teammates have their own sessions, their own context windows, and can message each other directly without routing through a central coordinator.</li>
+                        <li><strong>Shared task list as coordination mechanism.</strong> Agent Teams maintain a shared task list — a common view of what needs to be done, what is in progress, and what is complete. Any teammate can read the task list, update it, and claim items. This is the coordination mechanism that replaces the parent agent's orchestration in sub-agent hierarchies. The task list is the production schedule; teammates are the departments running independently against it.</li>
+                        <li><strong>When Agent Teams outperform sub-agent hierarchies.</strong> Work that requires genuine peer collaboration — not just delegation — benefits from Agent Teams. If Agent A's output depends on Agent B's output in non-trivial ways, and both agents need to exchange multiple rounds of information before either can complete, the peer communication model eliminates the overhead of routing through a coordinator. This matters especially for tasks like: one agent writing an API while another writes the consuming client, iterating until both sides agree on the interface.</li>
+                        <li><strong>When sub-agents outperform Agent Teams.</strong> Well-defined, bounded delegation is more efficient with sub-agents. If the parent agent can fully specify a task upfront and expects a clean result, the sub-agent model is simpler, more predictable, and requires less coordination overhead. Agent Teams introduce coordination complexity — a shared task list that can conflict, teammates that can block on each other, inter-agent messaging that can fail.</li>
+                        <li><strong>Experimental status and production readiness.</strong> Agent Teams require the CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS environment variable to enable. As of February 2026, this is explicitly experimental — the API and behavior may change, the failure modes are less well-understood than sub-agents, and the tooling for debugging inter-agent interactions is nascent. This is a feature to learn and experiment with, not a feature to depend on in production critical workflows yet.</li>
+                    </ul>
+
+                    <h4>Architectural Comparison</h4>
+                    <div class="comparison-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Dimension</th>
+                                    <th>Sub-Agents</th>
+                                    <th>Agent Teams</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Communication model</td>
+                                    <td>Parent-child (hierarchical)</td>
+                                    <td>Peer-to-peer (flat)</td>
+                                </tr>
+                                <tr>
+                                    <td>Task assignment</td>
+                                    <td>Parent assigns at spawn time</td>
+                                    <td>Shared task list (claim-based)</td>
+                                </tr>
+                                <tr>
+                                    <td>Inter-agent messaging</td>
+                                    <td>Not possible</td>
+                                    <td>Direct teammate messaging</td>
+                                </tr>
+                                <tr>
+                                    <td>Context isolation</td>
+                                    <td>Yes — each sub-agent is isolated</td>
+                                    <td>Yes — each teammate is isolated</td>
+                                </tr>
+                                <tr>
+                                    <td>Coordination overhead</td>
+                                    <td>Low (parent orchestrates)</td>
+                                    <td>Higher (shared task list + messaging)</td>
+                                </tr>
+                                <tr>
+                                    <td>Best for</td>
+                                    <td>Well-defined bounded delegation</td>
+                                    <td>Collaborative, interdependent work</td>
+                                </tr>
+                                <tr>
+                                    <td>Production readiness (Feb 2026)</td>
+                                    <td>Stable</td>
+                                    <td>Experimental</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h4>Follow-Up Questions to Expect</h4>
+                    <div class="card warning">
+                        <ul>
+                            <li>"How do you prevent Agent Teams from getting into a coordination deadlock?" — This is an open engineering problem as of February 2026. The shared task list provides visibility, but preventing circular dependencies between teammates requires careful task decomposition upfront. Design tasks so each teammate has a clear output that does not require another teammate's output to begin. The ccpm (Critical Chain Project Management) pattern — using GitHub Issues as the task queue — is one approach to bringing proven project management discipline to agent coordination.</li>
+                            <li>"What model do Agent Teams use?" — TeammateTool was launched with Opus 4.6 (February 2026). Each teammate runs as a full Claude session. This means Agent Teams are significantly more expensive than sub-agent hierarchies for equivalent work — each teammate is a full-cost session, not a constrained sub-task. This cost consideration is important for production decisions about when to use the feature.</li>
+                            <li>"How does this relate to multi-agent frameworks like AutoGen or CrewAI?" — Claude Code's Agent Teams are native to the Claude Code CLI environment, with access to real filesystem tools, git operations, and the full skill/MCP ecosystem. AutoGen and CrewAI are programming frameworks that require custom agent code. Claude Code's version is higher-level and more immediately useful for software development tasks; the frameworks offer more customization for research and novel agent architectures.</li>
+                        </ul>
+                    </div>
+
+                    <h4>Production Story</h4>
+                    <div class="card success">
+                        <p><strong>The API + client co-design experiment:</strong> A team experimenting with Agent Teams (enabled the experimental flag in their development environment) used it for designing a new internal API and its TypeScript client simultaneously. One teammate was responsible for the backend FastAPI implementation; another for the TypeScript client library. They were given the same high-level specification and access to the shared task list. Over 90 minutes, the teammates sent 11 direct messages to each other, negotiating the endpoint signatures, the error response format, and the pagination schema. By the end, both the API implementation and the client were consistent — they had argued out the inconsistencies in inter-agent messages rather than through multiple rounds of human review. The engineer observed that the most surprising thing was not that it worked, but that the negotiation messages sounded exactly like the kind of "hey, can we align on this?" Slack thread that normally takes a day between human engineers. The future of collaborative software development may look less like humans directing AI and more like humans setting goals for AI teams to coordinate on.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <section>
+            <h2>How to Use These Conversations</h2>
+            <div class="card info">
+                <p>The best preparation for any of these interview questions is not memorizing the talking points — it is developing genuine fluency by building real things. If you have deployed a CLAUDE.md that meaningfully improved your team's sessions, you do not need to memorize why CLAUDE.md matters. If you have debugged a context compaction failure in a real 4-hour session, the /compact explanation comes naturally. The conversations above provide the framework; your hands-on experience provides the credibility.</p>
+            </div>
+            <div class="card warning">
+                <p>The "production story" format is particularly powerful in technical conversations. A concrete story about a specific problem, a specific approach, and a specific result carries more weight than any number of abstract assertions. Develop 2-3 personal production stories from your own Claude Code use. They are your most persuasive interview asset and the most irreplaceable.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="section-footer">
+        <a href="journey.html" class="btn">Previous: Learning Journey</a>
+        <a href="integration.html" class="btn">Next: System Design Integration</a>
+    </footer>
+
+    <script src="../../js/components.js"></script>
+</body>
+</html>

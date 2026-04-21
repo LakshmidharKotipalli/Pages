@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Section 5 — Ripple Effects Map | LangGraph Learning Journey</title>
+    <meta name="description" content="How architectural decisions in LangGraph cascade through your entire system. Six critical ripple effects every production engineer must understand.">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* ── Progress bar ── */
+        #progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: var(--primary);
+            z-index: 9999;
+            transition: width 0.1s;
+        }
+
+        /* ── Section hero ── */
+        .section-hero {
+            background: linear-gradient(135deg, #0D1117 0%, #1a0a2e 50%, #0e0526 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 64px 0 48px;
+            position: relative;
+            overflow: hidden;
+        }
+        .section-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 700px 350px at 20% 60%, rgba(139,92,246,0.10) 0%, transparent 70%),
+                radial-gradient(ellipse 400px 200px at 75% 25%, rgba(248,81,73,0.07) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .section-hero .container { position: relative; }
+        .section-label {
+            display: inline-block;
+            background: rgba(139,92,246,0.15);
+            border: 1px solid rgba(139,92,246,0.4);
+            color: var(--primary);
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 5px 16px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+        }
+        .section-hero h1 {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 800;
+            color: #fff;
+            border: none;
+            margin: 0 0 16px;
+            line-height: 1.2;
+        }
+        .section-hero h1 span { color: var(--primary); }
+        .section-hero p {
+            max-width: 680px;
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            line-height: 1.8;
+            margin: 0;
+        }
+
+        /* ── Ripple overview SVG ── */
+        .ripple-diagram-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 40px;
+            margin: 40px 0;
+            text-align: center;
+            overflow: hidden;
+        }
+        .ripple-diagram-container h2 {
+            margin-top: 0;
+            color: var(--primary);
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+        }
+        .ripple-diagram-container > p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 32px;
+        }
+        .ripple-svg-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* ── Ripple effect cards ── */
+        .ripple-effects-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 32px;
+            margin: 40px 0;
+        }
+
+        .ripple-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .ripple-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+
+        .ripple-card-header {
+            padding: 24px 28px;
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        .ripple-number {
+            flex-shrink: 0;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: white;
+        }
+        .ripple-header-text { flex: 1; }
+        .ripple-header-text h3 {
+            margin: 0 0 8px;
+            font-size: 1.2rem;
+            color: #fff;
+        }
+        .ripple-meta {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .magnitude-badge {
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+        .mag-critical { background: rgba(248,81,73,0.2); color: #F85149; border: 1px solid rgba(248,81,73,0.3); }
+        .mag-high     { background: rgba(245,158,11,0.2); color: #F59E0B; border: 1px solid rgba(245,158,11,0.3); }
+        .mag-medium   { background: rgba(210,153,34,0.2); color: #D29922; border: 1px solid rgba(210,153,34,0.3); }
+        .mag-low      { background: rgba(88,166,255,0.2); color: #58A6FF; border: 1px solid rgba(88,166,255,0.3); }
+        .time-horizon {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .ripple-card-body { padding: 28px; }
+
+        /* Wave chain */
+        .wave-chain {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            margin: 20px 0;
+        }
+        .wave-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+        .wave-connector {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-shrink: 0;
+            width: 36px;
+        }
+        .wave-dot {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+        .wave-dot.source { background: #6B7280; font-size: 0.7rem; }
+        .wave-line {
+            width: 2px;
+            height: 28px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.15), transparent);
+            margin: 3px 0;
+        }
+        .wave-text-block {
+            flex: 1;
+            padding-bottom: 24px;
+        }
+        .wave-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+        .wave-text {
+            font-size: 0.97rem;
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        /* Sub-sections within body */
+        .ripple-subsection {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+        .ripple-subsection h4 {
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin: 0 0 12px;
+        }
+
+        .prevention-box {
+            background: rgba(63,185,80,0.07);
+            border: 1px solid rgba(63,185,80,0.2);
+            border-radius: 8px;
+            padding: 14px 18px;
+            font-size: 0.93rem;
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        .critical-alert {
+            background: rgba(248,81,73,0.08);
+            border: 1px solid rgba(248,81,73,0.25);
+            border-radius: 8px;
+            padding: 14px 18px;
+            font-size: 0.93rem;
+            line-height: 1.7;
+        }
+
+        .fix-box {
+            background: rgba(88,166,255,0.07);
+            border: 1px solid rgba(88,166,255,0.2);
+            border-radius: 8px;
+            padding: 14px 18px;
+            font-size: 0.93rem;
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        /* Two-column compare */
+        .compare-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 12px;
+        }
+        .compare-col {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+        }
+        .compare-col h5 {
+            margin: 0 0 10px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+        .compare-col.bad h5  { color: var(--danger); }
+        .compare-col.good h5 { color: var(--success); }
+        .compare-col ul { padding-left: 16px; margin: 0; }
+        .compare-col li { font-size: 0.9rem; margin: 6px 0; color: var(--text); }
+
+        /* Summary table */
+        .summary-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 32px;
+            margin: 40px 0;
+        }
+        .summary-section h2 { margin-top: 0; color: var(--primary); }
+
+        /* Key insight callout */
+        .insight-callout {
+            background: linear-gradient(135deg, rgba(139,92,246,0.12) 0%, rgba(139,92,246,0.04) 100%);
+            border: 1px solid rgba(139,92,246,0.3);
+            border-radius: 12px;
+            padding: 28px;
+            margin: 32px 0;
+        }
+        .insight-callout h3 { margin-top: 0; color: var(--primary); font-size: 1.05rem; }
+        .insight-callout p { margin: 0; color: var(--text); line-height: 1.8; }
+
+        /* Analogy box */
+        .analogy-box {
+            background: rgba(88,166,255,0.06);
+            border-left: 4px solid var(--info);
+            border-radius: 0 10px 10px 0;
+            padding: 20px 24px;
+            margin: 24px 0;
+        }
+        .analogy-box .analogy-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--info);
+            margin-bottom: 8px;
+        }
+        .analogy-box p { margin: 0; font-size: 0.97rem; color: var(--text); line-height: 1.7; }
+
+        /* Copy button */
+        .copy-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(139,92,246,0.2);
+            border: 1px solid rgba(139,92,246,0.4);
+            color: var(--primary);
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .copy-button:hover { background: rgba(139,92,246,0.35); }
+
+        @media (max-width: 640px) {
+            .compare-grid { grid-template-columns: 1fr; }
+            .ripple-card-header { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+<div id="progress-bar"></div>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="container">
+        <div class="logo">LangGraph</div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="04-mental-models.html">Section 4</a>
+            <a href="06-evolution.html">Section 6</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero -->
+<div class="section-hero">
+    <div class="container">
+        <div class="breadcrumbs">
+            <a href="index.html">LangGraph</a>
+            <span class="separator">/</span>
+            <span>Section 5</span>
+        </div>
+        <span class="section-label">Section 5 of 10</span>
+        <h1>Ripple Effects Map — <span>How Decisions Cascade</span></h1>
+        <p>Every architectural choice you make in LangGraph sends shockwaves through your system, your team, and your product timeline. This section maps those cascades — so you can see the full blast radius of a decision before you commit to it.</p>
+    </div>
+</div>
+
+<main id="main-content">
+<div class="container">
+
+    <!-- Air Traffic Analogy -->
+    <div class="analogy-box" style="margin-top: 40px;">
+        <div class="analogy-label">Air Traffic Control Analogy</div>
+        <p>In an airport, a single decision — say, changing how the flight recorder (checkpointer) works — ripples outward immediately. Pilots feel the change in cockpit procedures. Ground crews must update checklists. FAA regulations may require audits. The "small technical decision" is never small. LangGraph architecture works the same way: a choice about state schema or checkpointer type touches every layer of your system, months after the commit lands.</p>
+    </div>
+
+    <!-- Overview Insight -->
+    <div class="insight-callout">
+        <h3>Why Ripple Effects Are Underestimated</h3>
+        <p>Engineers evaluate decisions on their immediate technical merit — "async is faster than sync." What they miss are the second and third-order effects: async means state durability isn't guaranteed immediately, which means retry logic must be idempotent, which means node design philosophy changes for the entire team. The direct effect takes days; the third ripple takes months. This section gives you the full map.</p>
+    </div>
+
+    <!-- SVG Ripple Diagram -->
+    <div class="ripple-diagram-container">
+        <h2>Architecture Decision Ripple Map</h2>
+        <p>Six decisions, color-coded by magnitude. Rings represent time horizons: inner = immediate, middle = 1-3 months, outer = 6-12 months.</p>
+        <div class="ripple-svg-wrapper">
+            <svg viewBox="0 0 900 600" width="900" height="600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ripple effects map showing 6 LangGraph architecture decisions radiating from a central point">
+                <defs>
+                    <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stop-color="#1a0a2e" stop-opacity="1"/>
+                        <stop offset="100%" stop-color="#0D1117" stop-opacity="1"/>
+                    </radialGradient>
+                    <!-- Ring pulses -->
+                    <filter id="glow">
+                        <feGaussianBlur stdDeviation="3" result="blur"/>
+                        <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+                    </filter>
+                    <marker id="arrow-orange" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+                        <path d="M0,0 L8,4 L0,8 Z" fill="#F59E0B" opacity="0.7"/>
+                    </marker>
+                    <marker id="arrow-red" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+                        <path d="M0,0 L8,4 L0,8 Z" fill="#F85149" opacity="0.8"/>
+                    </marker>
+                    <marker id="arrow-yellow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+                        <path d="M0,0 L8,4 L0,8 Z" fill="#D29922" opacity="0.7"/>
+                    </marker>
+                    <marker id="arrow-blue" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+                        <path d="M0,0 L8,4 L0,8 Z" fill="#58A6FF" opacity="0.7"/>
+                    </marker>
+                    <marker id="arrow-purple" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+                        <path d="M0,0 L8,4 L0,8 Z" fill="#8B5CF6" opacity="0.7"/>
+                    </marker>
+                    <marker id="arrow-green" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+                        <path d="M0,0 L8,4 L0,8 Z" fill="#3FB950" opacity="0.7"/>
+                    </marker>
+                </defs>
+
+                <!-- Background -->
+                <rect width="900" height="600" fill="url(#bgGrad)" rx="12"/>
+
+                <!-- Concentric rings — time horizons -->
+                <circle cx="450" cy="300" r="260" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1" stroke-dasharray="4,6"/>
+                <circle cx="450" cy="300" r="185" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1" stroke-dasharray="4,6"/>
+                <circle cx="450" cy="300" r="110" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="4,6"/>
+                <circle cx="450" cy="300" r="55"  fill="none" stroke="rgba(139,92,246,0.25)" stroke-width="1.5"/>
+
+                <!-- Ring labels -->
+                <text x="450" y="193" text-anchor="middle" fill="rgba(255,255,255,0.25)" font-size="10" font-family="monospace">1–3 MONTHS</text>
+                <text x="450" y="118" text-anchor="middle" fill="rgba(255,255,255,0.18)" font-size="10" font-family="monospace">6–12 MONTHS</text>
+                <text x="450" y="248" text-anchor="middle" fill="rgba(255,255,255,0.3)" font-size="10" font-family="monospace">IMMEDIATE</text>
+
+                <!-- Center node -->
+                <circle cx="450" cy="300" r="48" fill="rgba(139,92,246,0.18)" stroke="#8B5CF6" stroke-width="2"/>
+                <circle cx="450" cy="300" r="38" fill="rgba(139,92,246,0.25)" stroke="#8B5CF6" stroke-width="1" opacity="0.7"/>
+                <text x="450" y="294" text-anchor="middle" fill="#8B5CF6" font-size="9" font-weight="700" font-family="monospace">LANGGRAPH</text>
+                <text x="450" y="306" text-anchor="middle" fill="#8B5CF6" font-size="9" font-weight="700" font-family="monospace">ARCHITECTURE</text>
+                <text x="450" y="318" text-anchor="middle" fill="rgba(139,92,246,0.7)" font-size="8" font-family="monospace">DECISION</text>
+
+                <!-- ── Spoke 1: TOP — Sync vs Async Checkpointing (ORANGE/HIGH) ── -->
+                <!-- Direction: 12 o'clock -->
+                <line x1="450" y1="252" x2="450" y2="148" stroke="#F59E0B" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-orange)" opacity="0.7"/>
+                <circle cx="450" cy="140" r="8" fill="rgba(245,158,11,0.25)" stroke="#F59E0B" stroke-width="1.5"/>
+                <circle cx="450" cy="82" r="6" fill="rgba(245,158,11,0.18)" stroke="#F59E0B" stroke-width="1.2" opacity="0.8"/>
+                <line x1="450" y1="130" x2="450" y2="90" stroke="#F59E0B" stroke-width="1" stroke-dasharray="3,3" opacity="0.5"/>
+                <!-- Label -->
+                <rect x="326" y="46" width="248" height="28" rx="5" fill="rgba(245,158,11,0.1)" stroke="rgba(245,158,11,0.3)" stroke-width="1"/>
+                <text x="450" y="63" text-anchor="middle" fill="#F59E0B" font-size="10" font-weight="700" font-family="-apple-system, sans-serif">1. Sync vs Async Checkpointing</text>
+                <!-- Immediate label -->
+                <text x="470" y="144" fill="rgba(245,158,11,0.8)" font-size="8.5" font-family="monospace">+10–50ms latency</text>
+
+                <!-- ── Spoke 2: TOP-RIGHT — State Schema Unbounded (YELLOW/MEDIUM→HIGH) ── -->
+                <!-- Direction: 2 o'clock -->
+                <line x1="490" y1="260" x2="588" y2="168" stroke="#D29922" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-yellow)" opacity="0.7"/>
+                <circle cx="594" cy="162" r="8" fill="rgba(210,153,34,0.25)" stroke="#D29922" stroke-width="1.5"/>
+                <circle cx="660" cy="102" r="6" fill="rgba(210,153,34,0.18)" stroke="#D29922" stroke-width="1.2" opacity="0.8"/>
+                <line x1="600" y1="156" x2="656" y2="108" stroke="#D29922" stroke-width="1" stroke-dasharray="3,3" opacity="0.5"/>
+                <!-- Label -->
+                <rect x="650" y="60" width="230" height="28" rx="5" fill="rgba(210,153,34,0.1)" stroke="rgba(210,153,34,0.3)" stroke-width="1"/>
+                <text x="765" y="77" text-anchor="middle" fill="#D29922" font-size="10" font-weight="700" font-family="-apple-system, sans-serif">2. State Schema Unbounded</text>
+                <text x="620" y="155" fill="rgba(210,153,34,0.8)" font-size="8.5" font-family="monospace">slow serialize</text>
+
+                <!-- ── Spoke 3: RIGHT — MemorySaver in Prod (RED/CRITICAL) ── -->
+                <!-- Direction: 3 o'clock -->
+                <line x1="502" y1="300" x2="598" y2="300" stroke="#F85149" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrow-red)" opacity="0.8"/>
+                <circle cx="606" cy="300" r="9" fill="rgba(248,81,73,0.3)" stroke="#F85149" stroke-width="2"/>
+                <circle cx="690" cy="300" r="7" fill="rgba(248,81,73,0.2)" stroke="#F85149" stroke-width="1.5" opacity="0.9"/>
+                <circle cx="762" cy="300" r="5" fill="rgba(248,81,73,0.15)" stroke="#F85149" stroke-width="1.2" opacity="0.8"/>
+                <line x1="615" y1="300" x2="683" y2="300" stroke="#F85149" stroke-width="1" stroke-dasharray="3,3" opacity="0.6"/>
+                <line x1="697" y1="300" x2="757" y2="300" stroke="#F85149" stroke-width="1" stroke-dasharray="3,3" opacity="0.4"/>
+                <!-- Label -->
+                <rect x="658" y="256" width="230" height="28" rx="5" fill="rgba(248,81,73,0.1)" stroke="rgba(248,81,73,0.35)" stroke-width="1"/>
+                <text x="773" y="273" text-anchor="middle" fill="#F85149" font-size="10" font-weight="700" font-family="-apple-system, sans-serif">3. MemorySaver in Production</text>
+                <text x="633" y="292" fill="rgba(248,81,73,0.85)" font-size="8" font-family="monospace">CRITICAL</text>
+                <text x="633" y="303" fill="rgba(248,81,73,0.7)" font-size="8" font-family="monospace">lost on restart</text>
+
+                <!-- ── Spoke 4: BOTTOM-RIGHT — Monolith vs Subgraphs (BLUE/LOW→HIGH) ── -->
+                <!-- Direction: 5 o'clock -->
+                <line x1="488" y1="340" x2="580" y2="420" stroke="#58A6FF" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-blue)" opacity="0.7"/>
+                <circle cx="586" cy="426" r="8" fill="rgba(88,166,255,0.22)" stroke="#58A6FF" stroke-width="1.5"/>
+                <circle cx="648" cy="484" r="6" fill="rgba(88,166,255,0.15)" stroke="#58A6FF" stroke-width="1.2" opacity="0.8"/>
+                <line x1="592" y1="432" x2="644" y2="480" stroke="#58A6FF" stroke-width="1" stroke-dasharray="3,3" opacity="0.5"/>
+                <!-- Label -->
+                <rect x="640" y="496" width="240" height="28" rx="5" fill="rgba(88,166,255,0.1)" stroke="rgba(88,166,255,0.3)" stroke-width="1"/>
+                <text x="760" y="513" text-anchor="middle" fill="#58A6FF" font-size="10" font-weight="700" font-family="-apple-system, sans-serif">4. Monolith vs Subgraphs</text>
+                <text x="610" y="434" fill="rgba(88,166,255,0.8)" font-size="8.5" font-family="monospace">unmaintainable @20+</text>
+
+                <!-- ── Spoke 5: BOTTOM — Missing max_iterations (ORANGE/HIGH) ── -->
+                <!-- Direction: 6 o'clock -->
+                <line x1="450" y1="348" x2="450" y2="444" stroke="#F59E0B" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-orange)" opacity="0.7"/>
+                <circle cx="450" cy="452" r="8" fill="rgba(245,158,11,0.25)" stroke="#F59E0B" stroke-width="1.5"/>
+                <circle cx="450" cy="512" r="6" fill="rgba(245,158,11,0.18)" stroke="#F59E0B" stroke-width="1.2" opacity="0.8"/>
+                <line x1="450" y1="460" x2="450" y2="506" stroke="#F59E0B" stroke-width="1" stroke-dasharray="3,3" opacity="0.5"/>
+                <!-- Label -->
+                <rect x="322" y="524" width="256" height="28" rx="5" fill="rgba(245,158,11,0.1)" stroke="rgba(245,158,11,0.3)" stroke-width="1"/>
+                <text x="450" y="541" text-anchor="middle" fill="#F59E0B" font-size="10" font-weight="700" font-family="-apple-system, sans-serif">5. Missing max_iterations Guard</text>
+                <text x="416" y="462" fill="rgba(245,158,11,0.8)" font-size="8.5" font-family="monospace">infinite loop</text>
+
+                <!-- ── Spoke 6: LEFT — Node Granularity (PURPLE/MEDIUM) ── -->
+                <!-- Direction: 9-10 o'clock -->
+                <line x1="398" y1="278" x2="302" y2="200" stroke="#8B5CF6" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-purple)" opacity="0.7"/>
+                <circle cx="296" cy="195" r="8" fill="rgba(139,92,246,0.25)" stroke="#8B5CF6" stroke-width="1.5"/>
+                <circle cx="224" cy="136" r="6" fill="rgba(139,92,246,0.18)" stroke="#8B5CF6" stroke-width="1.2" opacity="0.8"/>
+                <line x1="290" y1="189" x2="230" y2="142" stroke="#8B5CF6" stroke-width="1" stroke-dasharray="3,3" opacity="0.5"/>
+                <!-- Label -->
+                <rect x="20" y="50" width="228" height="28" rx="5" fill="rgba(139,92,246,0.1)" stroke="rgba(139,92,246,0.3)" stroke-width="1"/>
+                <text x="134" y="67" text-anchor="middle" fill="#8B5CF6" font-size="10" font-weight="700" font-family="-apple-system, sans-serif">6. Node Granularity Choices</text>
+                <text x="248" y="202" fill="rgba(139,92,246,0.8)" font-size="8.5" font-family="monospace">too coarse/fine</text>
+
+                <!-- Legend -->
+                <rect x="20" y="530" width="280" height="58" rx="6" fill="rgba(0,0,0,0.4)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+                <text x="34" y="548" fill="rgba(255,255,255,0.5)" font-size="9" font-family="monospace" font-weight="700">MAGNITUDE LEGEND</text>
+                <circle cx="34"  cy="561" r="5" fill="rgba(248,81,73,0.4)"  stroke="#F85149" stroke-width="1.5"/>
+                <text x="44" cy="561" y="565" fill="#F85149" font-size="9" font-family="monospace"> CRITICAL</text>
+                <circle cx="110" cy="561" r="5" fill="rgba(245,158,11,0.4)" stroke="#F59E0B" stroke-width="1.5"/>
+                <text x="120" y="565" fill="#F59E0B" font-size="9" font-family="monospace"> HIGH</text>
+                <circle cx="174" cy="561" r="5" fill="rgba(210,153,34,0.4)" stroke="#D29922" stroke-width="1.5"/>
+                <text x="184" y="565" fill="#D29922" font-size="9" font-family="monospace"> MEDIUM</text>
+                <circle cx="243" cy="561" r="5" fill="rgba(88,166,255,0.4)"  stroke="#58A6FF" stroke-width="1.5"/>
+                <text x="253" y="565" fill="#58A6FF" font-size="9" font-family="monospace"> LOW</text>
+                <!-- Ring legend -->
+                <circle cx="34"  cy="578" r="4" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1" stroke-dasharray="2,2"/>
+                <text x="44" y="582" fill="rgba(255,255,255,0.4)" font-size="9" font-family="monospace"> Immediate → 6-12 months (outer)</text>
+            </svg>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════
+         RIPPLE EFFECTS DETAILED CARDS
+    ══════════════════════════════════════════════════════ -->
+    <div class="ripple-effects-grid">
+
+        <!-- ── RIPPLE 1: Sync vs Async Checkpointing ── -->
+        <div class="ripple-card">
+            <div class="ripple-card-header">
+                <div class="ripple-number" style="background: #F59E0B;">1</div>
+                <div class="ripple-header-text">
+                    <h3>Choosing Synchronous vs Asynchronous Checkpointing</h3>
+                    <div class="ripple-meta">
+                        <span class="magnitude-badge mag-high">HIGH Magnitude</span>
+                        <span class="time-horizon">Immediate → 12 months</span>
+                    </div>
+                </div>
+            </div>
+            <div class="ripple-card-body">
+                <p>Checkpointing is how LangGraph saves state between node executions — the flight recorder writing to disk after each maneuver. The decision of <em>when</em> that write happens (synchronously blocking the agent, or asynchronously in the background) seems like a performance micro-optimization. It is not.</p>
+
+                <div class="wave-chain">
+                    <div class="wave-item">
+                        <div class="wave-connector">
+                            <div class="wave-dot source" style="background:#6B7280;">D</div>
+                            <div class="wave-line"></div>
+                        </div>
+                        <div class="wave-text-block">
+                            <div class="wave-label">Direct Effect</div>
+                            <div class="wave-text">Synchronous checkpointing blocks the agent thread for <strong>10–50ms per node transition</strong>. For a 12-node agent, that is 120–600ms of pure checkpoint overhead per run — before any LLM calls happen.</div>
+                        </div>
+                    </div>
+                    <div class="wave-item">
+                        <div class="wave-connector">
+                            <div class="wave-dot" style="background:#F59E0B;">R1</div>
+                            <div class="wave-line"></div>
+                        </div>
+                        <div class="wave-text-block">
+                            <div class="wave-label">Ripple 1 (Days → Weeks)</div>
+                            <div class="wave-text">Agents feel slow to users. On long-running workflows, users lose patience and abandon sessions. Product leadership responds by designing shorter, more frequent interactions — which may not be what your architecture was built for.</div>
+                        </div>
+                    </div>
+                    <div class="wave-item">
+                        <div class="wave-connector">
+                            <div class="wave-dot" style="background:#F59E0B; opacity:0.85">R2</div>
+                            <div class="wave-line"></div>
+                        </div>
+                        <div class="wave-text-block">
+                            <div class="wave-label">Ripple 2 (1–3 Months)</div>
+                            <div class="wave-text">Profiling confirms checkpointing is the bottleneck. Team invests engineering cycles in async infrastructure — queues, background workers, write-ahead logs. What started as a 2-line config choice becomes a 2-month infra project.</div>
+                        </div>
+                    </div>
+                    <div class="wave-item">
+                        <div class="wave-connector">
+                            <div class="wave-dot" style="background:#F59E0B; opacity:0.7">R3</div>
+                        </div>
+                        <div class="wave-text-block">
+                            <div class="wave-label">Ripple 3 (6–12 Months)</div>
+                            <div class="wave-text">With async checkpointing, state might not be durable the moment a node finishes. A crash between async writes loses state. Now <strong>every node must be designed idempotent</strong> — running it twice must produce the same result. This is a fundamental node design philosophy shift that affects every node written going forward.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ripple-subsection">
+                    <h4>The Production Decision Framework</h4>
+                    <div class="fix-box">
+                        <strong>Start with synchronous</strong> checkpointing (PostgresSaver default behavior). Profile under real load. Migrate to async only when you have measured evidence that checkpointing is your bottleneck — and simultaneously invest in idempotent node design. Never add async before you add idempotency guarantees.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── RIPPLE 2: State Schema Unbounded ── -->
+        <div class="ripple-card">
+            <div class="ripple-card-header">
+                <div class="ripple-number" style="background: #D29922;">2</div>
+                <div class="ripple-header-text">
+                    <h3>State Schema Grows Unbounded Over Time</h3>
+                    <div class="ripple-meta">
+                        <span class="magnitude-badge mag-medium">MEDIUM → HIGH</span>
+                        <span class="time-horizon">Gradual (grows with team)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="ripple-card-body">
+                <p>State is the airplane — every field is cargo it carries from node to node. Adding fields to State feels free. It costs nothing upfront. The price arrives slowly, then all at once.</p>
+
+                <div class="wave-chain">
+                    <div class="wave-item">
+                        <div class="wave-connector">
+                            <div class="wave-dot source" style="background:#6B7280;">D</div>
+                            <div class="wave-line"></div>
+                        </div>
+                        <div class="wave-text-block">
+                            <div class="wave-label">Direct Effect</div>
+                            <div class="wave-text">Larger state objects consume more memory and take more time to serialize/deserialize on every checkpoint. A 200-field state object serializing to 50KB JSON adds measurable latency at scale.</div>
+                        </div>
+                    </div>
+                    <div class="wave-item">
+                        <div class="wave-connector">
+                            <div class="wave-dot" style="background:#D29922;">R1</div>
+                            <div class="wave-line"></div>
+                        </div>
+                        <div class="wave-text-block">
+                            <div class="wave-label">Ripple 1 (Weeks)</div>
+                            <div class="wave-text">Checkpointing slows down. Agent response times increase. User experience degrades. You're back to Ripple Effect 1, but now caused by data bloat, not the checkpointer type.</div>
+                        </div>
+                    </div>
+                    <div class="wave-item">
+                        <div class="wave-connector">
+                            <div class="wave-dot" style="background:#D29922; opacity:0.85">R2</div>
+                            <div class="wave-line"></div>
+                        </div>
+                        <div class="wave-text-block">
+                            <div class="wave-label">Ripple 2 (1–2 Months)</div>
+                            <div class="wave-text">If you inject state into LLM prompts ("Here is the current context: {state}"), <strong>large state = expensive context windows</strong>. At GPT-4o pricing, 50KB of state injected into every LLM call across 10,000 daily runs is meaningful money. Teams discover this during their first billing cycle.</div>
+                        </div>
+                    </div>
+                    <div class="wave-item">
+                        <div class="wave-connector">
+                            <div class="wave-dot" style="background:#D29922; opacity:0.7">R3</div>
+                            <div class="wave-line"></div>
+                        </div>
+                        <div class="wave-text-block">
+                            <div class="wave-label">Ripple 3 (3–6 Months)</div>
+                            <div class="wave-text">State schema becomes a <strong>cross-team shared contract</strong>. Team A adds a field. Team B's node reads it. Now removing or renaming that field breaks Team B's code. What was a private implementation detail becomes a public API. Version management becomes necessary.</div>
+                        </div>
+                    </div>
+                    <div class="wave-item">
+                        <div class="wave-connector">
+                            <div class="wave-dot" style="background:#D29922; opacity:0.55">R4</div>
+                        </div>
+                        <div class="wave-text-block">
+                            <div class="wave-label">Ripple 4 (Ongoing)</div>
+                            <div class="wave-text">Debugging a production incident means inspecting checkpointed state. With 200 fields, finding the relevant field is like searching for a specific conversation in a phone book. Debugging time multiplies. On-call rotations become more painful.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ripple-subsection">
+                    <h4>Prevention Strategy</h4>
+                    <div class="prevention-box">
+                        <strong>Design state schema upfront</strong> in a team meeting, not ad-hoc. Apply namespace conventions: <code>search_query</code>, <code>search_results</code>, <code>search_metadata</code> — group by domain. Implement state compression for the <code>messages</code> list (trim old messages, summarize). Store large blobs (document contents, raw HTML) externally; keep only IDs in state. Treat the State TypedDict like a public API: require review to change it.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── RIPPLE 3: MemorySaver in Production ── -->
+        <div class="ripple-card" style="border-color: rgba(248,81,73,0.3);">
+            <div class="ripple-card-header" style="background: rgba(248,81,73,0.06);">
+                <div class="ripple-number" style="background: #F85149;">3</div>
+                <div class="ripple-header-text">
+                    <h3>Using MemorySaver in Production</h3>
+                    <div class="ripple-meta">
+                        <span class="magnitude-badge mag-critical">CRITICAL</span>
+                        <span class="time-horizon">Immediate — first production incident</span>
+                    </div>
+                </div>
+            </div>
+            <div class="ripple-card-body">
+                <p>MemorySaver is development scaffolding, not an airplane's flight recorder — it keeps records only while the plane is in the air. The moment the process stops, all records vanish. This is the single most common catastrophic mistake made by teams graduating from prototype to production.</p>
+
+                <div class="wave-chain">
+                    <div class="wave-item">
+                        <div class="wave-connector">
+                            <div class="wave-dot source" style="background:#6B7280;">D</div>
+                            <div class="wave-line"></div>
+                        </div>
+                        <div class="wave-text-block">
+                            <div class="wave-label">Direct Effect</div>
+                            <div class="wave-text">All agent state is stored in the Python process's heap memory. When the process stops — for any reason — all active threads are gone. No resume capability. No recovery.</div>
+                        </div>
+                    </div>
+                    <div class="wave-item">
+                        <div class="wave-connector">
+                            <div class="wave-dot" style="background:#F85149;">R1</div>
+                            <div class="wave-line"></div>
+                        </div>
+                        <div class="wave-text-block">
+                            <div class="wave-label">Ripple 1 (First Deploy)</div>
+                            <div class="wave-text">Any deployment, crash, auto-scaling event, or even a Kubernetes pod restart wipes all active user sessions. Users who were mid-conversation with an agent lose everything. The first production deploy is the first incident.</div>
+                        </div>
+                    </div>
+                    <div class="wave-item">
+                        <div class="wave-connector">
+                            <div class="wave-dot" style="background:#F85149; opacity:0.85">R2</div>
+                            <div class="wave-line"></div>
+                        </div>
+                        <div class="wave-text-block">
+                            <div class="wave-label">Ripple 2 (When Traffic Grows)</div>
+                            <div class="wave-text"><strong>Cannot scale horizontally.</strong> Each pod has a different in-memory state. If a request routes to a different pod than where the session started (common in load-balanced environments), it finds no state. Horizontal scaling — the most basic cloud scaling strategy — is impossible.</div>
+                        </div>
+                    </div>
+                    <div class="wave-item">
+                        <div class="wave-connector">
+                            <div class="wave-dot" style="background:#F85149; opacity:0.7">R3</div>
+                        </div>
+                        <div class="wave-text-block">
+                            <div class="wave-label">Ripple 3 (After Every Crash)</div>
+                            <div class="wave-text">Post-mortem is impossible. The crash wiped the evidence. You cannot replay what the agent did. LangSmith has no checkpoint to inspect. The bug that caused the crash may be unreproducible because the state that triggered it is gone.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ripple-subsection">
+                    <h4>The Non-Negotiable Rule</h4>
+                    <div class="critical-alert">
+                        <strong style="color: #F85149;">MemorySaver is ONLY for development and testing.</strong> Never in production. Make this a mandatory code review checklist item: "Does this PR use MemorySaver?" → instant rejection. In production, always use <code>PostgresSaver</code> (recommended) or <code>SqliteSaver</code> for single-instance deployments. The PostgreSQL connection overhead is trivially small compared to the catastrophic failure mode of MemorySaver.
+                    </div>
+                </div>
+
+                <div class="ripple-subsection">
+                    <h4>The Correct Production Pattern</h4>
+                    <pre><code># NEVER in production
+from langgraph.checkpoint.memory import MemorySaver
+checkpointer = MemorySaver()  # dies with the process
+
+# ALWAYS use persistent storage in production
+from langgraph.checkpoint.postgres import PostgresSaver
+from psycopg import Connection
+
+conn = Connection.connect(DATABASE_URL)
+checkpointer = PostgresSaver(conn)
+# State survives restarts, scales horizontally,
+# enables post-mortem debugging</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── RIPPLE 4: Monolith vs Subgraphs ── -->
+        <div class="ripple-card">
+            <div class="ripple-card-header">
+                <div class="ripple-number" style="background: #58A6FF;">4</div>
+                <div class="ripple-header-text">
+                    <h3>Building a Monolithic StateGraph vs Modular Subgraphs</h3>
+                    <div class="ripple-meta">
+                        <span class="magnitude-badge mag-low">LOW Initially</span>
+                        <span class="magnitude-badge mag-high">HIGH at Scale</span>
+                        <span class="time-horizon">Slow burn — 3–9 months</span>
+                    </div>
+                </div>
+            </div>
+            <div class="ripple-card-body">
+                <p>One large graph vs. composed subgraphs mirrors the monolith vs. microservices debate in software architecture. The monolith wins at first. It always does. The ripples arrive when the team and codebase grow.</p>
+
+                <div class="wave-chain">
+                    <div class="wave-item">
+                        <div class="wave-connector">
+                            <div class="wave-dot source" style="background:#6B7280;">D</div>
+                            <div class="wave-line"></div>
+                        </div>
+                        <div class="wave-text-block">
+                            <div class="wave-label">Direct Effect</div>
+                            <div class="wave-text">A monolithic StateGraph works fine for 5–10 nodes. Code is simple, fast to write, easy to understand. YAGNI ("You Aren't Gonna Need It") applies.</div>
+                        </div>
+                    </div>
+                    <div class="wave-item">
+                        <div class="wave-connector">
+                            <div class="wave-dot" style="background:#58A6FF;">R1</div>
+                            <div class="wave-line"></div>
+                        </div>
+                        <div class="wave-text-block">
+                            <div class="wave-label">Ripple 1 (15+ Nodes)</div>
+                            <div class="wave-text">Any change to one node requires running the entire graph's regression test suite. A small fix to the document parsing logic requires re-testing the synthesis, ranking, and formatting nodes. Iteration slows dramatically.</div>
+                        </div>
+                    </div>
+                    <div class="wave-item">
+                        <div class="wave-connector">
+                            <div class="wave-dot" style="background:#58A6FF; opacity:0.85">R2</div>
+                            <div class="wave-line"></div>
+                        </div>
+                        <div class="wave-text-block">
+                            <div class="wave-label">Ripple 2 (Multiple Teams)</div>
+                            <div class="wave-text">Can't assign ownership. Team A owns the research nodes, Team B owns the synthesis nodes — but they all live in one graph. Merge conflicts are constant. Deployments require coordination across teams. The graph becomes a shared bottleneck.</div>
+                        </div>
+                    </div>
+                    <div class="wave-item">
+                        <div class="wave-connector">
+                            <div class="wave-dot" style="background:#58A6FF; opacity:0.7">R3</div>
+                        </div>
+                        <div class="wave-text-block">
+                            <div class="wave-label">Ripple 3 (CI/CD)</div>
+                            <div class="wave-text">Testing the monolith requires running the entire graph — which may involve real LLM calls (expensive) or complex mocks (brittle). CI pipelines become slow and unreliable. Engineers start skipping tests.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ripple-subsection">
+                    <h4>The Pragmatic Threshold</h4>
+                    <div class="prevention-box">
+                        <strong>Start monolithic.</strong> Always. YAGNI is correct. <strong>Refactor to subgraphs when you hit these triggers:</strong> (1) You have 3+ logical domains in one graph (research, synthesis, output formatting). (2) Two or more teams need to independently deploy their piece. (3) CI is taking more than 10 minutes due to graph complexity. Subgraph composition is a refactor you can do incrementally — no need to rebuild from scratch.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── RIPPLE 5: Missing max_iterations ── -->
+        <div class="ripple-card">
+            <div class="ripple-card-header">
+                <div class="ripple-number" style="background: #F59E0B;">5</div>
+                <div class="ripple-header-text">
+                    <h3>Not Implementing a max_iterations Guard</h3>
+                    <div class="ripple-meta">
+                        <span class="magnitude-badge mag-high">HIGH</span>
+                        <span class="time-horizon">Immediate when it hits</span>
+                    </div>
+                </div>
+            </div>
+            <div class="ripple-card-body">
+                <p>An agent without iteration limits is an airplane with no fuel gauge — everything looks fine until it doesn't. When an LLM gets confused and starts looping, nothing stops it. The loop continues until something external intervenes: a cost alarm, an ops engineer, or a database that fills up.</p>
+
+                <div class="wave-chain">
+                    <div class="wave-item">
+                        <div class="wave-connector">
+                            <div class="wave-dot source" style="background:#6B7280;">D</div>
+                            <div class="wave-line"></div>
+                        </div>
+                        <div class="wave-text-block">
+                            <div class="wave-label">Direct Effect</div>
+                            <div class="wave-text">A single agent enters a loop. The conditional edge logic evaluates to "continue" on every pass. The agent runs indefinitely.</div>
+                        </div>
+                    </div>
+                    <div class="wave-item">
+                        <div class="wave-connector">
+                            <div class="wave-dot" style="background:#F59E0B;">R1</div>
+                            <div class="wave-line"></div>
+                        </div>
+                        <div class="wave-text-block">
+                            <div class="wave-label">Ripple 1 (Minutes)</div>
+                            <div class="wave-text">Each loop iteration makes LLM API calls. At GPT-4o pricing, a stuck agent calling the API every 2 seconds consumes <strong>$30–$100+ per hour</strong>. Discovered at the end of the month on the billing statement, or caught by a cost alert if you set one up.</div>
+                        </div>
+                    </div>
+                    <div class="wave-item">
+                        <div class="wave-connector">
+                            <div class="wave-dot" style="background:#F59E0B; opacity:0.85">R2</div>
+                            <div class="wave-line"></div>
+                        </div>
+                        <div class="wave-text-block">
+                            <div class="wave-label">Ripple 2 (Hours)</div>
+                            <div class="wave-text">Stuck agents write checkpoints on every iteration. The checkpointer database grows continuously. Depending on PostgreSQL configuration, this can fill disk, trigger I/O saturation, or hit row count limits — affecting all agents, not just the stuck one.</div>
+                        </div>
+                    </div>
+                    <div class="wave-item">
+                        <div class="wave-connector">
+                            <div class="wave-dot" style="background:#F59E0B; opacity:0.7">R3</div>
+                            <div class="wave-line"></div>
+                        </div>
+                        <div class="wave-text-block">
+                            <div class="wave-label">Ripple 3 (Blocking Others)</div>
+                            <div class="wave-text">If your LLM provider has per-account rate limits, a stuck agent consuming the rate limit blocks all other agents from making API calls. A single runaway agent can cause a system-wide outage for every other agent in production.</div>
+                        </div>
+                    </div>
+                    <div class="wave-item">
+                        <div class="wave-connector">
+                            <div class="wave-dot" style="background:#F59E0B; opacity:0.55">R4</div>
+                        </div>
+                        <div class="wave-text-block">
+                            <div class="wave-label">Ripple 4 (User-Facing)</div>
+                            <div class="wave-text">From the user's perspective: they triggered the agent, it never returned. They open a support ticket. Engineering triages it (investigation time), reproduces it (debugging time), traces through the checkpoints to find the loop (analysis time). One stuck agent → 4–8 hours of engineering time.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ripple-subsection">
+                    <h4>The Mandatory Fix (2 Lines)</h4>
+                    <pre><code>class AgentState(TypedDict):
+    messages: Annotated[list, operator.add]
+    iteration_count: int  # Add to EVERY stateful agent
+
+def should_continue(state: AgentState) -> str:
+    # ALWAYS check iteration count in EVERY conditional edge
+    if state["iteration_count"] >= 25:
+        return "max_iterations_reached"
+    if state["messages"][-1].tool_calls:
+        return "continue"
+    return "end"
+
+# And increment in your agent node:
+def agent_node(state: AgentState) -> AgentState:
+    # ... your LLM call ...
+    return {
+        "messages": [response],
+        "iteration_count": state["iteration_count"] + 1
+    }</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── RIPPLE 6: Node Granularity ── -->
+        <div class="ripple-card">
+            <div class="ripple-card-header">
+                <div class="ripple-number" style="background: #8B5CF6;">6</div>
+                <div class="ripple-header-text">
+                    <h3>Node Granularity — Too Coarse vs Too Fine</h3>
+                    <div class="ripple-meta">
+                        <span class="magnitude-badge mag-medium">MEDIUM</span>
+                        <span class="time-horizon">Architectural (permanent)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="ripple-card-body">
+                <p>In air traffic control, a "control tower" is not one monolithic entity — it has separate controllers for ground, departure, approach, and en-route. But you also don't assign one controller per taxiway stripe. Node granularity in LangGraph works the same way: too coarse is unmaintainable; too fine is noise.</p>
+
+                <div class="compare-grid">
+                    <div class="compare-col bad">
+                        <h5>Too Coarse — One Big Node</h5>
+                        <ul>
+                            <li>Hard to unit test individual steps</li>
+                            <li>Cannot checkpoint between sub-steps</li>
+                            <li>Node failure requires re-running expensive operations from scratch</li>
+                            <li>Latency attribution impossible: "Which part of <code>process_everything_node</code> is slow?"</li>
+                            <li>LLM call + database write + formatting in one node = three different failure modes to handle simultaneously</li>
+                        </ul>
+                    </div>
+                    <div class="compare-col good">
+                        <h5>Too Fine — Every Line a Node</h5>
+                        <ul>
+                            <li>Graph overhead for trivial operations (string formatting node?)</li>
+                            <li>State passing becomes extremely verbose</li>
+                            <li>Impossible to understand the agent's high-level flow by reading the graph</li>
+                            <li>Every micro-operation checkpointed = extreme checkpoint volume</li>
+                            <li>Graph visualization becomes unreadable — 80+ nodes</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="ripple-subsection">
+                    <h4>The Sweet Spot Definition</h4>
+                    <div class="fix-box">
+                        <strong>One node = one meaningful, independently testable unit of work with clear inputs and outputs.</strong> Ask: "Can I write a unit test for this node that runs without spinning up the full graph?" If yes, you have a good node. If the test requires the upstream node's output to be realistic, your nodes are too tightly coupled.
+                    </div>
+                </div>
+
+                <div class="ripple-subsection">
+                    <h4>The Ripple: Granularity Cascades Into Everything</h4>
+                    <div class="wave-chain">
+                        <div class="wave-item">
+                            <div class="wave-connector">
+                                <div class="wave-dot" style="background:#8B5CF6; font-size:0.65rem;">T</div>
+                                <div class="wave-line"></div>
+                            </div>
+                            <div class="wave-text-block">
+                                <div class="wave-label">Testing Strategy</div>
+                                <div class="wave-text">Coarse nodes require integration tests (slow, expensive, brittle). Fine-grained nodes enable unit tests (fast, cheap, robust). The right granularity determines how easy your CI is to maintain.</div>
+                            </div>
+                        </div>
+                        <div class="wave-item">
+                            <div class="wave-connector">
+                                <div class="wave-dot" style="background:#8B5CF6; font-size:0.65rem; opacity:0.8">D</div>
+                                <div class="wave-line"></div>
+                            </div>
+                            <div class="wave-text-block">
+                                <div class="wave-label">Debugging Granularity</div>
+                                <div class="wave-text">LangSmith shows traces at the node level. Coarse nodes give you coarse traces — you know "process_data failed" but not why or where. The granularity of your nodes is the granularity of your observability.</div>
+                            </div>
+                        </div>
+                        <div class="wave-item">
+                            <div class="wave-connector">
+                                <div class="wave-dot" style="background:#8B5CF6; font-size:0.65rem; opacity:0.6">C</div>
+                            </div>
+                            <div class="wave-text-block">
+                                <div class="wave-label">Cost Attribution</div>
+                                <div class="wave-text">LLM costs are attributed at the node level in LangSmith. Fine-grained LLM nodes let you see exactly which calls are expensive. Coarse nodes hide costs in aggregate "this big function cost $0.08" — you can't optimize what you can't measure.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- end ripple-effects-grid -->
+
+    <!-- Summary Table -->
+    <div class="summary-section">
+        <h2>Decision Impact Summary</h2>
+        <p style="color: var(--text-muted); margin-bottom: 24px;">Quick reference for architectural decisions and their blast radius.</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Decision</th>
+                    <th>Magnitude</th>
+                    <th>Time Horizon</th>
+                    <th>Primary Stakeholder</th>
+                    <th>Prevention</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Sync vs Async Checkpointing</td>
+                    <td><span class="magnitude-badge mag-high">HIGH</span></td>
+                    <td>Immediate → 12 months</td>
+                    <td>All users + Infra team</td>
+                    <td>Profile first, add idempotency before async</td>
+                </tr>
+                <tr>
+                    <td>State Schema Growth</td>
+                    <td><span class="magnitude-badge mag-medium">MEDIUM → HIGH</span></td>
+                    <td>Grows over time</td>
+                    <td>All teams (shared contract)</td>
+                    <td>Schema review process, namespace conventions</td>
+                </tr>
+                <tr>
+                    <td>MemorySaver in Production</td>
+                    <td><span class="magnitude-badge mag-critical">CRITICAL</span></td>
+                    <td>First incident</td>
+                    <td>All users, entire service</td>
+                    <td>Code review checklist, PostgresSaver always</td>
+                </tr>
+                <tr>
+                    <td>Monolith vs Subgraphs</td>
+                    <td><span class="magnitude-badge mag-low">LOW → HIGH</span></td>
+                    <td>3–9 months</td>
+                    <td>Developer teams</td>
+                    <td>Refactor at 3+ domains or multiple teams</td>
+                </tr>
+                <tr>
+                    <td>Missing max_iterations</td>
+                    <td><span class="magnitude-badge mag-high">HIGH</span></td>
+                    <td>Immediate when hit</td>
+                    <td>Cost, reliability, users</td>
+                    <td>Always add iteration_count to State</td>
+                </tr>
+                <tr>
+                    <td>Node Granularity</td>
+                    <td><span class="magnitude-badge mag-medium">MEDIUM</span></td>
+                    <td>Permanent architecture</td>
+                    <td>Dev team, ops team</td>
+                    <td>"One testable unit of work" heuristic</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Key Takeaway -->
+    <div class="key-takeaway">
+        <h3>The Meta-Lesson About Ripple Effects</h3>
+        <p>In air traffic control, flight controllers are trained to think three moves ahead. A single routing decision for one plane affects runway availability for the next six arrivals. LangGraph architecture demands the same mindset: no decision is local. The checkpointer choice affects your LLM prompt design. The state schema affects your team's velocity. The node granularity affects your ability to debug production incidents six months from now.</p>
+        <p style="margin-top: 12px;">The engineers who build reliable agents are not more technically skilled — they have simply learned to trace ripples before they commit. This section gives you the map. Use it every time you make an architectural choice.</p>
+    </div>
+
+    <!-- Navigation -->
+    <div class="navigation">
+        <a href="04-mental-models.html" class="button secondary">← Section 4: Mental Models</a>
+        <a href="06-evolution.html" class="button primary">Section 6: Evolution Story →</a>
+    </div>
+
+</div><!-- end container -->
+</main>
+
+<script src="js/components.js"></script>
+</body>
+</html>

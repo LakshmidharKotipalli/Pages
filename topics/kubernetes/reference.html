@@ -1,0 +1,1727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Reference - Learn Kubernetes</title>
+    <link rel="stylesheet" href="../../css/styles.css">
+    <link rel="stylesheet" href="theme.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <a href="index.html">← Back to Overview</a>
+        <span class="current-section">Quick Reference</span>
+    </nav>
+
+    <main>
+        <h1>Quick Reference & Cheat Sheets</h1>
+
+        <section class="intro">
+            <p class="explanation">This is your <strong>quick reference guide</strong> for Kubernetes essentials. Use this as a cheat sheet during development, debugging, or interviews. Everything you need, organized for fast lookup.</p>
+        </section>
+
+        <!-- kubectl Commands -->
+        <section class="reference-section">
+            <h2>🚀 Essential kubectl Commands</h2>
+
+            <div class="accordion" data-multiple-open="true">
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Cluster Information</h4>
+                        <span>▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="code-example">
+<pre><code># View cluster info
+kubectl cluster-info
+
+# Get cluster nodes
+kubectl get nodes
+
+# View node details
+kubectl describe node &lt;node-name&gt;
+
+# Check kubectl version
+kubectl version --client
+
+# View current context
+kubectl config current-context
+
+# View all contexts
+kubectl config get-contexts
+
+# Switch context
+kubectl config use-context &lt;context-name&gt;</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Pod Operations</h4>
+                        <span>▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="code-example">
+<pre><code># List all pods
+kubectl get pods
+
+# List pods with more details
+kubectl get pods -o wide
+
+# List pods in all namespaces
+kubectl get pods --all-namespaces
+
+# View pod details
+kubectl describe pod &lt;pod-name&gt;
+
+# View pod logs
+kubectl logs &lt;pod-name&gt;
+
+# View logs with follow (tail -f)
+kubectl logs -f &lt;pod-name&gt;
+
+# View logs for a specific container
+kubectl logs &lt;pod-name&gt; -c &lt;container-name&gt;
+
+# Execute command in pod
+kubectl exec -it &lt;pod-name&gt; -- /bin/bash
+
+# Delete pod
+kubectl delete pod &lt;pod-name&gt;
+
+# Create pod from YAML
+kubectl apply -f pod.yaml</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Deployment Operations</h4>
+                        <span>▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="code-example">
+<pre><code># List deployments
+kubectl get deployments
+
+# Create deployment
+kubectl create deployment &lt;name&gt; --image=&lt;image&gt;
+
+# Scale deployment
+kubectl scale deployment &lt;name&gt; --replicas=3
+
+# Update deployment image
+kubectl set image deployment/&lt;name&gt; &lt;container&gt;=&lt;image&gt;
+
+# View deployment status
+kubectl rollout status deployment/&lt;name&gt;
+
+# View rollout history
+kubectl rollout history deployment/&lt;name&gt;
+
+# Rollback deployment
+kubectl rollout undo deployment/&lt;name&gt;
+
+# Rollback to specific revision
+kubectl rollout undo deployment/&lt;name&gt; --to-revision=2</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Service Operations</h4>
+                        <span>▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="code-example">
+<pre><code># List services
+kubectl get services
+
+# Expose deployment as service
+kubectl expose deployment &lt;name&gt; --port=80 --type=NodePort
+
+# Create service from YAML
+kubectl apply -f service.yaml
+
+# View service endpoints
+kubectl get endpoints &lt;service-name&gt;
+
+# Delete service
+kubectl delete service &lt;service-name&gt;</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>ConfigMap & Secrets</h4>
+                        <span>▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="code-example">
+<pre><code># List configmaps
+kubectl get configmaps
+
+# Create configmap from literal
+kubectl create configmap &lt;name&gt; --from-literal=&lt;key&gt;=&lt;value&gt;
+
+# Create configmap from file
+kubectl create configmap &lt;name&gt; --from-file=&lt;path&gt;
+
+# View configmap
+kubectl describe configmap &lt;name&gt;
+
+# List secrets
+kubectl get secrets
+
+# Create secret from literal
+kubectl create secret generic &lt;name&gt; --from-literal=&lt;key&gt;=&lt;value&gt;
+
+# Create secret from file
+kubectl create secret generic &lt;name&gt; --from-file=&lt;path&gt;
+
+# Decode secret value
+kubectl get secret &lt;name&gt; -o jsonpath='{.data.&lt;key&gt;}' | base64 -d</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Debugging & Troubleshooting</h4>
+                        <span>▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="code-example">
+<pre><code># Get pod events
+kubectl get events --sort-by=.metadata.creationTimestamp
+
+# View pod YAML (applied configuration)
+kubectl get pod &lt;pod-name&gt; -o yaml
+
+# View pod logs (previous instance if crashed)
+kubectl logs &lt;pod-name&gt; --previous
+
+# Port forward to local port
+kubectl port-forward &lt;pod-name&gt; 8080:80
+
+# Copy files from pod
+kubectl cp &lt;pod-name&gt;:/path/to/file ./local-file
+
+# Copy files to pod
+kubectl cp ./local-file &lt;pod-name&gt;:/path/to/file
+
+# Check resource usage
+kubectl top nodes
+kubectl top pods
+
+# View resource quotas
+kubectl describe quota</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Namespace Management</h4>
+                        <span>▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="code-example">
+<pre><code># List namespaces
+kubectl get namespaces
+
+# Create namespace
+kubectl create namespace &lt;name&gt;
+
+# Set namespace for current context
+kubectl config set-context --current --namespace=&lt;name&gt;
+
+# Delete everything in namespace
+kubectl delete all --all -n &lt;namespace&gt;</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Apply & Delete</h4>
+                        <span>▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="code-example">
+<pre><code># Apply from file
+kubectl apply -f &lt;file.yaml&gt;
+
+# Apply from directory
+kubectl apply -f &lt;directory&gt;
+
+# Delete from file
+kubectl delete -f &lt;file.yaml&gt;
+
+# Edit resource live
+kubectl edit &lt;resource-type&gt; &lt;name&gt;
+
+# Dry run (don't actually apply)
+kubectl apply -f &lt;file.yaml&gt; --dry-run=client
+
+# View diff
+kubectl diff -f &lt;file.yaml&gt;</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- YAML Patterns -->
+        <section class="reference-section">
+            <h2>📝 Common YAML Patterns</h2>
+
+            <div class="accordion" data-multiple-open="true">
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Deployment Template</h4>
+                        <span>▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="code-example">
+<pre><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.21
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Service (ClusterIP)</h4>
+                        <span>▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="code-example">
+<pre><code>apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  type: ClusterIP
+  selector:
+    app: nginx
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Service (LoadBalancer)</h4>
+                        <span>▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="code-example">
+<pre><code>apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: nginx
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>ConfigMap</h4>
+                        <span>▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="code-example">
+<pre><code>apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  database_host: "postgres.default.svc.cluster.local"
+  database_port: "5432"
+  cache_enabled: "true"
+  log_level: "info"
+---
+# Usage in Pod:
+env:
+- name: DATABASE_HOST
+  valueFrom:
+    configMapKeyRef:
+      name: app-config
+      key: database_host</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Secret</h4>
+                        <span>▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="code-example">
+<pre><code>apiVersion: v1
+kind: Secret
+metadata:
+  name: app-secret
+type: Opaque
+data:
+  # Values must be base64 encoded
+  # echo -n 'admin' | base64
+  username: YWRtaW4=
+  # echo -n 'password123' | base64
+  password: cGFzc3dvcmQxMjM=
+---
+# Usage in Pod:
+env:
+- name: USERNAME
+  valueFrom:
+    secretKeyRef:
+      name: app-secret
+      key: username</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>PersistentVolume & PersistentVolumeClaim</h4>
+                        <span>▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="code-example">
+<pre><code>apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-volume
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /mnt/data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pv-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+# Usage in Pod:
+volumeMounts:
+- name: storage
+  mountPath: /data
+volumes:
+- name: storage
+  persistentVolumeClaim:
+    claimName: pv-claim</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Ingress</h4>
+                        <span>▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="code-example">
+<pre><code>apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: nginx-service
+            port:
+              number: 80</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Resource Limits -->
+        <section class="reference-section">
+            <h2>⚡ Resource Limits Guidelines</h2>
+
+            <div class="card info">
+                <h3>Understanding Requests vs Limits</h3>
+                <ul>
+                    <li><strong>Requests:</strong> Guaranteed resources. Kubernetes schedules based on this.</li>
+                    <li><strong>Limits:</strong> Maximum resources. Container throttled or killed if exceeded.</li>
+                    <li><strong>Best Practice:</strong> Always set both. Prevents resource starvation and noisy neighbors.</li>
+                </ul>
+            </div>
+
+            <div class="accordion" data-multiple-open="true">
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Microservice Guidelines</h4>
+                        <span>▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="comparison-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Service Size</th>
+                                        <th>CPU Request</th>
+                                        <th>CPU Limit</th>
+                                        <th>Memory Request</th>
+                                        <th>Memory Limit</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Small (API, worker)</td>
+                                        <td>100m</td>
+                                        <td>500m</td>
+                                        <td>128Mi</td>
+                                        <td>256Mi</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Medium (web server)</td>
+                                        <td>250m</td>
+                                        <td>1000m</td>
+                                        <td>256Mi</td>
+                                        <td>512Mi</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Large (app server)</td>
+                                        <td>500m</td>
+                                        <td>2000m</td>
+                                        <td>512Mi</td>
+                                        <td>1Gi</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Extra Large (batch job)</td>
+                                        <td>1000m</td>
+                                        <td>4000m</td>
+                                        <td>1Gi</td>
+                                        <td>2Gi</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="card warning" style="margin-top: 1rem;">
+                            <strong>Note:</strong> 1000m = 1 CPU core. Adjust based on actual usage monitoring.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>CPU Units Explained</h4>
+                        <span>▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <ul>
+                            <li><strong>100m</strong> = 0.1 CPU = 10% of 1 core</li>
+                            <li><strong>500m</strong> = 0.5 CPU = 50% of 1 core</li>
+                            <li><strong>1000m</strong> = 1 CPU = 1 full core</li>
+                            <li><strong>2000m</strong> = 2 CPU = 2 full cores</li>
+                        </ul>
+                        <div class="card info">
+                            <p><strong>Example:</strong> If you set <code>cpu: 100m</code>, your container is guaranteed 10% of a CPU core. If you set <code>limits.cpu: 500m</code>, it won't exceed 50% of a core.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Memory Units Explained</h4>
+                        <span>▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <ul>
+                            <li><strong>128Mi</strong> = 128 Mebibytes ≈ 134 MB</li>
+                            <li><strong>256Mi</strong> = 256 Mebibytes ≈ 268 MB</li>
+                            <li><strong>1Gi</strong> = 1 Gibibyte ≈ 1.07 GB</li>
+                            <li><strong>1G</strong> = 1 Gigabyte = 1 GB</li>
+                        </ul>
+                        <div class="card warning">
+                            <p><strong>Gotcha:</strong> Kubernetes uses <strong>mebibytes (Mi)</strong> and <strong>gibibytes (Gi)</strong> by default (power of 2). Use <strong>M</strong> and <strong>G</strong> for megabytes/gigabytes (power of 10). The difference is ~5%.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pod Phases -->
+        <section class="reference-section">
+            <h2>📊 Pod Phases & What They Mean</h2>
+
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <h4>✅ Pending</h4>
+                    <p>Pod accepted but not running. Being scheduled or pulling images.</p>
+                    <p><strong>Common causes:</strong> Cluster lacks resources, image pull slow, scheduling constraints.</p>
+                </div>
+
+                <div class="tip-card">
+                    <h4>🏃 Running</h4>
+                    <p>Pod is running. At least one container is still running or starting.</p>
+                    <p><strong>Normal state:</strong> Everything is working as expected.</p>
+                </div>
+
+                <div class="tip-card">
+                    <h4>✅ Succeeded</h4>
+                    <p>All containers terminated successfully (job completed).</p>
+                    <p><strong>Normal for jobs:</strong> Batch jobs, one-time tasks.</p>
+                </div>
+
+                <div class="tip-card">
+                    <h4>❌ Failed</h4>
+                    <p>All containers terminated, at least one failed.</p>
+                    <p><strong>Check:</strong> <code>kubectl describe pod</code> for exit codes and events.</p>
+                </div>
+
+                <div class="tip-card">
+                    <h4>❓ Unknown</h4>
+                    <p>State couldn't be obtained (usually communication error).</p>
+                    <p><strong>Check:</strong> Node health, network connectivity.</p>
+                </div>
+            </div>
+
+            <div class="card info" style="margin-top: 2rem;">
+                <h3>Container States (Inside Pod)</h3>
+                <ul>
+                    <li><strong>Waiting:</strong> Container starting, pulling image, or running probes</li>
+                    <li><strong>Running:</strong> Container executing without issues</li>
+                    <li><strong>Terminated:</strong> Container exited (check exit code: 0 = success, non-zero = error)</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Event Types & Troubleshooting -->
+        <section class="reference-section">
+            <h2>🔍 Event Types & Troubleshooting</h2>
+
+            <div class="accordion" data-multiple-open="true">
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Common Event Types</h4>
+                        <span>▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="comparison-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Event</th>
+                                        <th>Meaning</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Pulled</strong></td>
+                                        <td>Successfully pulled container image</td>
+                                        <td>None, this is good</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>PullFailed</strong></td>
+                                        <td>Failed to pull image</td>
+                                        <td>Check image name, registry auth, network</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Scheduled</strong></td>
+                                        <td>Pod assigned to a node</td>
+                                        <td>None, this is good</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>FailedScheduling</strong></td>
+                                        <td>Couldn't find node for pod</td>
+                                        <td>Check resource requests, taints, selectors</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>FailedMount</strong></td>
+                                        <td>Volume mount failed</td>
+                                        <td>Check PVC, storage class, volume exists</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Killing</strong></td>
+                                        <td>Pod being terminated</td>
+                                        <td>Normal if deleting, otherwise check signals</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Unhealthy</strong></td>
+                                        <td>Readiness/liveness probe failed</td>
+                                        <td>Check probe configuration, app health</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>BackOff</strong></td>
+                                        <td>Container crashing, retrying with delay</td>
+                                        <td>Check logs, fix container crash loop</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Troubleshooting Flowchart</h4>
+                        <span>▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="troubleshooting-flow">
+                            <div class="troubleshoot-step">
+                                <div class="step-number">1</div>
+                                <div>
+                                    <h4>Pod not starting?</h4>
+                                    <p><code>kubectl get pods</code> - Check if Pending or Running</p>
+                                    <p><strong>If Pending:</strong> Check events with <code>kubectl describe pod</code></p>
+                                    <p><strong>If CrashLoopBackOff:</strong> Check logs with <code>kubectl logs</code></p>
+                                </div>
+                            </div>
+
+                            <div class="troubleshoot-step">
+                                <div class="step-number">2</div>
+                                <div>
+                                    <h4>Image pull errors?</h4>
+                                    <p>Check image name and tag in YAML</p>
+                                    <p>Verify registry credentials: <code>kubectl get secrets</code></p>
+                                    <p>Test locally: <code>docker pull &lt;image&gt;</code></p>
+                                </div>
+                            </div>
+
+                            <div class="troubleshoot-step">
+                                <div class="step-number">3</div>
+                                <div>
+                                    <h4>Can't reach service?</h4>
+                                    <p>Check service exists: <code>kubectl get svc</code></p>
+                                    <p>Check endpoints: <code>kubectl get endpoints &lt;service&gt;</code></p>
+                                    <p>Verify pod labels match service selector</p>
+                                    <p>Check network policies blocking traffic</p>
+                                </div>
+                            </div>
+
+                            <div class="troubleshoot-step">
+                                <div class="step-number">4</div>
+                                <div>
+                                    <h4>High CPU/Memory usage?</h4>
+                                    <p>Check metrics: <code>kubectl top pods</code></p>
+                                    <p>Review resource limits vs requests</p>
+                                    <p>Check if limits are too low (throttling) or too high (OOM)</p>
+                                </div>
+                            </div>
+
+                            <div class="troubleshoot-step">
+                                <div class="step-number">5</div>
+                                <div>
+                                    <h4>Pod restarting repeatedly?</h4>
+                                    <p>Check previous logs: <code>kubectl logs &lt;pod&gt; --previous</code></p>
+                                    <p>Look for app crashes (unhandled exceptions)</p>
+                                    <p>Check liveness probe configuration</p>
+                                    <p>Verify resource limits (OOMKilled)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Common Exit Codes</h4>
+                        <span>▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="comparison-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Exit Code</th>
+                                        <th>Meaning</th>
+                                        <th>Troubleshoot</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>0</strong></td>
+                                        <td>Success</td>
+                                        <td>Normal exit (job completed)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>1</strong></td>
+                                        <td>General error</td>
+                                        <td>Check application logs</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>125</strong></td>
+                                        <td>Container failed to run</td>
+                                        <td>Docker daemon error, check image</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>126</strong></td>
+                                        <td>Command not executable</td>
+                                        <td>Check entrypoint/command permissions</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>127</strong></td>
+                                        <td>Command not found</td>
+                                        <td>Check command path in container</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>137</strong></td>
+                                        <td>SIGKILL (killed)</td>
+                                        <td>OOMKilled, or manual kill</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>139</strong></td>
+                                        <td>SIGSEGV (segmentation fault)</td>
+                                        <td>Application bug, memory issue</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>143</strong></td>
+                                        <td>SIGTERM (terminated)</td>
+                                        <td>Graceful shutdown request</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Common Flags -->
+        <section class="reference-section">
+            <h2>🚩 Common kubectl Flags & Options</h2>
+
+            <div class="accordion" data-multiple-open="true">
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Output Formats</h4>
+                        <span>▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="code-example">
+<pre><code># Table format (default)
+kubectl get pods -o wide
+
+# JSON format
+kubectl get pod &lt;name&gt; -o json
+
+# YAML format
+kubectl get pod &lt;name&gt; -o yaml
+
+# Custom columns
+kubectl get pods -o custom-columns=NAME:.metadata.name,IP:.status.podIP
+
+# JSONPath (extract specific fields)
+kubectl get pod &lt;name&gt; -o jsonpath='{.status.podIP}'
+
+# Show labels
+kubectl get pods --show-labels</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Namespace & Context</h4>
+                        <span>▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="code-example">
+<pre><code># Specify namespace
+kubectl get pods -n &lt;namespace&gt;
+kubectl get pods --namespace=&lt;namespace&gt;
+
+# All namespaces
+kubectl get pods --all-namespaces
+kubectl get pods -A
+
+# Specify context
+kubectl get pods --context=&lt;context-name&gt;
+
+# Specify kubeconfig file
+kubectl get pods --kubeconfig=&lt;file&gt;</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Selectors & Filters</h4>
+                        <span>▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="code-example">
+<pre><code># By label
+kubectl get pods -l app=nginx
+kubectl get pods -l 'env in (dev,prod)'
+
+# By field selector
+kubectl get pods --field-selector=status.phase=Running
+
+# Watch for changes (stream)
+kubectl get pods -w
+
+# Show resource usage
+kubectl top pods --containers
+
+# Sort by field
+kubectl get pods --sort-by=.metadata.creationTimestamp</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Useful Utility Flags</h4>
+                        <span>▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="code-example">
+<pre><code># Dry run (don't execute)
+kubectl apply -f file.yaml --dry-run=client
+
+# Validate YAML (dry-run server)
+kubectl apply -f file.yaml --dry-run=server
+
+# Show diff
+kubectl diff -f file.yaml
+
+# Edit last applied configuration
+kubectl edit deploy &lt;name&gt; --edit-last-applied
+
+# Force delete (immediate)
+kubectl delete pod &lt;name&gt; --force --grace-period=0
+
+# Wait for condition
+kubectl wait --for=condition=ready pod/&lt;name&gt;
+
+# Verbosity (for debugging kubectl itself)
+kubectl get pods -v=9</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Performance Tuning -->
+        <section class="reference-section">
+            <h2>⚡ Performance Tuning Parameters</h2>
+
+            <div class="accordion" data-multiple-open="true">
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Resource Optimization</h4>
+                        <span>▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="card info">
+                            <h4>CPU Optimization</h4>
+                            <ul>
+                                <li><strong>Set appropriate requests:</strong> Base on actual usage, not guesses</li>
+                                <li><strong>Use CPU limits wisely:</strong> Too low = throttling, too high = noisy neighbor</li>
+                                <li><strong>Enable horizontal autoscaling:</strong> HPA adds pods when CPU high</li>
+                                <li><strong>Avoid CPU overcommit:</strong> Sum of requests ≤ node capacity</li>
+                            </ul>
+                        </div>
+
+                        <div class="card info" style="margin-top: 1rem;">
+                            <h4>Memory Optimization</h4>
+                            <ul>
+                                <li><strong>Set limits higher than requests:</strong> Prevents OOM, allows bursts</li>
+                                <li><strong>Monitor memory leaks:</strong> If memory grows constantly, fix app</li>
+                                <li><strong>Use vertical autoscaling:</strong> VPA adjusts based on usage</li>
+                                <li><strong>Profile with tools:</strong> Use heap profilers to find leaks</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Probe Tuning</h4>
+                        <span>▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="card warning">
+                            <h4>Liveness Probe Guidelines</h4>
+                            <ul>
+                                <li><strong>initialDelaySeconds:</strong> Give app time to start (10-30s)</li>
+                                <li><strong>periodSeconds:</strong> Check frequency (10-30s)</li>
+                                <li><strong>timeoutSeconds:</strong> Response timeout (1-5s)</li>
+                                <li><strong>failureThreshold:</strong> Failures before restart (3-5)</li>
+                                <li><strong>Gotcha:</strong> Too aggressive = restart loops. Too lenient = dead pods stay running.</li>
+                            </ul>
+                        </div>
+
+                        <div class="card success" style="margin-top: 1rem;">
+                            <h4>Readiness Probe Guidelines</h4>
+                            <ul>
+                                <li><strong>Faster than liveness:</strong> Smaller delays, more frequent checks</li>
+                                <li><strong>Check dependencies:</strong> Database, cache, external services</li>
+                                <li><strong>Grace period:</strong> Allow for connection establishment</li>
+                                <li><strong>Gotcha:</strong> If ready check fails, traffic stops but pod stays running.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Autoscaling Parameters</h4>
+                        <span>▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="card info">
+                            <h4>Horizontal Pod Autoscaler (HPA)</h4>
+                            <div class="code-example">
+<pre><code>apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: app-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: app
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70</code></pre>
+                            </div>
+                            <p><strong>Guidelines:</strong></p>
+                            <ul>
+                                <li>Target 70% CPU for scaling (allows headroom)</li>
+                                <li>Set min/max replicas based on load patterns</li>
+                                <li>Use custom metrics for autoscaling on queue length, RPS</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Monitoring Metrics -->
+        <section class="reference-section">
+            <h2>📊 Monitoring Metrics to Watch</h2>
+
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <h4>Cluster-Level Metrics</h4>
+                    <ul>
+                        <li><strong>Node health:</strong> % Ready, CPU/Memory usage</li>
+                        <li><strong>Pod distribution:</strong> Even spread across nodes?</li>
+                        <li><strong>Resource utilization:</strong> Cluster CPU/Memory %</li>
+                        <li><strong>API server latency:</strong> Control plane responsiveness</li>
+                    </ul>
+                </div>
+
+                <div class="tip-card">
+                    <h4>Pod-Level Metrics</h4>
+                    <ul>
+                        <li><strong>Restart count:</strong> Frequent restarts = crash loop</li>
+                        <li><strong>CPU throttling:</strong> At limits often?</li>
+                        <li><strong>Memory usage:</strong> Near limit = OOM risk</li>
+                        <li><strong>Network I/O:</strong> Traffic patterns</li>
+                    </ul>
+                </div>
+
+                <div class="tip-card">
+                    <h4>Application Metrics</h4>
+                    <ul>
+                        <li><strong>Request rate:</strong> RPS per pod</li>
+                        <li><strong>Error rate:</strong> 5xx errors increasing?</li>
+                        <li><strong>Latency:</strong> P95, P99 response times</li>
+                        <li><strong>Queue depth:</strong> Worker queue size</li>
+                    </ul>
+                </div>
+
+                <div class="tip-card">
+                    <h4>Business Metrics</h4>
+                    <ul>
+                        <li><strong>SLI/SLO:</strong> Error budget, uptime</li>
+                        <li><strong>Deployment frequency:</strong> How often you ship</li>
+                        <li><strong>Lead time:</strong> Deploy to production</li>
+                        <li><strong>MTTR:</strong> Mean time to recovery</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card warning" style="margin-top: 2rem;">
+                <h3>Alerting Thresholds (Starting Points)</h3>
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Warning</th>
+                                <th>Critical</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Pod Restart Rate</td>
+                                <td>> 1/hour</td>
+                                <td>> 5/hour</td>
+                            </tr>
+                            <tr>
+                                <td>CPU Usage</td>
+                                <td>70%</td>
+                                <td>90%</td>
+                            </tr>
+                            <tr>
+                                <td>Memory Usage</td>
+                                <td>80%</td>
+                                <td>95%</td>
+                            </tr>
+                            <tr>
+                                <td>Disk Usage</td>
+                                <td>70%</td>
+                                <td>85%</td>
+                            </tr>
+                            <tr>
+                                <td>API Server Latency</td>
+                                <td>500ms</td>
+                                <td>1s</td>
+                            </tr>
+                            <tr>
+                                <td>Error Rate</td>
+                                <td>1%</td>
+                                <td>5%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Common Gotchas -->
+        <section class="reference-section">
+            <h2>⚠️ Common Gotchas & Pitfalls</h2>
+
+            <div class="mistakes-accordion" data-multiple-open="true">
+                <div class="mistake-item">
+                    <div class="mistake-header">
+                        <h4>"My pods can't reach each other"</h4>
+                        <span class="severity critical">Critical</span>
+                    </div>
+                    <div class="mistake-content">
+                        <p><strong>The gotcha:</strong> Pods CAN reach each other by IP, but you should use Services.</p>
+                        <p><strong>Why:</strong> Pod IPs change when pods restart. Services provide stable DNS names.</p>
+                        <p><strong>Fix:</strong></p>
+                        <ul>
+                            <li>Create a Service for each pod you need to reach</li>
+                            <li>Use <code>&lt;service-name&gt;.&lt;namespace&gt;.svc.cluster.local</code></li>
+                            <li>In same namespace, just <code>&lt;service-name&gt;</code> works</li>
+                        </ul>
+                        <div class="code-example">
+<pre><code># Good: Use service DNS
+http://my-service.default.svc.cluster.local
+
+# Bad: Use pod IP (changes on restart)
+http://10.244.1.5</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mistake-item">
+                    <div class="mistake-header">
+                        <h4>"Pod stuck in Pending state"</h4>
+                        <span class="severity high">High</span>
+                    </div>
+                    <div class="mistake-content">
+                        <p><strong>The gotcha:</strong> You requested resources the cluster doesn't have.</p>
+                        <p><strong>Common causes:</strong></p>
+                        <ul>
+                            <li>CPU/Memory requests exceed node capacity</li>
+                            <li>No nodes match your node selector</li>
+                            <li>Tolerations missing for tainted nodes</li>
+                            <li>PVC can't find matching PV</li>
+                        </ul>
+                        <p><strong>Fix:</strong></p>
+                        <div class="code-example">
+<pre><code># Check what's wrong
+kubectl describe pod &lt;pod-name&gt;
+
+# Common output:
+# 0/3 nodes are available: 3 Insufficient cpu
+
+# Fix: Lower your requests or add nodes</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mistake-item">
+                    <div class="mistake-header">
+                        <h4>"CrashLoopBackOff - what does that mean?"</h4>
+                        <span class="severity high">High</span>
+                    </div>
+                    <div class="mistake-content">
+                        <p><strong>The gotcha:</strong> Your container is starting, then crashing, repeatedly.</p>
+                        <p><strong>Kubernetes is trying to help:</strong> It restarts the container with increasing delays (backoff).</p>
+                        <p><strong>Common causes:</strong></p>
+                        <ul>
+                            <li>Application error (exception on startup)</li>
+                            <li>Misconfigured environment variables</li>
+                            <li>Missing ConfigMaps/Secrets</li>
+                            <li>Wrong command/entrypoint</li>
+                        </ul>
+                        <p><strong>Fix:</strong></p>
+                        <div class="code-example">
+<pre><code># Check the logs
+kubectl logs &lt;pod-name&gt;
+
+# If previous crashed, check previous logs
+kubectl logs &lt;pod-name&gt; --previous</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mistake-item">
+                    <div class="mistake-header">
+                        <h4>"OOMKilled - but I have enough memory!"</h4>
+                        <span class="severity high">High</span>
+                    </div>
+                    <div class="mistake-content">
+                        <p><strong>The gotcha:</strong> You set memory <strong>limit</strong> too low, or not at all.</p>
+                        <p><strong>Without limits:</strong> Container can use all node memory, then gets killed.</p>
+                        <p><strong>With low limits:</strong> Container hits limit and gets killed.</p>
+                        <p><strong>Fix:</strong></p>
+                        <ul>
+                            <li>Always set memory limits</li>
+                            <li>Monitor actual usage with <code>kubectl top pods</code></li>
+                            <li>Set limits 20-30% above observed peak</li>
+                            <li>If growing continuously, fix memory leak in app</li>
+                        </ul>
+                        <div class="code-example">
+<pre><code>resources:
+  requests:
+    memory: "128Mi"    # Guaranteed minimum
+  limits:
+    memory: "256Mi"    # Maximum before OOMKill</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mistake-item">
+                    <div class="mistake-header">
+                        <h4>"Image pull errors in production"</h4>
+                        <span class="severity medium">Medium</span>
+                    </div>
+                    <div class="mistake-content">
+                        <p><strong>The gotcha:</strong> Private registry authentication not configured.</p>
+                        <p><strong>What's happening:</strong> Pod can't pull image because it needs credentials.</p>
+                        <p><strong>Fix:</strong> Create image pull secret</p>
+                        <div class="code-example">
+<pre><code># Create secret from Docker config
+kubectl create secret docker-registry regcred \
+  --docker-server=&lt;registry-url&gt; \
+  --docker-username=&lt;user&gt; \
+  --docker-password=&lt;password&gt;
+
+# Use in pod spec
+spec:
+  imagePullSecrets:
+  - name: regcred</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mistake-item">
+                    <div class="mistake-header">
+                        <h4>"My pods are on the wrong nodes"</h4>
+                        <span class="severity medium">Medium</span>
+                    </div>
+                    <div class="mistake-content">
+                        <p><strong>The gotcha:</strong> Scheduler places pods randomly unless you guide it.</p>
+                        <p><strong>Fix options:</strong></p>
+                        <ul>
+                            <li><strong>Node selectors:</strong> Simple label matching</li>
+                            <li><strong>Affinity:</strong> Advanced rules (co-locate, spread)</li>
+                            <li><strong>Taints/tolerations:</strong> Dedicated nodes</li>
+                        </ul>
+                        <div class="code-example">
+<pre><code># Node selector (simple)
+spec:
+  nodeSelector:
+    disktype: ssd
+
+# Affinity (advanced)
+spec:
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: app
+            operator: In
+            values:
+            - nginx
+        topologyKey: kubernetes.io/hostname</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mistake-item">
+                    <div class="mistake-header">
+                        <h4>"Rolling update broke everything"</h4>
+                        <span class="severity critical">Critical</span>
+                    </div>
+                    <div class="mistake-content">
+                        <p><strong>The gotcha:</strong> New version deployed but failing, and now you're down.</p>
+                        <p><strong>Immediate fix:</strong> Rollback</p>
+                        <div class="code-example">
+<pre><code># Rollback to previous version
+kubectl rollout undo deployment/&lt;name&gt;
+
+# Check rollout history
+kubectl rollout history deployment/&lt;name&gt;
+
+# Rollback to specific revision
+kubectl rollout undo deployment/&lt;name&gt; --to-revision=2</code></pre>
+                        </div>
+                        <p><strong>Prevention:</strong></p>
+                        <ul>
+                            <li>Use readiness probes (don't route traffic to unready pods)</li>
+                            <li>Set <code>maxSurge</code> and <code>maxUnavailable</code> carefully</li>
+                            <li>Consider blue-green deployments for critical apps</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="mistake-item">
+                    <div class="mistake-header">
+                        <h4>"Config changes not applying"</h4>
+                        <span class="severity medium">Medium</span>
+                    </div>
+                    <div class="mistake-content">
+                        <p><strong>The gotcha:</strong> ConfigMaps/Secrets don't auto-trigger pod restarts.</p>
+                        <p><strong>What's happening:</strong> You updated ConfigMap, but pods still have old env vars.</p>
+                        <p><strong>Fix options:</strong></p>
+                        <ul>
+                            <li>Restart pods: <code>kubectl rollout restart deployment/&lt;name&gt;</code></li>
+                            <li>Use checksum annotation to force rollout</li>
+                            <li>Mount ConfigMap as volume (updates in real-time)</li>
+                        </ul>
+                        <div class="code-example">
+<pre><code># Force restart when config changes
+kind: Deployment
+spec:
+  template:
+    metadata:
+      annotations:
+        checksum/config: "{{ include (print $.Template.BasePath \"/configmap.yaml\") . | sha256sum }}"</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Decision Flowcharts -->
+        <section class="reference-section">
+            <h2>🎯 Decision Flowcharts</h2>
+
+            <div class="accordion" data-multiple-open="true">
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Which Controller to Use?</h4>
+                        <span>▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="card info">
+                            <h4>Quick Decision Guide</h4>
+                            <ul>
+                                <li><strong>Deployment:</strong> Stateful apps, web servers, APIs (95% of cases)</li>
+                                <li><strong>StatefulSet:</strong> Databases, distributed systems requiring stable identities</li>
+                                <li><strong>DaemonSet:</strong> Logging agents, monitoring on every node</li>
+                                <li><strong>Job:</strong> One-time tasks, batch processing</li>
+                                <li><strong>CronJob:</strong> Scheduled tasks, periodic backups</li>
+                            </ul>
+                        </div>
+                        <div class="comparison-table" style="margin-top: 1rem;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Use Case</th>
+                                        <th>Controller</th>
+                                        <th>Why</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Web server, API, microservice</td>
+                                        <td>Deployment</td>
+                                        <td>Easy scaling, rolling updates</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Database (PostgreSQL, MySQL)</td>
+                                        <td>StatefulSet</td>
+                                        <td>Stable network, storage identity</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Logging agent (Fluentd)</td>
+                                        <td>DaemonSet</td>
+                                        <td>Run on every node automatically</td>
+                                    </tr>
+                                    <tr>
+                                        <td>One-time data migration</td>
+                                        <td>Job</td>
+                                        <td>Run to completion, track success</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Daily backup job</td>
+                                        <td>CronJob</td>
+                                        <td>Scheduled, repeated execution</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Message queue worker</td>
+                                        <td>Deployment</td>
+                                        <td>Scale based on queue length</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Redis cluster</td>
+                                        <td>StatefulSet</td>
+                                        <td>Stable IPs, stable storage</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Which Service Type?</h4>
+                        <span>▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="comparison-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Service Type</th>
+                                        <th>Use When</th>
+                                        <th>Scope</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>ClusterIP</strong></td>
+                                        <td>Internal service-to-service communication</td>
+                                        <td>Cluster internal only</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>NodePort</strong></td>
+                                        <td>Expose externally temporarily (testing/dev)</td>
+                                        <td>External via &lt;NodeIP&gt;:&lt;Port&gt;</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>LoadBalancer</strong></td>
+                                        <td>Expose to internet (cloud provider LB)</td>
+                                        <td>External via cloud LB IP</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>ExternalName</strong></td>
+                                        <td>Map to external DNS name (alias)</td>
+                                        <td>DNS CNAME</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="card info" style="margin-top: 1rem;">
+                            <h4>Best Practice</h4>
+                            <p><strong>Most common pattern:</strong></p>
+                            <ol>
+                                <li>Use <strong>ClusterIP</strong> for internal services (default)</li>
+                                <li>Use <strong>Ingress</strong> for external HTTP/HTTPS traffic</li>
+                                <li>Use <strong>LoadBalancer</strong> for external non-HTTP traffic (rare)</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Should I Use Kubernetes?</h4>
+                        <span>▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="card success">
+                            <h4>✅ Yes, use Kubernetes when:</h4>
+                            <ul>
+                                <li>You're running 10+ containers across multiple servers</li>
+                                <li>You need high availability and self-healing</li>
+                                <li>You have complex microservices architecture</li>
+                                <li>You're doing multi-cloud or hybrid deployments</li>
+                                <li>You have DevOps expertise or can hire it</li>
+                                <li>You need to scale applications automatically</li>
+                            </ul>
+                        </div>
+                        <div class="card warning" style="margin-top: 1rem;">
+                            <h4>❌ No, don't use Kubernetes when:</h4>
+                            <ul>
+                                <li>You have a simple monolith on one server</li>
+                                <li>You don't have DevOps resources to maintain it</li>
+                                <li>You're just starting with containers (learn Docker first)</li>
+                                <li>You need something running today without complexity</li>
+                                <li>You're okay with managed services (Lambda, App Engine)</li>
+                                <li>Your team is small and product-focused, not infra-focused</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Architecture Diagram Templates -->
+        <section class="reference-section">
+            <h2>🏗️ Architecture Diagram Templates</h2>
+
+            <div class="card info">
+                <h3>Standard Three-Tier Architecture</h3>
+                <div class="diagram-container" style="padding: 1rem;">
+                    <svg viewBox="0 0 800 300" class="architecture-diagram">
+                        <!-- Ingress -->
+                        <rect x="50" y="20" width="700" height="50" fill="#3b82f6" opacity="0.2" stroke="#3b82f6" stroke-width="2"/>
+                        <text x="400" y="50" text-anchor="middle" fill="#1f2937" font-weight="bold">Ingress Controller (NGINX/Traefik)</text>
+
+                        <!-- Web Layer -->
+                        <rect x="50" y="100" width="220" height="80" fill="#10b981" opacity="0.2" stroke="#10b981" stroke-width="2"/>
+                        <text x="160" y="130" text-anchor="middle" fill="#1f2937" font-weight="bold">Web Deployment</text>
+                        <text x="160" y="150" text-anchor="middle" fill="#6b7280" font-size="11">Replicas: 3</text>
+                        <text x="160" y="165" text-anchor="middle" fill="#6b7280" font-size="11">Service: ClusterIP</text>
+
+                        <!-- API Layer -->
+                        <rect x="290" y="100" width="220" height="80" fill="#8b5cf6" opacity="0.2" stroke="#8b5cf6" stroke-width="2"/>
+                        <text x="400" y="130" text-anchor="middle" fill="#1f2937" font-weight="bold">API Deployment</text>
+                        <text x="400" y="150" text-anchor="middle" fill="#6b7280" font-size="11">Replicas: 5</text>
+                        <text x="400" y="165" text-anchor="middle" fill="#6b7280" font-size="11">Service: ClusterIP</text>
+
+                        <!-- Worker Layer -->
+                        <rect x="530" y="100" width="220" height="80" fill="#f59e0b" opacity="0.2" stroke="#f59e0b" stroke-width="2"/>
+                        <text x="640" y="130" text-anchor="middle" fill="#1f2937" font-weight="bold">Worker Deployment</text>
+                        <text x="640" y="150" text-anchor="middle" fill="#6b7280" font-size="11">Replicas: 2</text>
+                        <text x="640" y="165" text-anchor="middle" fill="#6b7280" font-size="11">Service: None</text>
+
+                        <!-- Data Layer -->
+                        <rect x="50" y="220" width="220" height="60" fill="#ef4444" opacity="0.2" stroke="#ef4444" stroke-width="2"/>
+                        <text x="160" y="255" text-anchor="middle" fill="#1f2937" font-weight="bold">PostgreSQL (StatefulSet)</text>
+
+                        <rect x="290" y="220" width="220" height="60" fill="#ef4444" opacity="0.2" stroke="#ef4444" stroke-width="2"/>
+                        <text x="400" y="255" text-anchor="middle" fill="#1f2937" font-weight="bold">Redis (StatefulSet)</text>
+
+                        <rect x="530" y="220" width="220" height="60" fill="#ef4444" opacity="0.2" stroke="#ef4444" stroke-width="2"/>
+                        <text x="640" y="255" text-anchor="middle" fill="#1f2937" font-weight="bold">Message Queue</text>
+
+                        <!-- Arrows -->
+                        <defs>
+                            <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <polygon points="0 0, 10 3, 0 6" fill="#6b7280"/>
+                            </marker>
+                        </defs>
+
+                        <line x1="400" y1="70" x2="400" y2="100" stroke="#6b7280" stroke-width="2" marker-end="url(#arrowhead)"/>
+                        <line x1="160" y1="180" x2="160" y2="220" stroke="#6b7280" stroke-width="2" marker-end="url(#arrowhead)"/>
+                        <line x1="400" y1="180" x2="400" y2="220" stroke="#6b7280" stroke-width="2" marker-end="url(#arrowhead)"/>
+                        <line x1="640" y1="180" x2="640" y2="220" stroke="#6b7280" stroke-width="2" marker-end="url(#arrowhead)"/>
+                        <line x1="270" y1="140" x2="290" y2="140" stroke="#6b7280" stroke-width="2" marker-end="url(#arrowhead)"/>
+                    </svg>
+                </div>
+                <p class="diagram-caption">Typical web application architecture with frontend, API, workers, and data layer.</p>
+            </div>
+
+            <div class="card success" style="margin-top: 2rem;">
+                <h3>Microservices Architecture Pattern</h3>
+                <div class="diagram-container" style="padding: 1rem;">
+                    <svg viewBox="0 0 900 250" class="architecture-diagram">
+                        <!-- Service Mesh Boundary -->
+                        <rect x="30" y="30" width="840" height="190" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-dasharray="5,5"/>
+                        <text x="450" y="25" text-anchor="middle" fill="#8b5cf6" font-weight="bold">Service Mesh (Istio/Linkerd)</text>
+
+                        <!-- Gateway -->
+                        <rect x="50" y="60" width="150" height="50" fill="#3b82f6" opacity="0.2" stroke="#3b82f6" stroke-width="2"/>
+                        <text x="125" y="90" text-anchor="middle" fill="#1f2937" font-weight="bold" font-size="12">API Gateway</text>
+
+                        <!-- Services -->
+                        <rect x="50" y="140" width="100" height="60" fill="#10b981" opacity="0.2" stroke="#10b981" stroke-width="2"/>
+                        <text x="100" y="175" text-anchor="middle" fill="#1f2937" font-weight="bold" font-size="11">Auth</text>
+
+                        <rect x="170" y="140" width="100" height="60" fill="#10b981" opacity="0.2" stroke="#10b981" stroke-width="2"/>
+                        <text x="220" y="175" text-anchor="middle" fill="#1f2937" font-weight="bold" font-size="11">User</text>
+
+                        <rect x="290" y="140" width="100" height="60" fill="#10b981" opacity="0.2" stroke="#10b981" stroke-width="2"/>
+                        <text x="340" y="175" text-anchor="middle" fill="#1f2937" font-weight="bold" font-size="11">Order</text>
+
+                        <rect x="410" y="140" width="100" height="60" fill="#10b981" opacity="0.2" stroke="#10b981" stroke-width="2"/>
+                        <text x="460" y="175" text-anchor="middle" fill="#1f2937" font-weight="bold" font-size="11">Payment</text>
+
+                        <rect x="530" y="140" width="100" height="60" fill="#10b981" opacity="0.2" stroke="#10b981" stroke-width="2"/>
+                        <text x="580" y="175" text-anchor="middle" fill="#1f2937" font-weight="bold" font-size="11">Inventory</text>
+
+                        <rect x="650" y="140" width="100" height="60" fill="#10b981" opacity="0.2" stroke="#10b981" stroke-width="2"/>
+                        <text x="700" y="175" text-anchor="middle" fill="#1f2937" font-weight="bold" font-size="11">Notification</text>
+
+                        <rect x="770" y="140" width="80" height="60" fill="#f59e0b" opacity="0.2" stroke="#f59e0b" stroke-width="2"/>
+                        <text x="810" y="175" text-anchor="middle" fill="#1f2937" font-weight="bold" font-size="11">Monitoring</text>
+
+                        <!-- Arrows -->
+                        <defs>
+                            <marker id="arrowhead3" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <polygon points="0 0, 10 3, 0 6" fill="#6b7280"/>
+                            </marker>
+                        </defs>
+
+                        <line x1="125" y1="110" x2="125" y2="140" stroke="#6b7280" stroke-width="1"/>
+                    </svg>
+                </div>
+                <p class="diagram-caption">Microservices with service mesh for traffic management, security, and observability.</p>
+            </div>
+        </section>
+
+        <!-- Final Tips -->
+        <section class="reference-section">
+            <h2>💡 Quick Tips for Success</h2>
+
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <h4>Start Small</h4>
+                    <p>Don't deploy your entire architecture on day one. Start with one service, learn the patterns, then expand.</p>
+                </div>
+
+                <div class="tip-card">
+                    <h4>Use Namespaces</h4>
+                    <p>Separate environments (dev/staging/prod) with namespaces. Prevents accidental deletions and resource conflicts.</p>
+                </div>
+
+                <div class="tip-card">
+                    <h4>Label Everything</h4>
+                    <p>Add labels to every resource. Makes querying, organizing, and debugging 10x easier.</p>
+                </div>
+
+                <div class="tip-card">
+                    <h4>Set Resource Limits</h4>
+                    <p>Always set requests and limits. Prevents noisy neighbors and OOMKilled pods.</p>
+                </div>
+
+                <div class="tip-card">
+                    <h4>Monitor Everything</h4>
+                    <p>Set up Prometheus + Grafana from day one. You can't improve what you don't measure.</p>
+                </div>
+
+                <div class="tip-card">
+                    <h4>Use GitOps</h4>
+                    <p>Store all YAML in git. Use ArgoCD or Flux for deployments. Every change is tracked and reversible.</p>
+                </div>
+
+                <div class="tip-card">
+                    <h4>Practice Rollbacks</h4>
+                    <p>Know how to rollback before you deploy. Test it in non-production first.</p>
+                </div>
+
+                <div class="tip-card">
+                    <h4>Learn YAML Structure</h4>
+                    <p>Understand the schema: apiVersion → kind → metadata → spec. Makes every manifest make sense.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section class="reference-section">
+            <div class="card success">
+                <h3>🎯 Key Takeaway</h3>
+                <p>This reference guide is your <strong>quick lookup companion</strong> throughout your Kubernetes journey. Bookmark it, keep it open while you work, and refer to it when you're stuck.</p>
+                <p><strong>The essentials to remember:</strong></p>
+                <ul>
+                    <li><strong>kubectl get/describe/logs</strong> - Your debugging trifecta</li>
+                    <li><strong>Always set resource limits</strong> - Prevents OOM and resource starvation</li>
+                    <li><strong>Use Services, not Pod IPs</strong> - Stable networking</li>
+                    <li><strong>Check events first</strong> - Tells you what Kubernetes is trying to do</li>
+                    <li><strong>Readiness > Liveness</strong> - Prevent traffic to unready pods</li>
+                </ul>
+                <p><strong>Remember:</strong> This is a reference, not a tutorial. Learn the concepts in the other sections, then use this guide to look up specifics.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="section-nav">
+        <a href="practice.html" class="prev-btn">← Practice Exercises</a>
+        <a href="ecosystem.html" class="next-btn">Kubernetes Ecosystem →</a>
+    </footer>
+
+    <script src="../../js/components.js"></script>
+</body>
+</html>

@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patterns &amp; Anti-Patterns - Learn Claude Code Ecosystem</title>
+    <link rel="stylesheet" href="../../css/styles.css">
+    <link rel="stylesheet" href="theme.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <a href="index.html" class="nav-back">Back to Overview</a>
+        <span class="current-section">Patterns &amp; Anti-Patterns</span>
+        <div class="nav-links">
+            <a href="evolution.html">Previous</a>
+            <a href="tradeoffs.html">Next</a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <h1>Patterns &amp; Anti-Patterns</h1>
+            <p class="powerful-sentence">Patterns are behaviors that consistently produce good outcomes because they align with how the system is designed to work. Anti-patterns are behaviors that feel right — often because they mirror success patterns from different systems — but systematically produce bad outcomes in this one.</p>
+            <p class="explanation">These are not opinions. They are empirical observations from teams that have used Claude Code seriously enough to discover what breaks under sustained use. Study the anti-patterns with particular care — each one felt like the right approach to the team that chose it.</p>
+        </section>
+
+        <section>
+            <h2>Proven Patterns</h2>
+            <p>Seven patterns that produce consistently good outcomes across different team sizes, codebase scales, and use cases. Each includes the mechanism that makes it work, not just the observation that it does.</p>
+
+            <div class="accordion" data-multiple-open="true">
+                <div class="accordion-item">
+                    <div class="card success">
+                        <button class="accordion-header">Pattern 1: Context Hygiene — /clear Between Tasks, /compact Before Complex Work</button>
+                        <div class="accordion-content">
+                            <h4>What It Looks Like</h4>
+                            <p>Before starting a new, unrelated task in the same session, you run <strong>/clear</strong> to reset the context window entirely. Before beginning a complex implementation task that builds on an exploration session, you run <strong>/compact with a focus prompt</strong> that instructs Claude to preserve the architectural decisions and constraints while discarding the exploratory back-and-forth that reached those decisions.</p>
+                            <h4>Why It Works</h4>
+                            <p>The context window is the primary resource in every Claude Code session. It is finite and its contents directly influence response quality — not just what Claude can reference, but what patterns Claude activates and what associations Claude makes. A context window polluted with the debug conversation from the previous task will subtly bias responses to the current task. Fresh context is not just cleaner — it is genuinely more capable, because the model's attention is not divided across unrelated material.</p>
+                            <h4>Film Analogy</h4>
+                            <p>Between productions, the studio lot is reset. Equipment is returned to storage, sets are struck, the crew's mental model of the previous film is cleared. Starting a new production on a lot still cluttered with the previous film's props introduces errors, delays, and confusion that compound throughout the shoot. Context hygiene is set striking — a professional discipline, not a bureaucratic step.</p>
+                            <h4>Specific Recommendation</h4>
+                            <p>Treat every new logical task as a new session. Use /compact with a focused summary prompt at natural phase transitions — end of research, end of planning, beginning of implementation. Reserve /clear for complete task boundaries. Make context hygiene a team habit, not an individual discipline.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="card success">
+                        <button class="accordion-header">Pattern 2: CLAUDE.md as Contract — PR-Reviewed, Versioned, Tested</button>
+                        <div class="accordion-content">
+                            <h4>What It Looks Like</h4>
+                            <p>CLAUDE.md is treated with the same rigor as any other code file. Changes go through pull request review. The file has a clear structure with explicit sections for different categories of instruction. Its length is actively managed — when it exceeds 100-150 lines, the team refactors into modular <strong>.claude/rules/</strong> files. New instructions are tested: add an instruction, run a sample session, verify the instruction changes Claude's behavior as intended.</p>
+                            <h4>Why It Works</h4>
+                            <p>CLAUDE.md is your API contract with the AI. When a colleague asks why Claude is generating code in a particular style or making a particular architectural choice, the answer should be traceable to a line in CLAUDE.md. If it is not, that behavior is undefined — it may change between sessions, between Claude versions, or between different context configurations. Treating CLAUDE.md as a contract makes the AI's behavior deterministic and auditable, which is the same property you demand from any other component in your system.</p>
+                            <h4>Film Analogy</h4>
+                            <p>The production bible is not a suggestion document — it is the definitive reference that every crew member works from. When the cinematographer and the director of photography have conflicting visions for a shot, the production bible resolves the conflict. When Claude generates code that violates a team standard, the question is: is the standard in the production bible? If yes, file a bug against the session. If no, add it to the production bible. The bible is the ground truth.</p>
+                            <h4>Specific Recommendation</h4>
+                            <p>Write CLAUDE.md like you write API documentation — precise, testable, unambiguous. Avoid prose; prefer imperative statements. "Always use snake_case for database column names" is a testable instruction. "Follow our coding style" is not. Review the file quarterly and prune anything that no longer reflects current practice.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="card success">
+                        <button class="accordion-header">Pattern 3: Sub-agent Delegation — Explore for Research, Plan for Architecture, Bash for Execution</button>
+                        <div class="accordion-content">
+                            <h4>What It Looks Like</h4>
+                            <p>Before the main agent starts implementation, it delegates a codebase exploration to an <strong>Explore sub-agent</strong> whose only job is to map the relevant areas and return a structured summary. Before writing code, it delegates architecture planning to a <strong>Plan sub-agent</strong> that produces a structured implementation plan. Execution tasks with side effects run through a <strong>Bash sub-agent</strong> with explicitly scoped permissions. The main agent's context stays clean throughout.</p>
+                            <h4>Why It Works</h4>
+                            <p>Sub-agents have their own context windows. Every file the Explore sub-agent reads, every dead end the Plan sub-agent investigates, every intermediate command the Bash sub-agent runs — none of it lands in the main agent's context. The main agent receives a clean structured output: the map, the plan, the execution result. This is the context protection pattern. It is the difference between a director who reads every production report personally (overwhelmed context) and a director who receives curated briefings from department heads (clean context focused on decision-making).</p>
+                            <h4>Film Analogy</h4>
+                            <p>The director does not personally scout every location, draft every storyboard, and operate every camera. Specialists handle the specialist work and deliver results to the director. The director's mental capacity is reserved for creative direction — not consumed by reconnaissance and logistics. Sub-agent delegation applies the same principle to context management.</p>
+                            <h4>Specific Recommendation</h4>
+                            <p>Create three default sub-agent personas: Explore (read-only, broad access, returns structured maps), Plan (write-prohibited, focused on specification), and Execute (narrow task scope, explicit approval for destructive actions). These three cover 80% of delegation use cases without requiring custom agent design for each task.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="card success">
+                        <button class="accordion-header">Pattern 4: Skill Composition — Small, Focused Skills That Chain Together</button>
+                        <div class="accordion-content">
+                            <h4>What It Looks Like</h4>
+                            <p>Each skill does exactly one thing and does it completely. A <strong>create-migration</strong> skill creates a migration file with correct naming and structure. A <strong>validate-migration</strong> skill checks a migration for common errors. A <strong>migration-workflow</strong> skill chains the two: create, then validate, then prompt for review. The composition is explicit, and each component skill is independently usable and independently testable.</p>
+                            <h4>Why It Works</h4>
+                            <p>Small skills are testable. You can verify that create-migration produces correctly named files by running it in isolation. Large, monolithic skills — a single migration-manager skill that creates, validates, runs, rolls back, and generates documentation — cannot be tested at the component level. When the create step fails, you debug the entire skill. When you want to skip the documentation step for an emergency migration, you cannot. Composable skills inherit the same advantages as composable functions: isolation, reuse, and independent improvement.</p>
+                            <h4>Film Analogy</h4>
+                            <p>Professional film production does not have a single generalist who shoots, edits, scores, and distributes the film. Specialized crew handle specialized tasks, and the production pipeline connects them in sequence. Each department can improve independently. Skills are the crew specializations — kept narrow enough to be excellent at their specific job, connected through explicit pipelines rather than implicit monolithic procedures.</p>
+                            <h4>Specific Recommendation</h4>
+                            <p>Apply the Unix philosophy: each skill should do one thing well. If you find yourself using "and" in a skill's description ("creates and validates and documents"), split it. The composition layer — a workflow skill that chains sub-skills — is itself a skill, making it transparent and modifiable. Teams that follow this pattern build skill libraries that grow without accumulating complexity debt.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="card success">
+                        <button class="accordion-header">Pattern 5: Worktree Isolation — Run Risky Operations in Separate Directories</button>
+                        <div class="accordion-content">
+                            <h4>What It Looks Like</h4>
+                            <p>Before attempting a large refactoring, a database migration, or any operation with significant rollback cost, the developer or sub-agent creates a git worktree — a separate directory checked out to a new branch. The risky operation executes entirely in the worktree. The main working branch is untouched until the operation is reviewed and deliberately merged. If the experiment fails, the worktree is deleted and the main branch never touched.</p>
+                            <h4>Why It Works</h4>
+                            <p>Reversibility is the fundamental risk management principle. An AI agent making changes to the main working branch of a codebase creates irreversibility risk with every write operation. In a worktree, the blast radius of any failure is bounded — it is contained in an isolated directory that can be examined, learned from, and discarded. The main branch's integrity is preserved regardless of what happens in the experiment. This is not about distrust of the AI; it is about maintaining the same reversibility guarantees that professionals apply to all high-stakes operations.</p>
+                            <h4>Film Analogy</h4>
+                            <p>Before performing a dangerous stunt, production creates a controlled environment: closed set, safety crew in position, cameras rolling before action, medical team on standby. The main production schedule continues on a separate stage. If the stunt requires multiple takes, the controlled environment is reset without affecting the rest of the film. Worktrees are the controlled stunt environment for code changes.</p>
+                            <h4>Specific Recommendation</h4>
+                            <p>Make worktree creation a reflex for any agent task that touches more than five files or modifies database schemas. The overhead is fifteen seconds. The insurance value is proportional to the scope of the operation. Configure sub-agents that run risky operations to use the worktree isolation mode by default.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="card success">
+                        <button class="accordion-header">Pattern 6: Hook-Driven Guardrails — Pre-commit Validation for AI-Generated Code</button>
+                        <div class="accordion-content">
+                            <h4>What It Looks Like</h4>
+                            <p>Session lifecycle hooks run automatically at pre-commit: a linter that checks for convention violations, a secret scanner that catches accidentally hardcoded credentials, a test runner that verifies the changed files pass their unit tests, and optionally a dedicated review sub-agent that examines the diff against the team's coding standards. These hooks are not optional — they run on every commit from every agent session, without exception.</p>
+                            <h4>Why It Works</h4>
+                            <p>AI-generated code has the same failure modes as human-generated code, with different distributions. Human code fails on edge cases the developer did not consider. AI code fails on subtle contextual mismatches — the code is syntactically correct and semantically plausible but wrong for this specific codebase in ways that require contextual knowledge to detect. Hooks operationalize the quality standards defined in CLAUDE.md. They close the gap between the standard being declared and the standard being enforced.</p>
+                            <h4>Film Analogy</h4>
+                            <p>Every scene shot goes through dailies review before it is locked as final. The continuity supervisor checks every frame for props in the wrong position. Quality control is not an opinion — it is a structured process that runs on every output, with specific criteria and clear pass/fail results. Hooks are the dailies process for code: structured, systematic, non-negotiable.</p>
+                            <h4>Specific Recommendation</h4>
+                            <p>Start with three hooks: format-check (deterministic, zero false negatives), secret-scan (critical safety gate), and targeted-tests (tests for the changed files only, not the full suite). Add hooks incrementally as you identify systematic failure patterns in AI output. A hook that catches one class of error on every commit pays for itself faster than you expect.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="card success">
+                        <button class="accordion-header">Pattern 7: Memory Layering — Global Preferences, Project Rules, Auto Memory</button>
+                        <div class="accordion-content">
+                            <h4>What It Looks Like</h4>
+                            <p>The global <strong>~/.claude/CLAUDE.md</strong> contains personal developer preferences that apply everywhere: preferred explanation style, preferred verbosity level, languages to avoid suggesting, personal workflow shortcuts. The project-level <strong>./CLAUDE.md</strong> contains team standards and project-specific context. The auto memory in <strong>~/.claude/projects/&lt;project&gt;/memory/</strong> accumulates session-specific discoveries — libraries used, architectural decisions made, patterns established in this specific codebase. Each layer applies at the appropriate scope, and the layers compose rather than conflict.</p>
+                            <h4>Why It Works</h4>
+                            <p>Context relevance degrades with scope mismatch. Global preferences that appear in a project session where they are not relevant consume context without contributing value. Project rules that appear in a personal exploration session for a side project create friction. Auto memory that captures project-specific discoveries ensures those discoveries are available in future sessions without requiring manual re-documentation. The layering principle is: every instruction should appear at the tightest scope where it is relevant.</p>
+                            <h4>Film Analogy</h4>
+                            <p>A director carries a personal shooting style that applies to every production. Each production has its own production bible. Each day's shoot has a shooting script. These documents exist at different scopes and serve different audiences. The director's personal style informs everything but is not in the daily shooting script. The production bible guides the project but is not repeated in every day's schedule. Memory layering applies the same discipline to context management.</p>
+                            <h4>Specific Recommendation</h4>
+                            <p>Audit your memory layers quarterly. Remove personal preferences from project CLAUDE.md. Remove project rules from global CLAUDE.md. Review auto memory for accuracy — discoveries that are now outdated should be removed rather than left to mislead future sessions. Treat memory hygiene as the same discipline as dependency hygiene in your codebase.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Anti-Patterns</h2>
+            <p>Ten anti-patterns that consistently undermine teams using Claude Code. Each one felt like the right approach — often because it mirrors successful patterns from related but different domains. The film analogy here: these are the production mistakes that look professional until the dailies reveal the problem.</p>
+
+            <div class="accordion" data-multiple-open="true">
+                <div class="accordion-item">
+                    <div class="card error">
+                        <button class="accordion-header">Anti-Pattern 1: Context Stuffing — Dumping Entire Codebases into CLAUDE.md</button>
+                        <div class="accordion-content">
+                            <h4>What It Looks Like</h4>
+                            <p>A developer exports their entire codebase into CLAUDE.md — every file listing, every configuration value, every architectural diagram described in text — to ensure Claude "has everything it needs." Sessions start with the context window 60-70% occupied before the first question is asked.</p>
+                            <h4>Why It Feels Right</h4>
+                            <p>More context should mean better answers. In human conversations, the colleague with the most complete picture gives the best advice. This mental model transfers incorrectly to language models, where context occupancy degrades response quality beyond a threshold rather than improving it indefinitely.</p>
+                            <h4>The Actual Impact</h4>
+                            <p>The model's attention is distributed across the entire context window. Instructions near the end of a stuffed context window receive proportionally less attention than instructions at the beginning. Complex reasoning tasks — which require the model to hold multiple considerations simultaneously — degrade measurably when the context window is mostly occupied with reference material rather than working space. Use sub-agents with targeted file reads to provide relevant context on demand rather than pre-loading everything.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="card error">
+                        <button class="accordion-header">Anti-Pattern 2: Sub-agent Overuse — Creating Agents for Trivial Tasks</button>
+                        <div class="accordion-content">
+                            <h4>What It Looks Like</h4>
+                            <p>After discovering sub-agent delegation, a team creates dedicated agents for every task: a "rename variable" agent, a "add comment" agent, a "format file" agent. Agent spawning becomes the default response to any task, regardless of scope.</p>
+                            <h4>Why It Feels Right</h4>
+                            <p>Delegation through sub-agents protected the main context in pattern 3. If delegation is good, more delegation should be better. This is a classic extrapolation error — the pattern applies within a scope, not universally.</p>
+                            <h4>The Actual Impact</h4>
+                            <p>Spawning a sub-agent carries fixed overhead: system prompt loading, context initialization, and result return. For a task that takes five tokens to execute directly, the overhead of sub-agent delegation is an order of magnitude larger than the task itself. The pattern becomes self-defeating. Reserve sub-agents for tasks where the context protection benefit exceeds the coordination cost — typically tasks that require reading many files, generating many alternatives, or running extended command sequences.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="card error">
+                        <button class="accordion-header">Anti-Pattern 3: CLAUDE.md Bloat — 500-Line Files That Include Everything</button>
+                        <div class="accordion-content">
+                            <h4>What It Looks Like</h4>
+                            <p>CLAUDE.md grows from a focused 50-line standards document into a 500-line encyclopedia that includes company history, technology rationale, team preferences for every conceivable scenario, detailed explanations of every instruction, and narrative context explaining why each rule exists. The file reads like an onboarding document rather than a working instructions file.</p>
+                            <h4>Why It Feels Right</h4>
+                            <p>More complete documentation should produce more consistent behavior. If the AI understands the rationale, it should apply the rules more correctly. This mirrors how good onboarding documentation works for human engineers.</p>
+                            <h4>The Actual Impact</h4>
+                            <p>Every session starts with 30-40% context occupancy from documentation alone. Auto-compaction in long sessions will summarize away rules that have not been recently referenced — precisely the rules that cover edge cases and rare scenarios are most vulnerable, because they are by definition rarely referenced. The solution is modular rules in .claude/rules/ with focused, imperative instructions rather than comprehensive explanatory documentation. Explanations belong in a human-readable wiki; instructions belong in CLAUDE.md.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="card error">
+                        <button class="accordion-header">Anti-Pattern 4: Ignoring /context — Never Checking Context Usage</button>
+                        <div class="accordion-content">
+                            <h4>What It Looks Like</h4>
+                            <p>A developer runs a long session — three to four hours of exploration, planning, and implementation — without ever running /context to check the composition of the context window. Output quality degrades gradually and the degradation is attributed to the complexity of the task rather than to context saturation.</p>
+                            <h4>Why It Feels Right</h4>
+                            <p>If the system is managing itself, why monitor it? Auto-compaction should handle context management. Checking context feels like manual intervention into an automated system.</p>
+                            <h4>The Actual Impact</h4>
+                            <p>Context degradation is silent and gradual. There is no error message when the context window is 90% occupied. The model does not announce that it has summarized away an architectural decision. The developer experiences slightly less coherent responses and slightly more generic suggestions, attributes it to a difficult problem, and continues. Running /context at natural phase transitions — after exploration, before implementation — takes thirty seconds and reveals the composition of what Claude is actually working with. This is the same discipline as checking memory usage in a long-running process: not obsessive monitoring, but deliberate health checks.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="card error">
+                        <button class="accordion-header">Anti-Pattern 5: Monolithic Skills — One Skill Trying to Do Everything</button>
+                        <div class="accordion-content">
+                            <h4>What It Looks Like</h4>
+                            <p>A team creates a single "deploy" skill that: creates a migration, runs tests, builds the Docker image, pushes to the registry, updates the Helm chart, applies the deployment, monitors the rollout, sends a Slack notification, and updates the changelog. The skill is 300 lines and takes 45 minutes to run.</p>
+                            <h4>Why It Feels Right</h4>
+                            <p>A fully automated deployment pipeline that handles every step sounds like the goal. Encoding it in a skill makes it repeatable and consistent. One skill, one command, done.</p>
+                            <h4>The Actual Impact</h4>
+                            <p>When the Helm chart update step fails, you debug a 300-line skill. When a team needs to deploy without the changelog update step in an emergency, they cannot. When the Docker build step needs to change, the skill must be modified — breaking a unit that was tested as a whole. Monolithic skills fail for the same reasons monolithic services fail: they cannot be composed, cannot be tested in parts, and cannot be modified safely. The correct design is six small skills composed in a deployment-workflow skill, where each component is independently debuggable and optionally skippable.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="card error">
+                        <button class="accordion-header">Anti-Pattern 6: MCP Without Limits — Connecting Every Available Tool</button>
+                        <div class="accordion-content">
+                            <h4>What It Looks Like</h4>
+                            <p>A developer connects twelve MCP servers to their Claude Code configuration: production database, staging database, three internal APIs, two cloud provider APIs, CI system, documentation server, incident management platform, and service registry. The rationale: Claude should have access to everything it might need.</p>
+                            <h4>Why It Feels Right</h4>
+                            <p>Maximum context means maximum capability. If Claude can query production and staging and CI simultaneously, it can give more complete answers. This is the "more is better" fallacy applied to tool connectivity.</p>
+                            <h4>The Actual Impact</h4>
+                            <p>Tool descriptions from twelve MCP servers, even with lazy loading, create decision paralysis when Claude must choose which tools to invoke for a given task. The model has more potential paths to answer a question, which paradoxically reduces the clarity of its response. Security exposure increases: each MCP connection is a credential and a network path that can be exploited through prompt injection or misconfiguration. The right number of MCP connections is the minimum required for the current workflow, not the maximum available. Add connections deliberately; review them quarterly; remove any that are not regularly invoked.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="card error">
+                        <button class="accordion-header">Anti-Pattern 7: Skipping the Production Bible — No CLAUDE.md, Just Verbal Instructions</button>
+                        <div class="accordion-content">
+                            <h4>What It Looks Like</h4>
+                            <p>A developer provides their coding standards, team conventions, and architectural preferences through natural language at the beginning of each session: "Remember, we use snake_case here and we never use global state and our error handling follows the Result pattern..." The instructions are repeated — with variations — every session.</p>
+                            <h4>Why It Feels Right</h4>
+                            <p>Natural language instructions feel more flexible and nuanced than a configuration file. Adjusting the instructions each session allows contextual tuning. This mirrors how senior developers brief junior developers on each task rather than writing comprehensive style guides.</p>
+                            <h4>The Actual Impact</h4>
+                            <p>Instructions given verbally at session start are treated as part of the conversation, not as standing rules. They are subject to the same compaction that affects all early session context in long sessions. They vary in wording between sessions, producing variation in Claude's behavior. New team members who join and observe Claude Code sessions will not know to give the same instructions. The institutional knowledge is tribal rather than structural. A CLAUDE.md file takes thirty minutes to write and makes the team's relationship with the AI consistent, auditable, and transferable. The verbal briefing approach guarantees drift.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="card error">
+                        <button class="accordion-header">Anti-Pattern 8: Force-Pushing Agent Output — Trusting AI Commits Without Review</button>
+                        <div class="accordion-content">
+                            <h4>What It Looks Like</h4>
+                            <p>An agent generates a 200-line pull request, the developer scans the title and the first file, and approves and merges without reading the full diff. The reasoning: the agent has been reliable before, the task was well-scoped, and the PR looks reasonable at first glance.</p>
+                            <h4>Why It Feels Right</h4>
+                            <p>If the agent is trusted, why review its every output? Senior engineers who trust a junior colleague do not re-read every line they write. Extending that trust to the AI seems like a natural evolution of confidence.</p>
+                            <h4>The Actual Impact</h4>
+                            <p>AI agents produce subtly wrong code that passes surface inspection. A security check implemented correctly in structure but missing a critical edge case. An error message that accidentally exposes an internal stack trace. A performance optimization that works for the happy path but catastrophically degrades under the P99 load pattern. These bugs are invisible at first glance. They surface in production. The correct trust model is: trust the agent's architecture and approach, but verify the specific implementation through the same review process you apply to any junior engineer's PR. The review is not a statement of distrust; it is the quality control layer that catches what all code authors — human and AI — miss about their own work.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="card error">
+                        <button class="accordion-header">Anti-Pattern 9: Eternal Sessions — Never Clearing, Letting Auto-compaction Decide Everything</button>
+                        <div class="accordion-content">
+                            <h4>What It Looks Like</h4>
+                            <p>A developer starts a Claude Code session on Monday morning and runs it continuously through Friday afternoon, accumulating five days of conversation history, file reads, command executions, and agent interactions. They rely entirely on auto-compaction to manage the context window and never manually clear or compact.</p>
+                            <h4>Why It Feels Right</h4>
+                            <p>A session with accumulated context should be smarter than a fresh session. All the context of the week's work is available. The AI has seen everything and should be maximally informed. This is the most intuitive mental model and the most consistently incorrect one.</p>
+                            <h4>The Actual Impact</h4>
+                            <p>By Thursday, the session's context window is a compressed summary of five days of work, where the compression algorithm had no knowledge of what was architecturally significant. Early decisions that constrained later work — "we cannot use library X due to a licensing conflict" — may have been compacted into "discussed library selection." The AI in a Friday session is not informed by Monday's context — it is misled by Monday's compressed ghost. The recommendation from experienced Claude Code users is counter-intuitive: shorter sessions are more coherent than longer ones. New logical tasks deserve new sessions. Use CLAUDE.md and memory files as the persistence layer between sessions, not the context window itself.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="card error">
+                        <button class="accordion-header">Anti-Pattern 10: Copy-Paste Skills — Duplicating Logic Instead of Composing</button>
+                        <div class="accordion-content">
+                            <h4>What It Looks Like</h4>
+                            <p>A team has a create-service skill. They need a create-microservice skill with slightly different scaffolding. Rather than refactoring create-service to accept parameters or creating a composition layer, they copy the entire skill and modify the copy. Two weeks later, a third variation is needed, and the second copy is copied and modified. Six months later, the team has eight service creation skills that all share 80% of the same content.</p>
+                            <h4>Why It Feels Right</h4>
+                            <p>The copy-paste approach is fast. Modifying a copy does not risk breaking the original. Starting from working code feels safer than redesigning for composition. These are the same rationalizations that produce copy-paste code in every programming language.</p>
+                            <h4>The Actual Impact</h4>
+                            <p>When the team's service creation conventions change — a new dependency to always include, a new directory structure to follow — eight skills must be updated. In practice, three are updated immediately, two are updated after they cause problems, and three are quietly never updated. The skill library becomes a source of inconsistency rather than consistency. The fix is painful: identify the common core, refactor into a parameterized base skill, and compose the variations. But the fix is feasible. The ongoing cost of eight inconsistent copies is not: it compounds with every session that uses an outdated skill. Compose skills the same way you compose code: reuse the core, parameterize the variation, version the whole thing.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Pattern vs. Anti-Pattern: The Decision Heuristic</h2>
+            <div class="card info">
+                <h3>One Question That Separates Them</h3>
+                <p>Looking across the seven patterns and ten anti-patterns, a single question separates them consistently: <strong>Does this approach compose with the system's design, or does it work against it?</strong></p>
+                <p>The system's design centers on three principles: the context window is a finite, precious resource; composability enables maintainability; and human judgment is the quality gate, not an optional step. Patterns that treat context as precious, behaviors as composable, and review as mandatory consistently produce good outcomes. Anti-patterns that treat context as infinite, behaviors as monolithic, and review as overhead consistently produce bad outcomes — often after a period of apparent success that makes the eventual failure harder to diagnose.</p>
+                <p>The film studio analogy frames this sharply: a production company that respects the production bible, composes specialized crew skills, and reviews dailies before locking shots produces coherent films. One that improvises at every stage, tries to find one person to do all jobs, and locks shots without review produces chaos — efficiently, confidently, and only visibly at the premiere.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="section-footer">
+        <a href="evolution.html" class="btn">Previous: Evolution Story</a>
+        <a href="tradeoffs.html" class="btn">Next: Trade-offs Analysis</a>
+    </footer>
+    <script src="../../js/components.js"></script>
+</body>
+</html>

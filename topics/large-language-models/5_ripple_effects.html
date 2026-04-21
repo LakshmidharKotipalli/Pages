@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Ripple Effects Map — Large Language Models Learning Journey">
+    <title>Ripple Effects Map | LLM Learning Journey</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <a href="index.html" class="sidebar-brand">Large Language Models</a>
+            <span class="sidebar-subtitle">A Complete Learning Journey</span>
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="1_foundation.html" class="nav-link"><span class="nav-num">01</span> Foundation & Context</a>
+            <a href="2_living_analogy.html" class="nav-link"><span class="nav-num">02</span> Living Analogy</a>
+            <a href="3a_learning_journey.html" class="nav-link"><span class="nav-num">3a</span> Learning Journey</a>
+            <a href="3b_interview_conversations.html" class="nav-link"><span class="nav-num">3b</span> Interview Conversations</a>
+            <a href="4_system_design.html" class="nav-link"><span class="nav-num">04</span> System Design Integration</a>
+            <a href="5_ripple_effects.html" class="nav-link active"><span class="nav-num">05</span> Ripple Effects Map</a>
+            <a href="6_evolution.html" class="nav-link"><span class="nav-num">06</span> Evolution Story</a>
+            <a href="7_patterns.html" class="nav-link"><span class="nav-num">07</span> Patterns & Anti-Patterns</a>
+            <a href="8_tradeoffs.html" class="nav-link"><span class="nav-num">08</span> Trade-offs Analysis</a>
+            <a href="9_at_scale.html" class="nav-link"><span class="nav-num">09</span> At Scale</a>
+            <a href="10_landscape.html" class="nav-link"><span class="nav-num">10</span> Technology Landscape</a>
+            <a href="11_pitfalls.html" class="nav-link"><span class="nav-num">11</span> Pitfalls & War Stories</a>
+            <a href="12_debugging.html" class="nav-link"><span class="nav-num">12</span> Debugging Process</a>
+            <a href="13_eloquent.html" class="nav-link"><span class="nav-num">13</span> Eloquent Conversation</a>
+            <a href="14_exercises.html" class="nav-link"><span class="nav-num">14</span> Practice Exercises</a>
+            <a href="15_quick_ref.html" class="nav-link"><span class="nav-num">15</span> Quick Reference</a>
+            <a href="16_whats_next.html" class="nav-link"><span class="nav-num">16</span> What's Next</a>
+
+        </aside>
+        <main class="main-content">
+
+            <h4>Section Five</h4>
+            <h1>Ripple Effects Map</h1>
+            <p class="page-intro">Every architectural decision cascades. Here we trace the blast radius of common choices.</p>
+
+            <div class="card card--accent">
+                <h3>Decision: Switching from a 7B Model to a 70B Model</h3>
+                <table>
+                    <tr><th>Effect</th><th>Magnitude</th><th>Direction</th><th>Time Horizon</th></tr>
+                    <tr><td>Output quality (complex reasoning)</td><td>Major</td><td>↑ Significantly better</td><td>Immediate</td></tr>
+                    <tr><td>GPU memory requirement</td><td>Critical</td><td>↑ 10x (14GB → 140GB FP16)</td><td>Immediate</td></tr>
+                    <tr><td>Inference latency (TTFT)</td><td>Major</td><td>↑ 3-5x slower prefill</td><td>Immediate</td></tr>
+                    <tr><td>Inference cost per token</td><td>Major</td><td>↑ 8-10x more expensive</td><td>Ongoing</td></tr>
+                    <tr><td>Concurrent users per GPU</td><td>Critical</td><td>↓ From ~50 to ~5</td><td>Immediate</td></tr>
+                    <tr><td>Fine-tuning feasibility</td><td>Major</td><td>↓ Now requires QLoRA + multi-GPU</td><td>One-time</td></tr>
+                    <tr><td>Team hiring needs</td><td>Moderate</td><td>↑ Need ML infra engineers</td><td>1-3 months</td></tr>
+                </table>
+            </div>
+
+            <div class="card card--danger">
+                <h3>Decision: Enabling 128K Context Window (from 4K)</h3>
+                <table>
+                    <tr><th>Effect</th><th>Magnitude</th><th>Direction</th><th>Time Horizon</th></tr>
+                    <tr><td>Ability to process long documents</td><td>Major</td><td>↑ Game-changing for RAG, legal, code</td><td>Immediate</td></tr>
+                    <tr><td>Attention compute cost</td><td>Critical</td><td>↑ 1024x (quadratic scaling)</td><td>Immediate</td></tr>
+                    <tr><td>KV cache memory</td><td>Critical</td><td>↑ 32x more GPU memory per request</td><td>Immediate</td></tr>
+                    <tr><td>Quality on long inputs</td><td>Moderate</td><td>↓ "Lost in the middle" — models attend poorly to mid-context</td><td>Immediate</td></tr>
+                    <tr><td>Need for FlashAttention</td><td>Required</td><td>↑ Without it, you literally OOM</td><td>Immediate</td></tr>
+                </table>
+            </div>
+
+            <div class="card card--sage">
+                <h3>Decision: Using RAG Instead of Fine-Tuning</h3>
+                <table>
+                    <tr><th>Effect</th><th>Magnitude</th><th>Direction</th><th>Time Horizon</th></tr>
+                    <tr><td>Knowledge freshness</td><td>Major</td><td>↑ Can update without retraining</td><td>Ongoing</td></tr>
+                    <tr><td>System complexity</td><td>Major</td><td>↑ Need embedding pipeline, vector DB, retrieval logic</td><td>1-2 weeks</td></tr>
+                    <tr><td>Inference latency</td><td>Moderate</td><td>↑ +100-300ms for retrieval step</td><td>Ongoing</td></tr>
+                    <tr><td>Auditability</td><td>Major</td><td>↑ Can show which documents informed the answer</td><td>Immediate</td></tr>
+                    <tr><td>Token cost</td><td>Moderate</td><td>↑ Retrieved chunks consume context window tokens</td><td>Ongoing</td></tr>
+                </table>
+            </div>
+
+        </main>
+    </div>
+    <script src="js/components.js"></script>
+</body>
+</html>

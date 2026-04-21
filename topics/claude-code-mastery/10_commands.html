@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commands Reference — Claude Code Mastery</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Satoshi:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <nav class="nav-bar">
+        <a href="index.html" class="logo"><span>Claude Code</span> Mastery</a>
+        <div class="nav-links">
+            <a href="01_overview.html">Overview</a><a href="02_getting_started.html">Setup</a><a
+                href="03_golden_workflow.html">Workflow</a><a href="04_claude_md.html">CLAUDE.md</a><a
+                href="05_prompting.html">Prompting</a><a href="06_context.html">Context</a><a
+                href="07_extending.html">Extend</a><a href="08_automation.html">CI/CD</a><a
+                href="09_multi_agent.html">Multi-Agent</a><a href="10_commands.html" class="active">Commands</a><a
+                href="11_anti_patterns.html">Pitfalls</a><a href="12_community.html">Community</a>
+        </div>
+    </nav>
+    <div class="page-header">
+        <div class="breadcrumb"><a href="index.html">Home</a> / Chapter 10</div>
+        <h1>Commands <span class="gold">Reference</span></h1>
+        <p>Complete reference for slash commands, keyboard shortcuts, and CLI flags.</p>
+    </div>
+
+    <section class="container reveal">
+        <div class="section-label">Slash Commands</div>
+        <h2 class="section-title">In-Session Commands</h2>
+
+        <table class="cmd-table">
+            <thead>
+                <tr>
+                    <th>Command</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>/init</td>
+                    <td>Generate a CLAUDE.md for your project with conventions, commands, and patterns</td>
+                </tr>
+                <tr>
+                    <td>/clear</td>
+                    <td>Reset context completely — use between unrelated tasks</td>
+                </tr>
+                <tr>
+                    <td>/compact [instructions]</td>
+                    <td>Compress context with optional focus guidance (e.g., /compact Focus on API changes)</td>
+                </tr>
+                <tr>
+                    <td>/rewind</td>
+                    <td>Open checkpoint menu to restore previous conversation and code state</td>
+                </tr>
+                <tr>
+                    <td>/permissions</td>
+                    <td>Configure tool allowlists and domain access for URLs</td>
+                </tr>
+                <tr>
+                    <td>/sandbox</td>
+                    <td>Enable OS-level isolation — restricts filesystem and network access</td>
+                </tr>
+                <tr>
+                    <td>/hooks</td>
+                    <td>Configure automated event triggers (PreToolUse, PostToolUse, etc.)</td>
+                </tr>
+                <tr>
+                    <td>/agents</td>
+                    <td>View and manage available subagents</td>
+                </tr>
+                <tr>
+                    <td>/plugin</td>
+                    <td>Install community plugins</td>
+                </tr>
+                <tr>
+                    <td>/rename [name]</td>
+                    <td>Name your session for easy resuming (e.g., /rename "oauth-migration")</td>
+                </tr>
+                <tr>
+                    <td>/teleport</td>
+                    <td>Move a session from web/iOS to your terminal</td>
+                </tr>
+                <tr>
+                    <td>/desktop</td>
+                    <td>Hand off current session to the Desktop app for visual review</td>
+                </tr>
+                <tr>
+                    <td>/insights</td>
+                    <td>Usage reports — patterns, friction points, and suggested improvements</td>
+                </tr>
+                <tr>
+                    <td>/commit-push-pr</td>
+                    <td>Commit changes, push, and create a pull request in one step</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="container reveal">
+        <div class="section-label">Keyboard Shortcuts</div>
+        <h2 class="section-title">Keyboard Controls</h2>
+
+        <table class="cmd-table">
+            <thead>
+                <tr>
+                    <th>Shortcut</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Esc</td>
+                    <td>Stop Claude mid-action (context preserved, redirect immediately)</td>
+                </tr>
+                <tr>
+                    <td>Esc + Esc</td>
+                    <td>Open rewind menu — restore checkpoints or summarize from a point</td>
+                </tr>
+                <tr>
+                    <td>Shift+Tab</td>
+                    <td>Toggle Auto-accept mode — let Claude work autonomously</td>
+                </tr>
+                <tr>
+                    <td>Ctrl+G / Shift+Tab×2</td>
+                    <td>Toggle Plan Mode — read-only analysis, no code changes</td>
+                </tr>
+                <tr>
+                    <td>Cmd+Shift+X</td>
+                    <td>Open VS Code Extensions panel (for installation)</td>
+                </tr>
+                <tr>
+                    <td>Cmd+Shift+P</td>
+                    <td>Open VS Code Command Palette (to activate Claude Code)</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="container reveal">
+        <div class="section-label">CLI Flags</div>
+        <h2 class="section-title">Command-Line Options</h2>
+
+        <table class="cmd-table">
+            <thead>
+                <tr>
+                    <th>Flag</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>claude -p "prompt"</td>
+                    <td>Headless mode — process prompt and exit</td>
+                </tr>
+                <tr>
+                    <td>--output-format json</td>
+                    <td>JSON output for scripting (also: text, stream-json)</td>
+                </tr>
+                <tr>
+                    <td>--continue</td>
+                    <td>Resume the most recent conversation</td>
+                </tr>
+                <tr>
+                    <td>--resume</td>
+                    <td>Select from recent conversations to resume</td>
+                </tr>
+                <tr>
+                    <td>--worktree [name]</td>
+                    <td>Start in an isolated git worktree (auto-name if no name given)</td>
+                </tr>
+                <tr>
+                    <td>--from-pr &lt;number&gt;</td>
+                    <td>Start a session pre-loaded with a PR's context</td>
+                </tr>
+                <tr>
+                    <td>--allowedTools "..."</td>
+                    <td>Restrict tools Claude can use (e.g., "Edit,Bash(git commit *)")</td>
+                </tr>
+                <tr>
+                    <td>--dangerously-skip-permissions</td>
+                    <td>Skip all permission prompts (sandbox only!)</td>
+                </tr>
+                <tr>
+                    <td>--verbose</td>
+                    <td>Show detailed output for debugging</td>
+                </tr>
+                <tr>
+                    <td>claude mcp add</td>
+                    <td>Add an MCP server connection</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="container reveal">
+        <div class="section-label">Quick Prompts</div>
+        <h2 class="section-title">Common One-Liners</h2>
+
+        <div class="code-block" data-label="productivity one-liners"><code><span class="code-comment"># Explore a codebase</span>
+claude "give me an overview of this codebase"
+claude "trace the login process from front-end to database"
+
+<span class="code-comment"># Bug fixing</span>
+claude "I'm seeing an error when I run npm test"
+claude "suggest a few ways to fix the @ts-ignore in user.ts"
+
+<span class="code-comment"># Tests</span>
+claude "find functions in NotificationsService.swift not covered by tests"
+claude "write tests for the auth module, run them, fix failures"
+
+<span class="code-comment"># Refactoring</span>
+claude "refactor utils.js to use ES2024 features, maintain same behavior"
+claude "find deprecated API usage in our codebase"
+
+<span class="code-comment"># Documentation</span>
+claude "add JSDoc comments to undocumented functions in auth.js"
+
+<span class="code-comment"># Git</span>
+claude "commit with a descriptive message and open a PR"
+claude "summarize the changes I've made to the authentication module"</code></div>
+    </section>
+
+    <section class="container">
+        <div class="page-nav">
+            <a href="09_multi_agent.html"><span class="nav-dir">← Previous</span><span class="nav-title">Multi-Agent
+                    Development</span></a>
+            <a href="11_anti_patterns.html" class="next"><span class="nav-dir">Next →</span><span
+                    class="nav-title">Anti-Patterns & Pitfalls</span></a>
+        </div>
+    </section>
+    <footer>
+        <p>Claude Code Mastery Guide · <a href="https://docs.anthropic.com/en/docs/claude-code/common-workflows"
+                target="_blank">Source: Anthropic Docs</a></p>
+    </footer>
+    <script src="js/components.js"></script>
+</body>
+
+</html>

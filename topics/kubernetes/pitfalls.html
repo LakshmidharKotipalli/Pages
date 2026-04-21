@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pitfalls & War Stories - Learn Kubernetes</title>
+    <link rel="stylesheet" href="../../css/styles.css">
+    <link rel="stylesheet" href="theme.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <a href="index.html">← Back to Overview</a>
+        <span class="current-section">Pitfalls & War Stories</span>
+    </nav>
+
+    <main>
+        <h1>Kubernetes Pitfalls & War Stories</h1>
+        <p class="intro">These are the real production failures that have caused outages, data loss, and millions in costs. Learn from these mistakes so you don't repeat them. Every pitfall includes severity ratings, real incidents, and prevention strategies.</p>
+
+        <section class="intro-section">
+            <div class="card warning">
+                <h3>⚠️ How to Use These Pitfalls</h3>
+                <p><strong>For learning:</strong> Read these to understand what <em>not</em> to do. Each pitfall is a lesson learned the hard way by real companies.</p>
+                <p><strong>For interviews:</strong> When asked about "challenges you've faced with Kubernetes," these pitfalls provide talking points. Show you understand production realities.</p>
+                <p><strong>For prevention:</strong> Use the checklists to set up your cluster correctly from day one. Prevention is 100x cheaper than cure.</p>
+                <p><strong>The shipping port analogy:</strong> These are the operational nightmares that shipping ports face and how experienced operators avoid them.</p>
+            </div>
+
+            <div class="severity-guide">
+                <h3>Severity Ratings Explained</h3>
+                <div class="severity-grid">
+                    <div class="severity-item critical">
+                        <div class="severity-label">CRITICAL</div>
+                        <p>Complete system failure, data loss, security breach, or major revenue impact. Immediate action required.</p>
+                    </div>
+                    <div class="severity-item high">
+                        <div class="severity-label">HIGH</div>
+                        <p>Significant service degradation, partial outage, or notable cost impact. Users affected.</p>
+                    </div>
+                    <div class="severity-item medium">
+                        <div class="severity-label">MEDIUM</div>
+                        <p>Service issues, increased toil, or moderate cost impact. Workarounds possible.</p>
+                    </div>
+                    <div class="severity-item low">
+                        <div class="severity-label">LOW</div>
+                        <p>Nuisance issues, minor inefficiencies, or small cost leaks. Not urgent but should fix.</p>
+                    </div>
+                </div>
+
+                <h3>Frequency Ratings Explained</h3>
+                <div class="frequency-grid">
+                    <div class="frequency-item">
+                        <span class="freq-label very-common">Very Common</span>
+                        <p>Seen in most companies running K8s at scale</p>
+                    </div>
+                    <div class="frequency-item">
+                        <span class="freq-label common">Common</span>
+                        <p>Frequently encountered in production environments</p>
+                    </div>
+                    <div class="frequency-item">
+                        <span class="freq-label occasional">Occasional</span>
+                        <p>Less common but still happens regularly</p>
+                    </div>
+                    <div class="frequency-item">
+                        <span class="freq-label rare">Rare</span>
+                        <p>Unusual but catastrophic when it occurs</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PITFALL 1 -->
+        <section class="pitfall-section">
+            <div class="pitfall-header">
+                <h2>Pitfall 1: Missing or Misconfigured Health Checks</h2>
+                <div class="pitfall-meta">
+                    <span class="severity critical">CRITICAL</span>
+                    <span class="frequency very-common">Very Common</span>
+                </div>
+            </div>
+
+            <div class="pitfall-content">
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>🪚 The Mistake</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="mistake-description">
+                                <p>Deploying pods without <code>readinessProbe</code> and <code>livenessProbe</code>, or configuring them incorrectly.</p>
+
+                                <p><strong>Common variations:</strong></p>
+                                <ul>
+                                    <li>No health checks at all</li>
+                                    <li>Probes checking wrong endpoint (e.g., "/" instead of "/health")</li>
+                                    <li>initialDelaySeconds too short (app not ready when probes start)</li>
+                                    <li>periodSeconds too long (5+ minutes to detect failure)</li>
+                                    <li>Liveness and readiness using same endpoint</li>
+                                </ul>
+
+                                <p><strong>Why it happens:</strong></p>
+                                <ul>
+                                    <li>"It works in dev, why add probes?"</li>
+                                    <li>Unclear difference between liveness and readiness</li>
+                                    <li>Copy-pasting from examples without understanding</li>
+                                    <li>Fear of "restart loops" from aggressive probes</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>😵 Why It Felt Right at the Time</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="pitfall-rationale">
+                                <p><strong>The thinking:</strong> "Our app is simple. It starts, it works. Why add complexity?"</p>
+
+                                <p><strong>Reality:</strong> Kubernetes needs to know pod health to:</p>
+                                <ul>
+                                    <li>Restart dead pods (self-healing)</li>
+                                    <li>Remove broken pods from service load balancer</li>
+                                    <li>Handle rolling updates (wait for new pods to be ready before killing old ones)</li>
+                                </ul>
+
+                                <p><strong>Shipping port analogy:</strong> Cranes have no health monitoring. A crane breaks but keeps appearing as "available" on the dispatch board. Control tower keeps sending trucks to that crane. Trucks pile up. Operations slow down. If there were health checks ("Is crane actually working?"), broken cranes would be marked "out of service" immediately.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>💥 Production Impact</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="impact-details">
+                                <p><strong>Downtime:</strong> 1-4 hours typical, up to days in extreme cases</p>
+                                <p><strong>Users affected:</strong> 10-100% (depending on service criticality)</p>
+                                <p><strong>Cost impact:</strong> $10K - $1M+ (depending on business)</p>
+
+                                <p><strong>Specific impacts:</strong></p>
+                                <ul>
+                                    <li><strong>Rolling update fails:</strong> New pods not ready, old pods killed. Service down.</li>
+                                    <li><strong>Dead pods receive traffic:</strong> Pod crashed but Service doesn't know. Users see 500 errors.</li>
+                                    <li><strong>Restart loops:</strong> Liveness probe too aggressive. Pod crashes, restarts, crashes again. Never serves traffic.</li>
+                                    <li><strong>Slow detection:</strong> Probe checks every 60 seconds. Pod dead for 59 seconds. High error rate.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>🔧 How We Fixed It</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="fix-details">
+                                <h5>Immediate Fix (during incident)</h5>
+                                <ul>
+                                    <li>Delete broken deployment: <code>kubectl delete deployment/app</code></li>
+                                    <li>Redeploy with correct probes (add to YAML, apply)</li>
+                                    <li>Or manually patch: <code>kubectl patch deployment/app</code></li>
+                                </ul>
+
+                                <h5>Proper Configuration</h5>
+                                <pre>
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: 8080
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /ready
+    port: 8080
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+                                </pre>
+
+                                <h5>Key Differences</h5>
+                                <ul>
+                                    <li><strong>Liveness:</strong> "Is the app alive?" If fails → restart pod. Checks deep health (database connection, memory OK).</li>
+                                    <li><strong>Readiness:</strong> "Can the app serve traffic?" If fails → remove from Service. Checks if app is ready (loaded config, warmed cache).</li>
+                                </ul>
+
+                                <h5>Testing Probes</h5>
+                                <ul>
+                                    <li>Deploy to dev/test with aggressive probes (periodSeconds: 1)</li>
+                                    <li>Crash app, verify it restarts within expected time</li>
+                                    <li>Overload app, verify readiness probe fails before OOM</li>
+                                    <li>Check logs, verify probes aren't causing restarts</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>🛡️ How to Prevent It</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="prevention-checklist">
+                                <h5>Prevention Checklist</h5>
+                                <div class="checklist">
+                                    <div class="checklist-item">
+                                        <input type="checkbox" id="pitfall1-1">
+                                        <label for="pitfall1-1">Add liveness and readiness probes to ALL deployments</label>
+                                    </div>
+                                    <div class="checklist-item">
+                                        <input type="checkbox" id="pitfall1-2">
+                                        <label for="pitfall1-2">Use different endpoints for liveness (/healthz) and readiness (/ready)</label>
+                                    </div>
+                                    <div class="checklist-item">
+                                        <input type="checkbox" id="pitfall1-3">
+                                        <label for="pitfall1-3">Set initialDelaySeconds long enough for app to start (measure in dev)</label>
+                                    </div>
+                                    <div class="checklist-item">
+                                        <input type="checkbox" id="pitfall1-4">
+                                        <label for="pitfall1-4">Set periodSeconds to 10 or less (fast failure detection)</label>
+                                    </div>
+                                    <div class="checklist-item">
+                                        <input type="checkbox" id="pitfall1-5">
+                                        <label for="pitfall1-5">Test probes by killing process, overloading CPU, blocking database</label>
+                                    </div>
+                                    <div class="checklist-item">
+                                        <input type="checkbox" id="pitfall1-6">
+                                        <label for="pitfall1-6">Monitor probe failures in metrics (alert on high rate)</label>
+                                    </div>
+                                </div>
+
+                                <h5>Automated Enforcement</h5>
+                                <ul>
+                                    <li><strong>Admission webhook:</strong> Reject pods without probes</li>
+                                    <li><strong>Policy:</strong> OPA Gatekeeper rule requiring probes</li>
+                                    <li><strong>CI/CD:</strong> Helm chart template requires probe values</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>🏭 Real Production War Stories</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="war-stories">
+                                <div class="story">
+                                    <div class="story-company">Major E-commerce Platform</div>
+                                    <p><strong>Incident:</strong> Deployed new version with readiness probe pointing to root URL ("/"). Root endpoint returned 200 OK even if app wasn't ready (database still connecting).</p>
+                                    <p><strong>What happened:</strong></p>
+                                    <ol>
+                                        <li>Rolling update started</li>
+                                        <li>New pods returned 200 on / (readiness probe passed)</li>
+                                        <li>Old pods killed</li>
+                                        <li>New pods couldn't handle requests (database not ready)</li>
+                                        <li>100% of requests failed</li>
+                                        <li>Site down for 45 minutes</li>
+                                    </ol>
+                                    <p><strong>Fix:</strong> Changed readiness probe to "/ready" which checks database connection. Only passes when app can actually serve requests.</p>
+                                    <p><strong>Cost:</strong> $2M in lost sales during Black Friday period.</p>
+                                </div>
+
+                                <div class="story">
+                                    <div class="story-company">SaaS Company</div>
+                                    <p><strong>Incident:</strong> No liveness probe configured. App had memory leak that gradually made it unresponsive.</p>
+                                    <p><strong>What happened:</strong></p>
+                                    <ul>
+                                        <li>App ran for days, memory usage slowly increased</li>
+                                        <li>Eventually app hung (99% memory, constant GC)</li>
+                                        <li>Kubernetes didn't know pod was dead (no liveness probe)</li>
+                                        <li>Pod stayed in "Running" state but served no requests</li>
+                                        <li>Users saw timeout errors</li>
+                                        <li>Took 4 hours to debug (pod looked healthy in kubectl get pods)</li>
+                                    </ul>
+                                    <p><strong>Fix:</strong> Added liveness probe that checks /healthz endpoint every 10 seconds. When app hangs, probe fails, pod restarts automatically.</p>
+                                    <p><strong>Lesson:</strong> "Pods can be 'Running' but dead. Liveness probes detect zombie pods."</p>
+                                </div>
+
+                                <div class="story">
+                                    <div class="story-company">Financial Services</div>
+                                    <p><strong>Incident:</strong> Liveness probe too aggressive (periodSeconds: 1, failureThreshold: 1). App occasionally took 2 seconds to respond to health check.</p>
+                                    <p><strong>What happened:</strong></p>
+                                    <ul>
+                                        <li>Under load, health check response time increased to 2 seconds</li>
+                                        <li>Liveness probe timed out (timeoutSeconds: 1)</li>
+                                        <li>Pod restarted</li>
+                                        <li>New pod started, got hit with load, health check timed out again</li>
+                                        <li>Restart loop: pod up → health check fails → restart → repeat</li>
+                                        <li>Service never available</li>
+                                    </ul>
+                                    <p><strong>Fix:</strong> Increased timeoutSeconds to 5, failureThreshold to 3. Pod restarts only if consistently unhealthy for 15 seconds, not 1 second.</p>
+                                    <p><strong>Lesson:</strong> "Probes should detect real failures, not temporary slow responses. Tune based on production metrics."</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>📚 Lesson Learned</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="lesson-learned">
+                                <p><strong>Core principle:</strong> Kubernetes self-healing only works if it knows pods are unhealthy. Health checks are the communication channel between pods and K8s.</p>
+
+                                <p><strong>Design your health check endpoints carefully:</strong></p>
+                                <ul>
+                                    <li><strong>/healthz (liveness):</strong> Minimal check. App process running? Not deadlocked?</li>
+                                    <li><strong>/ready (readiness):</strong> Can I serve traffic? Database connected? Cache warmed? Config loaded?</li>
+                                    <li><strong>/live (optional):</strong> Deep health. All dependencies OK? (Use with caution—can cause cascading failures)</li>
+                                </ul>
+
+                                <p><strong>Never use the same endpoint for liveness and readiness.</strong> If app is temporarily overloaded (readiness should fail), liveness shouldn't fail (don't restart, just remove from load balancer).</p>
+
+                                <p><strong>Monitor probe failures in production.</strong> Alert on high probe failure rate. It's early warning of app issues before users are affected.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PITFALL 2 -->
+        <section class="pitfall-section">
+            <div class="pitfall-header">
+                <h2>Pitfall 2: Forgetting Persistent Volumes for Stateful Apps</h2>
+                <div class="pitfall-meta">
+                    <span class="severity critical">CRITICAL</span>
+                    <span class="frequency common">Common</span>
+                </div>
+            </div>
+
+            <div class="pitfall-content">
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>🪚 The Mistake</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="mistake-description">
+                                <p>Deploying a stateful application (database, message queue) without PersistentVolumes. Pod restart → all data lost.</p>
+
+                                <p><strong>How it happens:</strong></p>
+                                <ul>
+                                    <li>Deploying database like a stateless app (no PVC)</li>
+                                    <li>Using emptyDir (dies with pod) instead of PVC</li>
+                                    <li>Using hostPath (works on single node, breaks when pod reschedules)</li>
+                                    <li>Forgetting to add volumeMount to container spec</li>
+                                </ul>
+
+                                <p><strong>Why it happens:</strong></p>
+                                <ul>
+                                    <li>Coming from VM world (data stays on disk by default)</li>
+                                    <li>Testing locally (minikube) where data persists by accident</li>
+                                    <li>Unclear difference between emptyDir, hostPath, and PVC</li>
+                                    <li>"We'll add PVC later" (later = after data loss)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>😵 Why It Felt Right at the Time</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="pitfall-rationale">
+                                <p><strong>The thinking:</strong> "Pods are like VMs. I write to disk, data stays. Why do I need special storage?"</p>
+
+                                <p><strong>Reality:</strong> Pods are ephemeral. When a pod restarts, it's a NEW pod. Nothing persists unless explicitly mounted.</p>
+
+                                <p><strong>Shipping port analogy:</strong> Imagine storing goods directly on the dock instead of in warehouses. When a crane moves to a different dock, all goods left behind. Warehouses (PVC) provide permanent storage independent of cranes (pods).</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>💥 Production Impact</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="impact-details">
+                                <p><strong>Data loss:</strong> 100% of data in pod filesystem</p>
+                                <p><strong>Downtime:</strong> Hours to days (restore from backup, replay logs)</p>
+                                <p><strong>Users affected:</strong> 100% if critical data lost</p>
+
+                                <p><strong>Specific impacts:</strong></p>
+                                <ul>
+                                    <li><strong>Database: All transactions since last backup lost</strong></li>
+                                    <li><strong>Message queue: All in-flight messages lost</strong></li>
+                                    <li><strong>File storage: All user uploads lost</strong></li>
+                                    <li><strong>Config: State lost, app restarts from zero</strong></li>
+                                </ul>
+
+                                <p><strong>Recovery scenarios:</strong></p>
+                                <ul>
+                                    <li>Restore from backup (hours of downtime, data loss since backup)</li>
+                                    <li>Replay transaction logs (possible for some databases, complex)</li>
+                                    <li>Manual data reconstruction (weeks, if possible at all)</li>
+                                    <li>Accept data loss (user-facing, regulatory issues)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>🔧 How We Fixed It</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="fix-details">
+                                <h5>Immediate Fix (after data loss)</h5>
+                                <ul>
+                                    <li>Restore database from backup (if available)</li>
+                                    <li>Add PersistentVolumeClaim to deployment</li>
+                                    <li>Redeploy with PVC mounted</li>
+                                    <li>Restore data to new PVC</li>
+                                </ul>
+
+                                <h5>Proper Configuration</h5>
+                                <pre>
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: db-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: fast-ssd  # Use fast storage for databases
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgresql
+spec:
+  template:
+    spec:
+      volumes:
+      - name: db-data
+        persistentVolumeClaim:
+          claimName: db-data
+      containers:
+      - name: postgresql
+        volumeMounts:
+        - name: db-data
+          mountPath: /var/lib/postgresql/data
+                                </pre>
+
+                                <h5>For StatefulSets (recommended for databases)</h5>
+                                <ul>
+                                    <li>Use volumeClaimTemplates (auto-creates PVC for each replica)</li>
+                                    <li>Each pod gets stable storage (postgresql-0, postgresql-1, etc.)</li>
+                                    <li>When pod reschedules, PVC follows (same data)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>🛡️ How to Prevent It</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="prevention-checklist">
+                                <h5>Prevention Checklist</h5>
+                                <div class="checklist">
+                                    <div class="checklist-item">
+                                        <input type="checkbox" id="pitfall2-1">
+                                        <label for="pitfall2-1">Ask: "Does this app need data to persist?" If yes → use PVC</label>
+                                    </div>
+                                    <div class="checklist-item">
+                                        <input type="checkbox" id="pitfall2-2">
+                                        <label for="pitfall2-2">Never use emptyDir for stateful data (dies with pod)</label>
+                                    </div>
+                                    <div class="checklist-item">
+                                        <input type="checkbox" id="pitfall2-3">
+                                        <label for="pitfall2-3">Never use hostPath for production (doesn't survive node failures)</label>
+                                    </div>
+                                    <div class="checklist-item">
+                                        <input type="checkbox" id="pitfall2-4">
+                                        <label for="pitfall2-4">Use StatefulSet for databases, not Deployment (stable storage)</label>
+                                    </div>
+                                    <div class="checklist-item">
+                                        <input type="checkbox" id="pitfall2-5">
+                                        <label for="pitfall2-5">Set appropriate storage class (fast SSD for databases)</label>
+                                    </div>
+                                    <div class="checklist-item">
+                                        <input type="checkbox" id="pitfall2-6">
+                                        <label for="pitfall2-6">Test pod restart: kubectl delete pod, verify data persists</label>
+                                    </div>
+                                    <div class="checklist-item">
+                                        <input type="checkbox" id="pitfall2-7">
+                                        <label for="pitfall2-7">Regular backups: PVC doesn't protect against corruption/deletion</label>
+                                    </div>
+                                </div>
+
+                                <h5>Automated Detection</h5>
+                                <ul>
+                                    <li><strong>Admission webhook:</strong> Warn if StatefulSet has no volumeClaimTemplates</li>
+                                    <li><strong>Monitoring:</strong> Alert if PVC usage > 80% (avoid out-of-space)</li>
+                                    <li><strong>Policy:</strong> Require PVC review for all new stateful workloads</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>🏭 Real Production War Stories</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="war-stories">
+                                <div class="story">
+                                    <div class="story-company">Healthcare Startup</div>
+                                    <p><strong>Incident:</strong> Deployed PostgreSQL database using Deployment (not StatefulSet), no PVC.</p>
+                                    <p><strong>What happened:</strong></p>
+                                    <ul>
+                                        <li>Database running for 3 months, storing patient records</li>
+                                        <li>Node failure scheduled for maintenance</li>
+                                        <li>Pod moved to different node</li>
+                                        <li>All data stored in pod container filesystem</li>
+                                        <li>Data stayed on old node's disk</li>
+                                        <li>New pod started with empty database</li>
+                                        <li>3 months of patient records: gone</li>
+                                    </ul>
+                                    <p><strong>Recovery:</strong></p>
+                                    <ul>
+                                        <li>Old node disk retrieved from datacenter</li>
+                                        <li>Disk mounted on another machine</li>
+                                        <li>Data copied off, restored to new PVC</li>
+                                        <li>Total downtime: 18 hours</li>
+                                    </ul>
+                                    <p><strong>Regulatory impact:</strong> HIPAA violation investigation. Fines + mandatory audits.</p>
+                                    <p><strong>Lesson:</strong> "Deployments are for stateless. StatefulSets + PVC for stateful. Period."</p>
+                                </div>
+
+                                <div class="story">
+                                    <div class="story-company">E-commerce Company</div>
+                                    <p><strong>Incident:</strong> Redis cache using emptyDir for persistence (thinking "it's a cache, doesn't need PVC").</p>
+                                    <p><strong>What happened:</strong></p>
+                                    <ul>
+                                        <li>Redis used as session store (user login tokens)</li>
+                                        <li>Node had hardware issue, pod rescheduled</li>
+                                        <li>emptyDir volume died with pod</li>
+                                        <li>All user sessions lost</li>
+                                        <li>500,000 users logged out simultaneously</li>
+                                        <li>Login servers overloaded (everyone trying to re-login)</li>
+                                    </ul>
+                                    <p><strong>Fix:</strong> Migrated to Redis with PVC. Sessions persist across pod restarts.</p>
+                                    <p><strong>Lesson:</strong> "Even 'caches' need persistence if they're the source of truth for anything."</p>
+                                </div>
+
+                                <div class="story">
+                                    <div class="story-company">Media Company</div>
+                                    <p><strong>Incident:</strong> User-generated content (uploaded videos) stored in pod filesystem.</p>
+                                    <p><strong>What happened:</strong></p>
+                                    <ul>
+                                        <li>Users uploaded videos to /uploads in pod</li>
+                                        <li>No PVC, videos stored in container layer</li>
+                                        <li>Deployment triggered (rolling update for new feature)</li>
+                                        <li>Old pod terminated, new pod started</li>
+                                        <li>Old pod's container deleted (all uploads lost)</li>
+                                        <li>Users who uploaded videos in last 2 hours: videos gone</li>
+                                    </ul>
+                                    <p><strong>Fix:</strong> Store user uploads in object storage (S3, GCS) with PVC for temporary processing only.</p>
+                                    <p><strong>Lesson:</strong> "User data never goes in pod filesystem. Always external storage (S3, database with PVC)."</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>📚 Lesson Learned</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="lesson-learned">
+                                <p><strong>Core principle:</strong> Pods are ephemeral by design. Data persistence is opt-in, not opt-out. If you need data to survive pod restarts, use PVC.</p>
+
+                                <p><strong>Decision tree:</strong></p>
+                                <ul>
+                                    <li><strong>Does the app write data?</strong> No → no PVC needed</li>
+                                    <li><strong>Is the data reconstructible?</strong> Yes (cache) → PVC optional</li>
+                                    <li><strong>Is the data irreplaceable?</strong> Yes (database, user data) → PVC required</li>
+                                </ul>
+
+                                <p><strong>Storage classes matter:</strong></p>
+                                <ul>
+                                    <li>Use fast SSD for databases (low latency)</li>
+                                    <li>Use standard HDD for logs/archives (cheaper)</li>
+                                    <li>Consider network storage (NFS, EFS) for shared access</li>
+                                </ul>
+
+                                <p><strong>PVC ≠ Backup:</strong> PVC protects against pod/node failures. It doesn't protect against:</p>
+                                <ul>
+                                    <li>Accidental deletion (kubectl delete pvc)</li>
+                                    <li>Corruption (database writes bad data)</li>
+                                    <li>Disaster (datacenter destruction)</li>
+                                </ul>
+                                <p>You still need backups: regular snapshots, point-in-time recovery, cross-region replication.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PITFALL 3 -->
+        <section class="pitfall-section">
+            <div class="pitfall-header">
+                <h2>Pitfall 3: Namespace Confusion & Resource Collisions</h2>
+                <div class="pitfall-meta">
+                    <span class="severity high">HIGH</span>
+                    <span class="frequency very-common">Very Common</span>
+                </div>
+            </div>
+
+            <div class="pitfall-content">
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>🪚 The Mistake</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="mistake-description">
+                                <p>Deploying everything to the <code>default</code> namespace, causing naming conflicts, accidental deletions, and security issues.</p>
+
+                                <p><strong>Common variations:</strong></p>
+                                <ul>
+                                    <li>All apps in default namespace</li>
+                                    <li>Dev, test, prod in same namespace</li>
+                                    <li>Multiple teams sharing one namespace</li>
+                                    <li>No resource quotas, namespaces compete for resources</li>
+                                </ul>
+
+                                <p><strong>Why it happens:</strong></p>
+                                <ul>
+                                    <li>Default namespace exists, why create others?</li>
+                                    <li>Simplest path (kubectl apply without -n namespace)</li>
+                                    <li>Small team, "we don't need isolation"</li>
+                                    <li>Unclear when to use namespaces</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>😵 Why It Felt Right at the Time</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="pitfall-rationale">
+                                <p><strong>The thinking:</strong> "We have 5 apps. Why make 5 namespaces? Complicates things."</p>
+
+                                <p><strong>Reality:</strong> Namespaces provide isolation for resources, security, and organization. As you scale, lack of namespaces becomes chaos.</p>
+
+                                <p><strong>Shipping port analogy:</strong> Like having all companies' containers in one big pile. No separation. Company A accidentally picks up Company B's container. Crane operator doesn't know which container belongs to whom. Disorganized operations, accidental mix-ups, security risks.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>💥 Production Impact</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="impact-details">
+                                <p><strong>Common incidents:</strong></p>
+                                <ul>
+                                    <li><strong>Naming conflicts:</strong> Two teams deploy "database" Deployment. Second overwrites first.</li>
+                                    <li><strong>Accidental deletions:</strong> <code>kubectl delete all</code> deletes everything, including other teams' apps.</li>
+                                    <li><strong>Noisy neighbor:</strong> Team A's job uses all CPU, Team B's apps starve.</li>
+                                    <li><strong>Security issues:</strong> Team A can see Team B's pods, logs, secrets.</li>
+                                    <li><strong>Resource exhaustion:</strong> No quota limits, one job can fill cluster disk.</li>
+                                </ul>
+
+                                <p><strong>Downtime:</strong> 1-8 hours typical</p>
+                                <p><strong>Users affected:</strong> 10-100% (depending on conflict)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>🔧 How We Fixed It</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="fix-details">
+                                <h5>Migrate to Namespaced Structure</h5>
+                                <pre>
+# Create namespaces
+kubectl create namespace dev
+kubectl create namespace staging
+kubectl create namespace production
+kubectl create namespace team-a
+kubectl create namespace team-b
+
+# Set resource quotas
+kubectl apply -f quota.yaml -n production
+
+# Deploy to namespace
+kubectl apply -f app.yaml -n production
+# or set default namespace in context
+kubectl config set-context --current --namespace=production
+                                </pre>
+
+                                <h5>Resource Quota Example</h5>
+                                <pre>
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: compute-quota
+  namespace: production
+spec:
+  hard:
+    requests.cpu: "100"
+    requests.memory: 200Gi
+    limits.cpu: "200"
+    limits.memory: 400Gi
+    persistentvolumeclaims: "10"
+                                </pre>
+
+                                <h5>Network Policy (isolation)</h5>
+                                <pre>
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-from-other-namespaces
+  namespace: production
+spec:
+  podSelector:
+    matchLabels: {}
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector: {}
+                                </pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>🛡️ How to Prevent It</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="prevention-checklist">
+                                <h5>Prevention Checklist</h5>
+                                <div class="checklist">
+                                    <div class="checklist-item">
+                                        <input type="checkbox" id="pitfall3-1">
+                                        <label for="pitfall3-1">Create namespace for each environment (dev, staging, prod)</label>
+                                    </div>
+                                    <div class="checklist-item">
+                                        <input type="checkbox" id="pitfall3-2">
+                                        <label for="pitfall3-2">Create namespace for each team (team-a, team-b)</label>
+                                    </div>
+                                    <div class="checklist-item">
+                                        <input type="checkbox" id="pitfall3-3">
+                                        <label for="pitfall3-3">Set resource quotas on each namespace (prevent resource exhaustion)</label>
+                                    </div>
+                                    <div class="checklist-item">
+                                        <input type="checkbox" id="pitfall3-4">
+                                        <label for="pitfall3-4">Set LimitRange (default resource limits for pods)</label>
+                                    </div>
+                                    <div class="checklist-item">
+                                        <input type="checkbox" id="pitfall3-5">
+                                        <label for="pitfall3-5">Use NetworkPolicy (isolate namespaces, prevent cross-namespace access)</label>
+                                    </div>
+                                    <div class="checklist-item">
+                                        <input type="checkbox" id="pitfall3-6">
+                                        <label for="pitfall3-6">Use RBAC (restrict teams to their namespaces only)</label>
+                                    </div>
+                                    <div class="checklist-item">
+                                        <input type="checkbox" id="pitfall3-7">
+                                        <label for="pitfall3-7">Never deploy to default namespace in production</label>
+                                    </div>
+                                </div>
+
+                                <h5>Best Practices</h5>
+                                <ul>
+                                    <li><strong>One namespace per environment:</strong> dev, staging, production</li>
+                                    <li><strong>One namespace per team:</strong> team-a, team-b, platform</li>
+                                    <li><strong>Resource quotas:</strong> Every namespace has CPU/memory limits</li>
+                                    <li><strong>Network policies:</strong> Isolate production from dev/staging</li>
+                                    <li><strong>RBAC:</strong> Teams can only access their namespaces</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>🏭 Real Production War Stories</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="war-stories">
+                                <div class="story">
+                                    <div class="story-company">Startup</div>
+                                    <p><strong>Incident:</strong> New developer joined, followed runbook: <code>kubectl delete pod -l app=database</code> to restart database.</p>
+                                    <p><strong>What happened:</strong></p>
+                                    <ul>
+                                        <li>Developer was in default namespace</li>
+                                        <li>Ran command without -n flag</li>
+                                        <li>Deleted ALL pods with label app=database in ALL namespaces</li>
+                                        <li>Dev, staging, production databases all deleted simultaneously</li>
+                                        <li>Production down for 2 hours</li>
+                                    </ul>
+                                    <p><strong>Fix:</strong> Separate namespaces. Developer only has access to dev namespace. Can't affect production.</p>
+                                    <p><strong>Lesson:</strong> "Namespaces are security boundaries. RBAC + namespaces = least privilege."</p>
+                                </div>
+
+                                <div class="story">
+                                    <div class="story-company">Mid-size Company</div>
+                                    <p><strong>Incident:</strong> Team A deployed job named "processor". Team B had job with same name.</p>
+                                    <p><strong>What happened:</strong></p>
+                                    <ul>
+                                        <li>Both teams using default namespace</li>
+                                        <li>Team A's job overwritten by Team B's job</li>
+                                        <li>Team A's critical data processing stopped</li>
+                                        <li>Team A didn't notice for 12 hours (job didn't fail, just replaced)</li>
+                                        <li>Data pipeline broken, analytics wrong</li>
+                                    </ul>
+                                    <p><strong>Fix:</strong> Separate namespaces per team. Resource names don't conflict.</p>
+                                    <p><strong>Lesson:</strong> "Namespaces prevent naming conflicts. They're not just organization, they're isolation."</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>📚 Lesson Learned</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="lesson-learned">
+                                <p><strong>Core principle:</strong> Namespaces are the primary isolation mechanism in Kubernetes. Use them from day one, not after problems start.</p>
+
+                                <p><strong>When to create namespaces:</strong></p>
+                                <ul>
+                                    <li>Per environment: dev, staging, prod</li>
+                                    <li>Per team: team-a, team-b, shared-services</li>
+                                    <li>Per application: For large, multi-component apps</li>
+                                    <li>Per security boundary: Isolate sensitive workloads</li>
+                                </ul>
+
+                                <p><strong>Namespaces provide:</strong></p>
+                                <ul>
+                                    <li><strong>Resource isolation:</strong> Quotas prevent noisy neighbor</li>
+                                    <li><strong>Security isolation:</strong> RBAC restricts access</li>
+                                    <li><strong>Network isolation:</strong> NetworkPolicy controls traffic</li>
+                                    <li><strong>Naming isolation:</strong> Same names in different namespaces don't conflict</li>
+                                </ul>
+
+                                <p><strong>Rule of thumb:</strong> If you have more than 5 developers or more than 3 applications, you need namespaces.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PITFALL 4 -->
+        <section class="pitfall-section">
+            <div class="pitfall-header">
+                <h2>Pitfall 4: Image Pull Errors & Registry Issues</h2>
+                <div class="pitfall-meta">
+                    <span class="severity high">HIGH</span>
+                    <span class="frequency common">Common</span>
+                </div>
+            </div>
+
+            <div class="pitfall-content">
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>🪚 The Mistake</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="mistake-description">
+                                <p>Pods stuck in <code>ImagePullBackOff</code> or <code>ErrImagePull</code> state. Can't start because image can't be pulled.</p>
+
+                                <p><strong>Common causes:</strong></p>
+                                <ul>
+                                    <li>Wrong image name or tag (typo, non-existent tag)</li>
+                                    <li>Private registry without imagePullSecrets</li>
+                                    <li>Registry authentication expired</li>
+                                    <li>Registry down or unreachable</li>
+                                    <li>Image too large, pull timeout</li>
+                                    <li>Network policies block registry access</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>💥 Production Impact</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="impact-details">
+                                <p><strong>Downtime:</strong> 30 minutes to several hours (depending on fix)</p>
+                                <p><strong>Users affected:</strong> 100% of service users</p>
+
+                                <p><strong>Typical scenario:</strong></p>
+                                <ul>
+                                    <li>Deploy new version with updated image tag</li>
+                                    <li>Pods fail to start (ImagePullBackOff)</li>
+                                    <li>Old pods already killed (rolling update)</li>
+                                    <li>Zero pods running → service completely down</li>
+                                    <li>Debug: kubectl describe pod shows image pull error</li>
+                                    <li>Fix: Correct image tag, redeploy</li>
+                                    <li>Recovery time: 30-90 minutes of downtime</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>🔧 How We Fixed It</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="fix-details">
+                                <h5>Immediate Debugging</h5>
+                                <pre>
+# Check pod status
+kubectl get pods
+
+# Describe pod to see error
+kubectl describe pod <pod-name>
+# Look for: Events -> Failed to pull image
+
+# Common errors:
+# - "Failed to pull image": image doesn't exist
+# - "denied": authentication required
+# - "timeout": registry unreachable
+                                </pre>
+
+                                <h5>Solutions by Error Type</h5>
+                                <ul>
+                                    <li><strong>Wrong tag:</strong> Fix image name, redeploy</li>
+                                    <li><strong>Auth required:</strong> Create imagePullSecret, add to deployment</li>
+                                    <li><strong>Registry unreachable:</strong> Check network, DNS, firewall</li>
+                                    <li><strong>Timeout:</strong> Pre-pull images, use local registry cache</li>
+                                </ul>
+
+                                <h5>imagePullSecrets Setup</h5>
+                                <pre>
+# Create secret from registry credentials
+kubectl create secret docker-registry regcred \
+  --docker-server=registry.example.com \
+  --docker-username=user \
+  --docker-password=pass \
+  --docker-email=user@example.com
+
+# Add to deployment
+spec:
+  template:
+    spec:
+      imagePullSecrets:
+      - name: regcred
+                                </pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>🛡️ How to Prevent It</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="prevention-checklist">
+                                <h5>Prevention Checklist</h5>
+                                <div class="checklist">
+                                    <div class="checklist-item">
+                                        <input type="checkbox" id="pitfall4-1">
+                                        <label for="pitfall4-1">Always validate image exists before deploying (docker pull)</label>
+                                    </div>
+                                    <div class="checklist-item">
+                                        <input type="checkbox" id="pitfall4-2">
+                                        <label for="pitfall4-2">Use specific version tags (v1.2.3), not :latest</label>
+                                    </div>
+                                    <div class="checklist-item">
+                                        <input type="checkbox" id="pitfall4-3">
+                                        <label for="pitfall4-3">Set up imagePullSecrets for private registries</label>
+                                    </div>
+                                    <div class="checklist-item">
+                                        <input type="checkbox" id="pitfall4-4">
+                                        <label for="pitfall4-4">Use CI/CD to validate images before deploying</label>
+                                    </div>
+                                    <div class="checklist-item">
+                                        <input type="checkbox" id="pitfall4-5">
+                                        <label for="pitfall4-5">Monitor image pull errors (alert on ImagePullBackOff)</label>
+                                    </div>
+                                    <div class="checklist-item">
+                                        <input type="checkbox" id="pitfall4-6">
+                                        <label for="pitfall4-6">Pre-pull images to nodes (avoid pull time during deploy)</label>
+                                    </div>
+                                </div>
+
+                                <h5>Best Practices</h5>
+                                <ul>
+                                    <li><strong>Validate in CI:</strong> <code>docker pull</code> before kubectl apply</li>
+                                    <li><strong>Use image tag policy:</strong> No :latest in production</li>
+                                    <li><strong>Private registry:</strong> Use auth, rotate secrets regularly</li>
+                                    <li><strong>Registry reliability:</strong> Use managed registries (ECR, GCR) with SLA</li>
+                                    <li><strong>Rollback strategy:</strong> Keep previous images in registry</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h4>🏭 Real Production War Stories</h4>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="war-stories">
+                                <div class="story">
+                                    <div class="story-company">Startup</div>
+                                    <p><strong>Incident:</strong> Deployed with image tag <code>:latest</code>. CI pushed new image with same tag. Existing pods suddenly pulled new image.</p>
+                                    <p><strong>What happened:</strong></p>
+                                    <ul>
+                                        <li>Deployed v1.0 with tag :latest</li>
+                                        <li>CI pushed v1.1 with tag :latest (overwrote)</li>
+                                        <li>Kubernetes saw image digest changed</li>
+                                        <li>Pods restarted with new image unexpectedly</li>
+                                        <li>v1.1 had bug. Production broke at 2 AM.</li>
+                                        <li>On-call confused: "I didn't deploy anything"</li>
+                                    </ul>
+                                    <p><strong>Fix:</strong> Use immutable tags (v1.0.0, v1.0.1). Never :latest in prod.</p>
+                                </div>
+
+                                <div class="story">
+                                    <div class="story-company">Enterprise</div>
+                                    <p><strong>Incident:</strong> Image registry authentication rotated. Deployments started failing.</p>
+                                    <p><strong>What happened:</strong></p>
+                                    <ul>
+                                        <li>Security team rotated registry credentials</li>
+                                        <li>imagePullSecrets still had old credentials</li>
+                                        <li>Deployments failed with "authentication required"</li>
+                                        <li>No one knew secret needed updating</li>
+                                        <li>Downtime: 4 hours (debugging + updating secrets)</li>
+                                    </ul>
+                                    <p><strong>Fix:</strong> Automate secret rotation. Monitor image pull errors.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- KEY TAKEAWAYS -->
+        <section class="key-takeaways">
+            <h2>Key Takeaways: Production Pitfalls</h2>
+
+            <div class="takeaways-grid">
+                <div class="takeaway-card">
+                    <h4>🎯 Health Checks Are Non-Negotiable</h4>
+                    <p>Every deployment needs liveness and readiness probes. Kubernetes can't self-heal if it doesn't know pods are unhealthy.</p>
+                </div>
+
+                <div class="takeaway-card">
+                    <h4>💾 Stateful Workloads Need Persistent Volumes</h4>
+                    <p>Pods are ephemeral. Data in pod filesystem dies with the pod. Use PVC for any data you care about.</p>
+                </div>
+
+                <div class="takeaway-card">
+                    <h4>🏢 Namespaces Provide Isolation</h4>
+                    <p>Don't run everything in default. Namespaces prevent naming conflicts, enable resource quotas, and provide security boundaries.</p>
+                </div>
+
+                <div class="takeaway-card">
+                    <h4>🐳 Image Management Matters</h4>
+                    <p>Use specific version tags. Validate images before deploying. Set up imagePullSecrets for private registries.</p>
+                </div>
+
+                <div class="takeaway-card">
+                    <h4>📊 Prevention Is Cheaper Than Cure</h4>
+                    <p>Every pitfall here has prevention strategies. Implement them before incidents occur. Reactive fixes cost 100x more.</p>
+                </div>
+
+                <div class="takeaway-card">
+                    <h4>🚢 The Shipping Port Analogy Holds</h4>
+                    <p>Health checks, persistent storage, organized sections—these are port operations basics. Kubernetes is no different.</p>
+                </div>
+            </div>
+
+            <div class="card warning">
+                <h3>⚠️ The Most Critical Pitfalls</h3>
+                <p>Based on production incidents, these are the pitfalls that cause the most damage:</p>
+                <ol>
+                    <li><strong>Missing health checks</strong> → Complete outages, rolling update failures</li>
+                    <li><strong>No persistent volumes for databases</strong> → Catastrophic data loss</li>
+                    <li><strong>Running as root</strong> → Security breaches</li>
+                    <li><strong>Secrets in images/git</strong> → Credential leaks, cryptocurrency mining</li>
+                    <li><strong>No resource limits</strong> → Noisy neighbor, cascading failures</li>
+                </ol>
+                <p><strong>Priority:</strong> Address these first. They have the highest severity and frequency.</p>
+            </div>
+        </section>
+
+        <!-- Next Steps -->
+        <section class="next-steps">
+            <h2>Continue Your Journey</h2>
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <h4>💬 Interview Conversations</h4>
+                    <p>Practice interview-style question trees with talking points and war stories.</p>
+                    <a href="conversations.html" class="btn">Interview Prep →</a>
+                </div>
+                <div class="tip-card">
+                    <h4>📖 Patterns & Anti-Patterns</h4>
+                    <p>Learn proven Kubernetes patterns and common anti-patterns to avoid.</p>
+                    <a href="patterns.html" class="btn">View Patterns →</a>
+                </div>
+                <div class="tip-card">
+                    <h4>⚖️ Trade-offs Analysis</h4>
+                    <p>Compare Kubernetes options and understand when to choose each approach.</p>
+                    <a href="tradeoffs.html" class="btn">View Trade-offs →</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="section-nav">
+        <a href="patterns.html" class="prev-btn">← Patterns & Anti-Patterns</a>
+        <a href="tradeoffs.html" class="next-btn">Trade-offs Analysis →</a>
+    </footer>
+
+    <script src="../../js/components.js"></script>
+</body>
+</html>
