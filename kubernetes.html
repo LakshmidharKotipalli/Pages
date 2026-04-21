@@ -17805,5 +17805,102 @@ spec:
   }
 })();
 </script>
+
+<script>/* components-patch */
+
+(function(){
+  'use strict';
+
+  /* ── Accordion ────────────────────────────────── */
+  document.querySelectorAll('.accordion-header').forEach(function(hdr){
+    hdr.style.cursor = 'pointer';
+    hdr.addEventListener('click', function(){
+      var item = this.closest('.accordion-item') || this.parentElement;
+      var wasActive = item.classList.contains('active');
+      // collapse all in same container
+      var parent = item.parentElement;
+      if(parent){
+        parent.querySelectorAll('.accordion-item').forEach(function(i){ i.classList.remove('active'); });
+      }
+      if(!wasActive) item.classList.add('active');
+    });
+  });
+
+  /* ── Tabs ─────────────────────────────────────── */
+  document.querySelectorAll('.tab-button').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var tabId = this.getAttribute('data-tab');
+      var container = this.closest('.tabs-container, .tab-wrapper, section, .topic-section') || document;
+      container.querySelectorAll('.tab-button').forEach(function(b){ b.classList.remove('active'); });
+      container.querySelectorAll('.tab-content').forEach(function(c){ c.classList.remove('active'); });
+      this.classList.add('active');
+      var content = document.getElementById(tabId);
+      if(content) content.classList.add('active');
+    });
+  });
+
+  /* ── Scroll-reveal (level, step, phase cards) ── */
+  if('IntersectionObserver' in window){
+    var revealObs = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){
+          e.target.style.opacity = '1';
+          e.target.style.transform = 'translateY(0)';
+          revealObs.unobserve(e.target);
+        }
+      });
+    }, {threshold: 0.08, rootMargin: '0px 0px -40px 0px'});
+
+    /* Only animate .level and .step — NOT .card or .section to avoid
+       hiding large visible areas in the combined single-page layout */
+    document.querySelectorAll('.level, .step, .phase').forEach(function(el){
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(16px)';
+      el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+      revealObs.observe(el);
+    });
+  }
+
+  /* ── Copy buttons on <pre><code> blocks ───────── */
+  document.querySelectorAll('pre').forEach(function(pre){
+    if(pre.querySelector('.copy-button')) return; // already added
+    var btn = document.createElement('button');
+    btn.className = 'copy-button';
+    btn.textContent = 'Copy';
+    btn.setAttribute('aria-label', 'Copy code');
+    btn.style.cssText = [
+      'position:absolute','top:8px','right:8px',
+      'background:rgba(255,255,255,0.08)','border:1px solid rgba(255,255,255,0.15)',
+      'color:#c9d1d9','font-size:0.72rem','padding:3px 10px',
+      'border-radius:5px','cursor:pointer','font-family:monospace',
+      'transition:background 0.15s'
+    ].join(';');
+    btn.addEventListener('mouseenter', function(){ this.style.background='rgba(255,255,255,0.15)'; });
+    btn.addEventListener('mouseleave', function(){ this.style.background='rgba(255,255,255,0.08)'; });
+    if(getComputedStyle(pre).position === 'static') pre.style.position = 'relative';
+    pre.appendChild(btn);
+    btn.addEventListener('click', function(){
+      var code = pre.querySelector('code');
+      var text = code ? code.textContent : pre.textContent;
+      navigator.clipboard.writeText(text).then(function(){
+        btn.textContent = 'Copied!';
+        setTimeout(function(){ btn.textContent = 'Copy'; }, 2000);
+      }).catch(function(){
+        btn.textContent = 'Error';
+        setTimeout(function(){ btn.textContent = 'Copy'; }, 2000);
+      });
+    });
+  });
+
+  /* ── Details/summary polyfill for older browsers ─ */
+  document.querySelectorAll('details').forEach(function(d){
+    var summary = d.querySelector('summary');
+    if(!summary) return;
+    summary.style.cursor = 'pointer';
+  });
+
+})();
+
+</script>
 </body>
 </html>
